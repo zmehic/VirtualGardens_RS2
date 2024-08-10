@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.9.34622.214
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualGardens.API", "VirtualGardens.API\VirtualGardens.API.csproj", "{7A53780A-8215-4163-924F-7DC50862D61E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualGardens.Models", "VirtualGardens.Models\VirtualGardens.Models.csproj", "{3068F1A4-C5C2-4049-BD0D-5789AC9953BA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7A53780A-8215-4163-924F-7DC50862D61E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A53780A-8215-4163-924F-7DC50862D61E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A53780A-8215-4163-924F-7DC50862D61E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A53780A-8215-4163-924F-7DC50862D61E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3068F1A4-C5C2-4049-BD0D-5789AC9953BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3068F1A4-C5C2-4049-BD0D-5789AC9953BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3068F1A4-C5C2-4049-BD0D-5789AC9953BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3068F1A4-C5C2-4049-BD0D-5789AC9953BA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AC806F00-E42C-4945-B83B-0BBDE5D9C6A5}
+	EndGlobalSection
+EndGlobal
