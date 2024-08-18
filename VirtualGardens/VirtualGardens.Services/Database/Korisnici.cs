@@ -25,6 +25,10 @@ public partial class Korisnici
 
     public string? Drzava { get; set; }
 
+    public string LozinkaHash { get; set; } = null!;
+
+    public string LozinkaSalt { get; set; } = null!;
+
     public DateTime DatumRegistracije { get; set; }
 
     public DateTime? ZadnjiLogin { get; set; }

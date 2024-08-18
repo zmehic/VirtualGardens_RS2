@@ -230,7 +230,6 @@ public partial class _210011Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Slika).HasColumnType("image");
             entity.Property(e => e.SlikaThumb).HasColumnType("image");
-            entity.Property(e => e.TloTloId).HasColumnName("TloTloID");
             entity.Property(e => e.VrstaProizvodaId).HasColumnName("VrstaProizvodaID");
 
             entity.HasOne(d => d.JedinicaMjere).WithMany(p => p.Proizvodis)

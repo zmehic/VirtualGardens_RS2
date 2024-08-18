@@ -19,8 +19,6 @@ public partial class Proizvodi
 
     public int JedinicaMjereId { get; set; }
 
-    public int TloTloId { get; set; }
-
     public int VrstaProizvodaId { get; set; }
 
     public byte[]? SlikaThumb { get; set; }
