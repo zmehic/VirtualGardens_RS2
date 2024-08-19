@@ -9,7 +9,7 @@ public partial class Ulazi
 
     public string BrojUlaza { get; set; } = null!;
 
-    public DateTime DatumUlaza { get; set; }
+    public DateTime DatumUlaza { get; set; } = DateTime.Now;
 
     public int KorisnikId { get; set; }
 

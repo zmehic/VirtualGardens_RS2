@@ -11,7 +11,7 @@ public partial class Ponude
 
     public int? Popust { get; set; }
 
-    public DateTime DatumKreiranja { get; set; }
+    public DateTime DatumKreiranja { get; set; } = DateTime.Now;
 
     public virtual ICollection<SetoviPonude> SetoviPonudes { get; set; } = new List<SetoviPonude>();
 }

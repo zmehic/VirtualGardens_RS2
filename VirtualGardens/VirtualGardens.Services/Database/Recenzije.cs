@@ -13,7 +13,7 @@ public partial class Recenzije
 
     public int KorisnikId { get; set; }
 
-    public DateTime Datum { get; set; }
+    public DateTime Datum { get; set; } = DateTime.Now;
 
     public int ProizvodId { get; set; }
 

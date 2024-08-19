@@ -33,7 +33,7 @@ public partial class Korisnici
 
     public DateTime? ZadnjiLogin { get; set; }
 
-    public bool JeAktivan { get; set; }
+    public bool JeAktivan { get; set; } = true;
 
     public DateTime? DatumRodjenja { get; set; }
 

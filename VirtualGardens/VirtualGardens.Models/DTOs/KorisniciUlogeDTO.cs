@@ -13,5 +13,7 @@ namespace VirtualGardens.Models.DTOs
         public int KorisnikId { get; set; }
 
         public DTOs.UlogeDTO? Uloga { get; set; }
+
+        public DTOs.KorisniciDTO? Korisnik { get; set; }
     }
 }

@@ -82,11 +82,10 @@ namespace VirtualGardens.Services.BaseServices
             try
             {
                 var tableIncludes = includes.Split(',');
-                query=tableIncludes.Aggregate(query,(current,inc)=> current.Include(inc));
+                query = tableIncludes.Aggregate(query, (current,inc)=> current.Include(inc));
             }
             catch (Exception)
             {
-
                 throw new Exception("Pogrešna include lista!");
             }
 

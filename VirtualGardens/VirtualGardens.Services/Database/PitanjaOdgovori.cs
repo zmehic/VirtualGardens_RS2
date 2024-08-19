@@ -9,7 +9,7 @@ public partial class PitanjaOdgovori
 
     public string Tekst { get; set; } = null!;
 
-    public DateTime Datum { get; set; }
+    public DateTime Datum { get; set; } = DateTime.Now;
 
     public int KorisnikId { get; set; }
 

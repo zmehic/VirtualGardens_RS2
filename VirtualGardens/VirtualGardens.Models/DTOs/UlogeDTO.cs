@@ -9,6 +9,7 @@ namespace VirtualGardens.Models.DTOs
         public int UlogaId { get; set; }
 
         public string Naziv { get; set; }
+        public string? Opis { get; set; }
 
         //public virtual ICollection<GeneralDTO.KorisniciUlogeDTO> KorisniciUloges { get; set; } = new List<GeneralDTO.KorisniciUlogeDTO>();
     }

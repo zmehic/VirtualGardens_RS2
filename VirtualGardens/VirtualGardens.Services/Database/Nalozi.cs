@@ -9,11 +9,11 @@ public partial class Nalozi
 
     public string BrojNaloga { get; set; } = null!;
 
-    public DateTime DatumKreiranja { get; set; }
+    public DateTime DatumKreiranja { get; set; } = DateTime.Now;
 
     public int ZaposlenikId { get; set; }
 
-    public bool Zavrsen { get; set; }
+    public bool Zavrsen { get; set; } = false;
 
     public virtual ICollection<Narudzbe> Narudzbes { get; set; } = new List<Narudzbe>();
 

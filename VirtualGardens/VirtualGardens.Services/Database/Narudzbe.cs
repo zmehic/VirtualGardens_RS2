@@ -9,11 +9,11 @@ public partial class Narudzbe
 
     public string BrojNarudzbe { get; set; } = null!;
 
-    public bool? Otkazana { get; set; }
+    public bool? Otkazana { get; set; } = false;
 
-    public DateTime Datum { get; set; }
+    public DateTime Datum { get; set; } = DateTime.Now;
 
-    public bool Placeno { get; set; }
+    public bool Placeno { get; set; } = false;
 
     public bool? Status { get; set; }
 

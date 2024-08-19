@@ -10,7 +10,7 @@ using VirtualGardens.Services.BaseInterfaces;
 
 namespace VirtualGardens.Services.AllServices
 {
-    public interface IKorisniciService: ICRUDService<Models.DTOs.KorisniciDTO, KorisniciSearchObject, KorisniciInsertRequest, KorisniciUpdateRequest>
+    public interface IKorisniciService : ICRUDService<Models.DTOs.KorisniciDTO, KorisniciSearchObject, KorisniciInsertRequest, KorisniciUpdateRequest>
     {
         Models.DTOs.KorisniciDTO Login(string username, string password);
     }

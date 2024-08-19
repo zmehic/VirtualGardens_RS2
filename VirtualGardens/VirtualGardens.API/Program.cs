@@ -2,6 +2,21 @@ using Mapster;
 using Microsoft.EntityFrameworkCore;
 using VirtualGardens.Services;
 using VirtualGardens.Services.AllServices;
+using VirtualGardens.Services.AllServices.JediniceMjere;
+using VirtualGardens.Services.AllServices.KorisniciUloge;
+using VirtualGardens.Services.AllServices.Nalozi;
+using VirtualGardens.Services.AllServices.Narudzbe;
+using VirtualGardens.Services.AllServices.PitanjaOdgovori;
+using VirtualGardens.Services.AllServices.Ponude;
+using VirtualGardens.Services.AllServices.ProizvodiSetovi;
+using VirtualGardens.Services.AllServices.Recenzije;
+using VirtualGardens.Services.AllServices.Setovi;
+using VirtualGardens.Services.AllServices.SetoviPonude;
+using VirtualGardens.Services.AllServices.Ulazi;
+using VirtualGardens.Services.AllServices.UlaziProizvodi;
+using VirtualGardens.Services.AllServices.Uloge;
+using VirtualGardens.Services.AllServices.VrsteProizvoda;
+using VirtualGardens.Services.AllServices.Zaposlenici;
 using VirtualGardens.Services.Auth;
 using VirtualGardens.Services.Database;
 
@@ -11,6 +26,21 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddTransient<IProizvodiService, ProizvodiService>();
 builder.Services.AddTransient<IKorisniciService, KorisniciService>();
+builder.Services.AddTransient<IJediniceMjereService, JediniceMjereService>();
+builder.Services.AddTransient<IUlogeService, UlogeService>();
+builder.Services.AddTransient<IZaposleniciService, ZaposleniciService>();
+builder.Services.AddTransient<INaloziService, NaloziService>();
+builder.Services.AddTransient<IVrsteProizvodaService, VrsteProizvodaService>();
+builder.Services.AddTransient<IUlaziService,UlaziService>();
+builder.Services.AddTransient<IUlaziProizvodiService, UlaziProizvodiService>();
+builder.Services.AddTransient<IKorisniciUlogeService, KorisniciUlogeService>();
+builder.Services.AddTransient<INarudzbeService, NarudzbeService>();
+builder.Services.AddTransient<IPitanjaOdgovoriService,PitanjaOdgovoriService>();
+builder.Services.AddTransient<ISetoviService, SetoviService>();
+builder.Services.AddTransient<IPonudeService, PonudeService>(); 
+builder.Services.AddTransient<IProizvodiSetoviService, ProizvodiSetoviService>();
+builder.Services.AddTransient<IRecenzijeService, RecenzijeService>();
+builder.Services.AddTransient<ISetoviPonudeService,SetoviPonudeService>();
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 

@@ -21,7 +21,7 @@ public partial class Zaposlenici
 
     public string? Drzava { get; set; }
 
-    public bool JeAktivan { get; set; }
+    public bool JeAktivan { get; set; } = true;
 
     public DateTime? DatumRodjenja { get; set; }
 
