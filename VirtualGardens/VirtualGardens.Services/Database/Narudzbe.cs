@@ -14,6 +14,7 @@ public partial class Narudzbe
     public DateTime Datum { get; set; } = DateTime.Now;
 
     public bool Placeno { get; set; } = false;
+    public string? StateMachine { get; set; }
 
     public bool? Status { get; set; }
 

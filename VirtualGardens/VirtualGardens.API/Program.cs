@@ -19,6 +19,7 @@ using VirtualGardens.Services.AllServices.VrsteProizvoda;
 using VirtualGardens.Services.AllServices.Zaposlenici;
 using VirtualGardens.Services.Auth;
 using VirtualGardens.Services.Database;
+using VirtualGardens.Services.NarudzbeStateMachine;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +42,12 @@ builder.Services.AddTransient<IPonudeService, PonudeService>();
 builder.Services.AddTransient<IProizvodiSetoviService, ProizvodiSetoviService>();
 builder.Services.AddTransient<IRecenzijeService, RecenzijeService>();
 builder.Services.AddTransient<ISetoviPonudeService,SetoviPonudeService>();
+
+builder.Services.AddTransient<BaseNarudzbaState>();
+builder.Services.AddTransient<InitialNarudzbaState>();
+builder.Services.AddTransient<CreatedNarudzbaState>();
+builder.Services.AddTransient<InProgressNarudzbaState>();
+builder.Services.AddTransient<FinishedNarudzbaState>();
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 

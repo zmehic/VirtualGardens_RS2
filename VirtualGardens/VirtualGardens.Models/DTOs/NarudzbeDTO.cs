@@ -17,6 +17,7 @@ namespace VirtualGardens.Models.DTOs
         public bool Placeno { get; set; }
 
         public bool? Status { get; set; }
+        public string? StateMachine { get; set; }
 
         public int UkupnaCijena { get; set; }
 

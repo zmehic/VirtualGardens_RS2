@@ -1,21 +1,26 @@
-﻿using MapsterMapper;
+﻿using Azure.Core;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VirtualGardens.Models.DTOs;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.BaseServices;
 using VirtualGardens.Services.Database;
+using VirtualGardens.Services.NarudzbeStateMachine;
 
 namespace VirtualGardens.Services.AllServices.Narudzbe
 {
     public class NarudzbeService : BaseCRUDService<Models.DTOs.NarudzbeDTO, NarudzbeSearchObject, Database.Narudzbe, NarudzbeUpsertRequest, NarudzbeUpsertRequest>, INarudzbeService
     {
-        public NarudzbeService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public BaseNarudzbaState BaseNarudzbaState { get; set; }
+        public NarudzbeService(_210011Context context, IMapper mapper, BaseNarudzbaState baseNarudzbaState) : base(context, mapper)
         {
+            BaseNarudzbaState = baseNarudzbaState;
         }
 
         public override IQueryable<Database.Narudzbe> AddFilter(NarudzbeSearchObject search, IQueryable<Database.Narudzbe> query)
@@ -71,6 +76,55 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
             }
 
             return query;
+        }
+
+        public override NarudzbeDTO Insert(NarudzbeUpsertRequest request)
+        {
+            var state = BaseNarudzbaState.CreateState("initial");
+            return state.Insert(request);
+        }
+
+        public override NarudzbeDTO Update(int id, NarudzbeUpsertRequest request)
+        {
+            var entity = GetById(id);
+            var state = BaseNarudzbaState.CreateState(entity.StateMachine);
+            return state.Update(id,request);
+        }
+
+        public NarudzbeDTO InProgress(int id)
+        {
+            var entity = GetById(id);
+            var state = BaseNarudzbaState.CreateState(entity.StateMachine);
+            return state.InProgress(id);
+        }
+
+        public NarudzbeDTO Edit(int id)
+        {
+            var entity = GetById(id);
+            var state = BaseNarudzbaState.CreateState(entity.StateMachine);
+            return state.Edit(id);
+        }
+
+        public NarudzbeDTO Finish(int id)
+        {
+            var entity = GetById(id);
+            var state = BaseNarudzbaState.CreateState(entity.StateMachine);
+            return state.Finish(id);
+        }
+
+        public List<string> AllowedActions(int id)
+        {
+            if(id <= 0)
+            {
+                var state = BaseNarudzbaState.CreateState("initial");
+                return state.AllowedActions(null);
+            }
+            else
+            {
+                var entity = Context.Narudzbes.Find(id);
+                var state = BaseNarudzbaState.CreateState(entity.StateMachine);
+                return state.AllowedActions(entity);
+            }
         }
     }
 }

@@ -17,5 +17,25 @@ namespace VirtualGardens.API.Controllers
         public NarudzbeController(INarudzbeService service) : base(service)
         {
         }
+        [HttpPut("{id}/inprogress")]
+        public NarudzbeDTO InProgress(int id)
+        {
+            return (_service as INarudzbeService).InProgress(id);
+        }
+        [HttpPut("{id}/edit")]
+        public NarudzbeDTO Edit(int id)
+        {
+            return (_service as INarudzbeService).Edit(id);
+        }
+        [HttpPut("{id}/finish")]
+        public NarudzbeDTO Finish(int id)
+        {
+            return (_service as INarudzbeService).Finish(id);
+        }
+        [HttpGet("{id}/allowedActions")]
+        public List<string> AllowedActions(int id)
+        {
+            return (_service as INarudzbeService).AllowedActions(id);
+        }
     }
 }
