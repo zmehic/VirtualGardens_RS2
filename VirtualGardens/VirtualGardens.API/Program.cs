@@ -1,5 +1,6 @@
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using VirtualGardens.API.Filters;
 using VirtualGardens.Services;
 using VirtualGardens.Services.AllServices;
 using VirtualGardens.Services.AllServices.JediniceMjere;
@@ -51,7 +52,10 @@ builder.Services.AddTransient<FinishedNarudzbaState>();
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(x =>
+{
+    x.Filters.Add<ExceptionFilter>();
+});
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();

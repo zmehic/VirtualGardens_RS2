@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using MapsterMapper;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,9 +19,11 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
     public class NarudzbeService : BaseCRUDService<Models.DTOs.NarudzbeDTO, NarudzbeSearchObject, Database.Narudzbe, NarudzbeUpsertRequest, NarudzbeUpsertRequest>, INarudzbeService
     {
         public BaseNarudzbaState BaseNarudzbaState { get; set; }
-        public NarudzbeService(_210011Context context, IMapper mapper, BaseNarudzbaState baseNarudzbaState) : base(context, mapper)
+        ILogger<ProizvodiService> _logger;
+        public NarudzbeService(_210011Context context, IMapper mapper, BaseNarudzbaState baseNarudzbaState, ILogger<ProizvodiService> logger) : base(context, mapper)
         {
             BaseNarudzbaState = baseNarudzbaState;
+            _logger = logger;
         }
 
         public override IQueryable<Database.Narudzbe> AddFilter(NarudzbeSearchObject search, IQueryable<Database.Narudzbe> query)
@@ -114,6 +117,7 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
 
         public List<string> AllowedActions(int id)
         {
+            _logger.LogInformation($"Allowed action called for {id}");
             if(id <= 0)
             {
                 var state = BaseNarudzbaState.CreateState("initial");
