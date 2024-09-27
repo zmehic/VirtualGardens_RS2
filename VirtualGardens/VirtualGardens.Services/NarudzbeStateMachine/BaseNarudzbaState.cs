@@ -48,6 +48,11 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
             throw new UserException("Method not allowed");
         }
 
+        public virtual void Delete(int id)
+        {
+            throw new UserException("Method not allowed");
+        }
+
         public virtual List<string> AllowedActions(Database.Narudzbe entity)
         {
             throw new UserException("Method not allowed");

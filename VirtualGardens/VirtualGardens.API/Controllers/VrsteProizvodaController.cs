@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VirtualGardens.API.Controllers.BaseControllers;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.HelperClasses;
 using VirtualGardens.Models.Requests.VrsteProizvoda;
 using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.AllServices.VrsteProizvoda;
@@ -16,5 +18,17 @@ namespace VirtualGardens.API.Controllers
         public VrsteProizvodaController(IVrsteProizvodaService service) : base(service)
         {
         }
+        [Authorize(Roles = "Admin,Kupac")]
+        public override PagedResult<VrsteProizvodaDTO> GetList([FromQuery] VrsteProizvodaSearchObject searchObject)
+        {
+            return base.GetList(searchObject);
+        }
+
+        [Authorize(Roles = "Admin,Kupac")]
+        public override VrsteProizvodaDTO GetById(int id)
+        {
+            return base.GetById(id);
+        }
+
     }
 }

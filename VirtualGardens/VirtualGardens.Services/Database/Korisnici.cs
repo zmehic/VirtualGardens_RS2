@@ -9,8 +9,6 @@ public partial class Korisnici
 
     public string KorisnickoIme { get; set; } = null!;
 
-    public string Lozinka { get; set; } = null!;
-
     public string Email { get; set; } = null!;
 
     public string Ime { get; set; } = null!;

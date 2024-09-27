@@ -11,6 +11,6 @@ namespace VirtualGardens.Models.DTOs
         public string Naziv { get; set; }
         public string? Opis { get; set; }
 
-        //public virtual ICollection<GeneralDTO.KorisniciUlogeDTO> KorisniciUloges { get; set; } = new List<GeneralDTO.KorisniciUlogeDTO>();
+        //public virtual ICollection<KorisniciUlogeDTO> KorisniciUloges { get; set; } = new List<KorisniciUlogeDTO>();
     }
 }

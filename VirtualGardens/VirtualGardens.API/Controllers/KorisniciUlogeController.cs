@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VirtualGardens.API.Controllers.BaseControllers;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.HelperClasses;
 using VirtualGardens.Models.Requests.KorisniciUloge;
 using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.AllServices.KorisniciUloge;
@@ -15,6 +17,18 @@ namespace VirtualGardens.API.Controllers
     {
         public KorisniciUlogeController(IKorisniciUlogeService service) : base(service)
         {
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override KorisniciUlogeDTO GetById(int id)
+        {
+            return base.GetById(id);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override PagedResult<KorisniciUlogeDTO> GetList([FromQuery] KorisniciUlogeSearchObject searchObject)
+        {
+            return base.GetList(searchObject);
         }
     }
 }

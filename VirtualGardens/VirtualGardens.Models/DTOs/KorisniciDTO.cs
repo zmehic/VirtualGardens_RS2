@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
+
 namespace VirtualGardens.Models.DTOs
 {
     public class KorisniciDTO
@@ -9,8 +10,6 @@ namespace VirtualGardens.Models.DTOs
         public int KorisnikId { get; set; }
 
         public string KorisnickoIme { get; set; }
-
-        public string Lozinka { get; set; }
 
         public string Email { get; set; }
 

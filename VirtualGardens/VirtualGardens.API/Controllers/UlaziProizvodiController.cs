@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VirtualGardens.API.Controllers.BaseControllers;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.HelperClasses;
 using VirtualGardens.Models.Requests.Ulazi;
 using VirtualGardens.Models.Requests.UlaziProizvodi;
 using VirtualGardens.Models.SearchObjects;
@@ -16,6 +18,18 @@ namespace VirtualGardens.API.Controllers
     {
         public UlaziProizvodiController(IUlaziProizvodiService service) : base(service)
         {
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override UlaziProizvodiDTO GetById(int id)
+        {
+            return base.GetById(id);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override PagedResult<UlaziProizvodiDTO> GetList([FromQuery] UlaziProizvodiSearchObject searchObject)
+        {
+            return base.GetList(searchObject);
         }
     }
 }

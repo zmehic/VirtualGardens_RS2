@@ -11,7 +11,7 @@ public partial class KorisniciUloge
 
     public int UlogaId { get; set; }
 
-    public virtual Korisnici Korisnik { get; set; } = null!;
+    public virtual Korisnici? Korisnik { get; set; }
 
-    public virtual Uloge Uloga { get; set; } = null!;
+    public virtual Uloge? Uloga { get; set; }
 }

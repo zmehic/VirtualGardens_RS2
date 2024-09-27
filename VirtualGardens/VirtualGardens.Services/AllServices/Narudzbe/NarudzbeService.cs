@@ -115,6 +115,13 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
             return state.Finish(id);
         }
 
+        public override void Delete(int id)
+        {
+            var entity = GetById(id);
+            var state = BaseNarudzbaState.CreateState(entity.StateMachine);
+            state.Delete(id);
+        }
+
         public List<string> AllowedActions(int id)
         {
             _logger.LogInformation($"Allowed action called for {id}");

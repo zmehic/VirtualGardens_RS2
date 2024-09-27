@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VirtualGardens.API.Controllers.BaseControllers;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.HelperClasses;
 using VirtualGardens.Models.Requests.Proizvodi;
 using VirtualGardens.Models.Requests.Recenzije;
 using VirtualGardens.Models.SearchObjects;
@@ -16,6 +18,24 @@ namespace VirtualGardens.API.Controllers
     {
         public RecenzijeController(IRecenzijeService service) : base(service)
         {
+        }
+
+        [Authorize(Roles = "Admin,Kupac")]
+        public override RecenzijeDTO Insert(RecenzijeUpsertRequest request)
+        {
+            return base.Insert(request);
+        }
+
+        [Authorize(Roles = "Admin,Kupac")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
+        }
+
+        [Authorize(Roles = "Admin,Kupac")]
+        public override RecenzijeDTO Update(int id, RecenzijeUpsertRequest request)
+        {
+            return base.Update(id, request);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.BaseInterfaces;
@@ -18,6 +19,7 @@ namespace VirtualGardens.API.Controllers.BaseControllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [Authorize(Roles = "Admin")]
         public virtual TModel Insert(TInsert request)
         {
             return _service.Insert(request);
@@ -25,6 +27,7 @@ namespace VirtualGardens.API.Controllers.BaseControllers
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [Authorize(Roles = "Admin")]
         public virtual TModel Update(int id, TUpdate request)
         {
             return _service.Update(id, request);
@@ -32,6 +35,7 @@ namespace VirtualGardens.API.Controllers.BaseControllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [Authorize(Roles = "Admin")]
         public virtual void Delete(int id)
         {
             _service.Delete(id);

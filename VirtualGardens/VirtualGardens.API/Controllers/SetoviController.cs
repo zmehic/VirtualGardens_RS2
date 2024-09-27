@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VirtualGardens.API.Controllers.BaseControllers;
 using VirtualGardens.Models.DTOs;
@@ -16,6 +17,24 @@ namespace VirtualGardens.API.Controllers
     {
         public SetoviController(ISetoviService service) : base(service)
         {
+        }
+
+        [Authorize(Roles = "Kupac,Admin")]
+        public override SetoviDTO Insert(SetoviUpsertRequest request)
+        {
+            return base.Insert(request);
+        }
+
+        [Authorize(Roles = "Kupac,Admin")]
+        public override SetoviDTO Update(int id, SetoviUpsertRequest request)
+        {
+            return base.Update(id, request);
+        }
+
+        [Authorize(Roles = "Kupac,Admin")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
         }
     }
 }

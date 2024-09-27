@@ -7,6 +7,8 @@ using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Models.Requests.Proizvodi;
 using VirtualGardens.Services.BaseInterfaces;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.HelperClasses;
+using Microsoft.AspNetCore.Authorization;
 
 namespace VirtualGardens.API.Controllers
 {
@@ -16,6 +18,18 @@ namespace VirtualGardens.API.Controllers
     {
         public ProizvodiController(IProizvodiService service) : base(service)
         {
+        }
+
+        [Authorize(Roles = "Admin,Kupac")]
+        public override PagedResult<ProizvodiDTO> GetList([FromQuery] ProizvodiSearchObject searchObject)
+        {
+            return base.GetList(searchObject);
+        }
+
+        [Authorize(Roles = "Admin,Kupac")]
+        public override ProizvodiDTO GetById(int id)
+        {
+            return base.GetById(id);
         }
     }
 }

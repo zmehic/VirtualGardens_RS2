@@ -27,6 +27,19 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
             return Mapper.Map<Models.DTOs.NarudzbeDTO>(entity);
         }
 
+        public override void Delete(int id)
+        {
+            var entity = Context.Set<Nalozi>().Find(id);
+
+            if (entity == null)
+            {
+                throw new Exception("Nemoguće pronaći objekat sa poslanim id-om!");
+            }
+
+            Context.Remove(entity);
+            Context.SaveChanges();
+        }
+
         public override NarudzbeDTO InProgress(int id)
         {
             var set = Context.Set<Narudzbe>();

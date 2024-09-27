@@ -103,9 +103,6 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.KorisnickoIme)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.Lozinka)
-                .HasMaxLength(128)
-                .IsUnicode(false);
             entity.Property(e => e.Prezime)
                 .HasMaxLength(50)
                 .IsUnicode(false);
