@@ -1,10 +1,12 @@
-﻿using MapsterMapper;
+﻿using EasyNetQ;
+using MapsterMapper;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.Messages;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Models.Requests.Ponude;
 using VirtualGardens.Models.Requests.SetoviPonude;
@@ -48,8 +50,13 @@ namespace VirtualGardens.Services.PonudeStateMachine
             entity.StateMachine = "active";
             Context.SaveChanges();
 
+            var bus = RabbitHutch.CreateBus("host=localhost:5673");
+            var mappedEntity = Mapper.Map<PonudeDTO>(entity);
 
-            return Mapper.Map<PonudeDTO>(entity);
+            PonudaActivated message = new PonudaActivated { ponuda=mappedEntity };
+            bus.PubSub.Publish(message);
+
+            return mappedEntity;
         }
 
         public override PonudeDTO AddSet(SetoviPonudeUpsertRequest request)
