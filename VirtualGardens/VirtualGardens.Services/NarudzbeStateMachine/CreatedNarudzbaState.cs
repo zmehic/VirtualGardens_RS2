@@ -29,7 +29,7 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
 
         public override void Delete(int id)
         {
-            var entity = Context.Set<Nalozi>().Find(id);
+            var entity = Context.Set<Narudzbe>().Find(id);
 
             if (entity == null)
             {
@@ -62,7 +62,7 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
 
         public override List<string> AllowedActions(Narudzbe entity)
         {
-            return new List<string>() { "update", "inprogress", "finish" };
+            return new List<string>() { "update", "inprogress", "finish", "delete" };
         }
     }
 }

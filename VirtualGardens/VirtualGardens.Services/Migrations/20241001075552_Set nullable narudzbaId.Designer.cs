@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VirtualGardens.Services.Database;
 
@@ -11,9 +12,11 @@ using VirtualGardens.Services.Database;
 namespace VirtualGardens.Services.Migrations
 {
     [DbContext(typeof(_210011Context))]
-    partial class _210011ContextModelSnapshot : ModelSnapshot
+    [Migration("20241001075552_Set nullable narudzbaId")]
+    partial class SetnullablenarudzbaId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -299,9 +302,6 @@ namespace VirtualGardens.Services.Migrations
 
                     b.Property<int?>("Popust")
                         .HasColumnType("int");
-
-                    b.Property<string>("StateMachine")
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("PonudaId")
                         .HasName("PK__Ponude__5AF121B118A3B521");

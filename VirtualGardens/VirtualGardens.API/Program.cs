@@ -24,6 +24,7 @@ using VirtualGardens.Services.AllServices.Zaposlenici;
 using VirtualGardens.Services.Auth;
 using VirtualGardens.Services.Database;
 using VirtualGardens.Services.NarudzbeStateMachine;
+using VirtualGardens.Services.PonudeStateMachine;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -52,6 +53,12 @@ builder.Services.AddTransient<InitialNarudzbaState>();
 builder.Services.AddTransient<CreatedNarudzbaState>();
 builder.Services.AddTransient<InProgressNarudzbaState>();
 builder.Services.AddTransient<FinishedNarudzbaState>();
+
+builder.Services.AddTransient<BasePonudaState>();
+builder.Services.AddTransient<InitialPonudaState>();
+builder.Services.AddTransient<CreatedPonudaState>();
+builder.Services.AddTransient<ActivePonudaState>();
+builder.Services.AddTransient<FinishedPonudaState>();
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 

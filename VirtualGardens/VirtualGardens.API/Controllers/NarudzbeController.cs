@@ -37,24 +37,28 @@ namespace VirtualGardens.API.Controllers
             return base.Insert(request);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}/inprogress")]
         public NarudzbeDTO InProgress(int id)
         {
             return (_service as INarudzbeService).InProgress(id);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}/edit")]
         public NarudzbeDTO Edit(int id)
         {
             return (_service as INarudzbeService).Edit(id);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}/finish")]
         public NarudzbeDTO Finish(int id)
         {
             return (_service as INarudzbeService).Finish(id);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet("{id}/allowedActions")]
         public List<string> AllowedActions(int id)
         {

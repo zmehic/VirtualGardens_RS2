@@ -10,6 +10,7 @@ public partial class Ponude
     public string Naziv { get; set; } = null!;
 
     public int? Popust { get; set; }
+    public string? StateMachine { get; set; }
 
     public DateTime DatumKreiranja { get; set; } = DateTime.Now;
 

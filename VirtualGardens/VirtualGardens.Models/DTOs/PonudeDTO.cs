@@ -11,6 +11,7 @@ namespace VirtualGardens.Models.DTOs
         public string Naziv { get; set; } = null!;
 
         public int? Popust { get; set; }
+        public string? StateMachine { get; set; }
 
         //public DateTime DatumKreiranja { get; set; } = DateTime.Now;
 

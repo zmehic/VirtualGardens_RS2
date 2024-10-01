@@ -12,7 +12,7 @@ namespace VirtualGardens.Models.DTOs
 
         public int? Popust { get; set; }
 
-        public int NarudzbaId { get; set; }
+        public int? NarudzbaId { get; set; }
 
         public int? CijenaSaPopustom { get; set; }
 

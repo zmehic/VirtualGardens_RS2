@@ -10,7 +10,7 @@ namespace VirtualGardens.Models.Requests.Setovi
 
         public int? Popust { get; set; }
 
-        public int NarudzbaId { get; set; }
+        public int? NarudzbaId { get; set; }
 
         public int? CijenaSaPopustom { get; set; }
     }
