@@ -23,6 +23,7 @@ using VirtualGardens.Services.AllServices.VrsteProizvoda;
 using VirtualGardens.Services.AllServices.Zaposlenici;
 using VirtualGardens.Services.Auth;
 using VirtualGardens.Services.Database;
+using VirtualGardens.Services.EmailService;
 using VirtualGardens.Services.NarudzbeStateMachine;
 using VirtualGardens.Services.PonudeStateMachine;
 
@@ -86,6 +87,16 @@ builder.Services.AddSwaggerGen(c =>
             new string[]{}
     } });
 
+});
+
+string smtpHost = "smtp.gmail.com";
+int smtpPort = 587;
+string smtpUser = "virtualgardens2024@gmail.com";
+string smtpPass = "pypikfshkshwqied";
+
+builder.Services.AddScoped<IEmailService>(provider =>
+{
+    return new EmailService(smtpHost, smtpPort, smtpUser, smtpPass);
 });
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

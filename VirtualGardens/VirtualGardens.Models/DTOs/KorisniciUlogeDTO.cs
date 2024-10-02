@@ -6,7 +6,7 @@ namespace VirtualGardens.Models.DTOs
 {
     public class KorisniciUlogeDTO
     {
-        public int KorisnikUlogeId { get; set; }
+        public int KorisniciUlogeId { get; set; }
 
         public int KorisnikId { get; set; }
         public int UlogaId { get; set; }

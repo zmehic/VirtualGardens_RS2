@@ -7,6 +7,7 @@ namespace VirtualGardens.Models.Messages
 {
     public class PonudaActivated
     {
+        public KorisniciDTO korisnik { get; set; }
         public PonudeDTO ponuda { get; set; }
     }
 }

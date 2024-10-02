@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualGardens.Models", "Vi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualGardens.Services", "VirtualGardens.Services\VirtualGardens.Services.csproj", "{63E02DEF-7374-4230-A1EC-FBAE2A1DDE7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualGardens.Subscriber", "VirtualGardens.Subscriber\VirtualGardens.Subscriber.csproj", "{E41B2289-60C8-4031-B23C-E9247E5DC0C4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualGardens.Subscriber", "VirtualGardens.Subscriber\VirtualGardens.Subscriber.csproj", "{24C1B1AD-DEA3-411C-9CB0-97066A63B7CB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{63E02DEF-7374-4230-A1EC-FBAE2A1DDE7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{63E02DEF-7374-4230-A1EC-FBAE2A1DDE7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{63E02DEF-7374-4230-A1EC-FBAE2A1DDE7D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E41B2289-60C8-4031-B23C-E9247E5DC0C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E41B2289-60C8-4031-B23C-E9247E5DC0C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E41B2289-60C8-4031-B23C-E9247E5DC0C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E41B2289-60C8-4031-B23C-E9247E5DC0C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{24C1B1AD-DEA3-411C-9CB0-97066A63B7CB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{24C1B1AD-DEA3-411C-9CB0-97066A63B7CB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{24C1B1AD-DEA3-411C-9CB0-97066A63B7CB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{24C1B1AD-DEA3-411C-9CB0-97066A63B7CB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

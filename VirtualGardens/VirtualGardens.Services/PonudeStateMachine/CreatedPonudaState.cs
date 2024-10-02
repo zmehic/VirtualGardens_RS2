@@ -1,5 +1,6 @@
 ﻿using EasyNetQ;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -53,9 +54,14 @@ namespace VirtualGardens.Services.PonudeStateMachine
             var bus = RabbitHutch.CreateBus("host=localhost:5673");
             var mappedEntity = Mapper.Map<PonudeDTO>(entity);
 
-            PonudaActivated message = new PonudaActivated { ponuda=mappedEntity };
-            bus.PubSub.Publish(message);
+            var users = Context.Korisnicis.Where(x => x.KorisniciUloges.Any(role => role.Uloga != null && role.Uloga.Naziv == "Kupac")).ToList();
 
+            foreach ( var user in users )
+            {
+                PonudaActivated message = new PonudaActivated { ponuda = mappedEntity, korisnik=Mapper.Map<KorisniciDTO>(user) };
+                bus.PubSub.Publish(message);
+            }
+            
             return mappedEntity;
         }
 
