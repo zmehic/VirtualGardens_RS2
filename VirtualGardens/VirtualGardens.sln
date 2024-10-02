@@ -9,7 +9,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualGardens.Models", "Vi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualGardens.Services", "VirtualGardens.Services\VirtualGardens.Services.csproj", "{63E02DEF-7374-4230-A1EC-FBAE2A1DDE7D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VirtualGardens.Subscriber", "VirtualGardens.Subscriber\VirtualGardens.Subscriber.csproj", "{24C1B1AD-DEA3-411C-9CB0-97066A63B7CB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VirtualGardens.Subscriber", "VirtualGardens.Subscriber\VirtualGardens.Subscriber.csproj", "{24C1B1AD-DEA3-411C-9CB0-97066A63B7CB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Config", "Config", "{716C13CA-9130-4EB7-B16E-0C46D1FF1F0C}"
+	ProjectSection(SolutionItems) = preProject
+		.env = .env
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

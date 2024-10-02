@@ -88,18 +88,10 @@ builder.Services.AddSwaggerGen(c =>
     } });
 
 });
+string envFilePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "config", ".env");
+DotNetEnv.Env.Load(envFilePath);
 
-string smtpHost = "smtp.gmail.com";
-int smtpPort = 587;
-string smtpUser = "virtualgardens2024@gmail.com";
-string smtpPass = "pypikfshkshwqied";
-
-builder.Services.AddScoped<IEmailService>(provider =>
-{
-    return new EmailService(smtpHost, smtpPort, smtpUser, smtpPass);
-});
-
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
 builder.Services.AddDbContext<_210011Context>(options => options.UseSqlServer(connectionString));
 builder.Services.AddMapster();
 builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication",null);

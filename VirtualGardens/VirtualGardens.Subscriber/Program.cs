@@ -3,12 +3,15 @@ using EasyNetQ;
 using VirtualGardens.Models.Messages;
 using VirtualGardens.Subscriber.EmailService;
 
+string envFilePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "config", ".env");
+DotNetEnv.Env.Load(envFilePath);
+
 Console.WriteLine("Hello, World!");
 
-string smtpHost = "smtp.gmail.com";
-int smtpPort = 587;
-string smtpUser = "virtualgardens2024@gmail.com";
-string smtpPass = "pypikfshkshwqied";
+string smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty;
+int smtpPort = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var port) ? port : 0;
+string smtpUser = Environment.GetEnvironmentVariable("SMTP_USER") ?? string.Empty;
+string smtpPass = Environment.GetEnvironmentVariable("SMTP_PASS") ?? string.Empty;
 
 var emailService = new EmailService(smtpHost, smtpPort, smtpUser, smtpPass);
 var bus = RabbitHutch.CreateBus("host=localhost:5673");
