@@ -32,50 +32,52 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
             {
                 query = query.Where(x => x.BrojNarudzbe.ToLower().StartsWith(search.BrojNarudzbeGTE.ToLower()));
             }
-
-            if (search.Otkazana.HasValue)
+            if(search != null)
             {
-                query = query.Where(x => x.Otkazana == search.Otkazana.Value);
-            }
+                if (search.Otkazana.HasValue)
+                {
+                    query = query.Where(x => x.Otkazana == search.Otkazana.Value);
+                }
 
-            if (search.DatumFrom.HasValue)
-            {
-                query = query.Where(x => x.Datum >= search.DatumFrom.Value);
-            }
+                if (search.DatumFrom.HasValue)
+                {
+                    query = query.Where(x => x.Datum >= search.DatumFrom.Value);
+                }
 
-            if (search.DatumTo.HasValue)
-            {
-                query = query.Where(x => x.Datum <= search.DatumTo.Value);
-            }
+                if (search.DatumTo.HasValue)
+                {
+                    query = query.Where(x => x.Datum <= search.DatumTo.Value);
+                }
 
-            if (search.Placeno.HasValue)
-            {
-                query = query.Where(x => x.Placeno == search.Placeno.Value);
-            }
+                if (search.Placeno.HasValue)
+                {
+                    query = query.Where(x => x.Placeno == search.Placeno.Value);
+                }
 
-            if (search.Status.HasValue)
-            {
-                query = query.Where(x => x.Status == search.Status.Value);
-            }
+                if (search.Status.HasValue)
+                {
+                    query = query.Where(x => x.Status == search.Status.Value);
+                }
 
-            if (search.UkupnaCijenaFrom.HasValue)
-            {
-                query = query.Where(x => x.UkupnaCijena >= search.UkupnaCijenaFrom.Value);
-            }
+                if (search.UkupnaCijenaFrom.HasValue)
+                {
+                    query = query.Where(x => x.UkupnaCijena >= search.UkupnaCijenaFrom.Value);
+                }
 
-            if (search.UkupnaCijenaTo.HasValue)
-            {
-                query = query.Where(x => x.UkupnaCijena <= search.UkupnaCijenaTo.Value);
-            }
+                if (search.UkupnaCijenaTo.HasValue)
+                {
+                    query = query.Where(x => x.UkupnaCijena <= search.UkupnaCijenaTo.Value);
+                }
 
-            if (search.KorisnikId.HasValue)
-            {
-                query = query.Where(x => x.KorisnikId == search.KorisnikId.Value);
-            }
+                if (search.KorisnikId.HasValue)
+                {
+                    query = query.Where(x => x.KorisnikId == search.KorisnikId.Value);
+                }
 
-            if (search.NalogId.HasValue)
-            {
-                query = query.Where(x => x.NalogId == search.NalogId.Value);
+                if (search.NalogId.HasValue)
+                {
+                    query = query.Where(x => x.NalogId == search.NalogId.Value);
+                }
             }
 
             return query;
@@ -133,7 +135,8 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
             else
             {
                 var entity = Context.Narudzbes.Find(id);
-                var state = BaseNarudzbaState.CreateState(entity.StateMachine);
+
+                var state = BaseNarudzbaState.CreateState(entity.StateMachine!);
                 return state.AllowedActions(entity);
             }
         }

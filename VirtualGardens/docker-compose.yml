@@ -1,0 +1,85 @@
+version: '3'
+services:
+#mssql docker   
+  rabbitmq:
+    image: rabbitmq:4.0-management
+    container_name: rabbitmq
+    hostname: "rabbitmq"
+    labels:
+        NAME: "rabbitmq"
+    restart: unless-stopped
+    ports:
+        - "15672:15672"
+        - "5673:5672"
+    expose:
+        - 5672
+        - 15672
+    healthcheck:
+        test: ["CMD", "curl", "-f", "http://localhost:15672"]
+        interval: 30s
+        timeout: 10s
+        retries: 10
+    networks:
+        - virtualgardensnet2024
+   
+  virtualgardens-sql:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    restart: unless-stopped
+    user: root
+    environment:
+        - ACCEPT_EULA=Y
+        - SA_PASSWORD=${SA_PASSWORD}
+        - MSSQL_PID=Developer
+    ports:
+        - 1401:1433
+    expose:
+        - 1433
+    networks:
+        - virtualgardensnet2024
+    
+  
+  virtualgardens-api:
+      restart: unless-stopped
+      build:
+        context: .
+      environment:
+        - CONNECTION_STRING=Server=${SOURCE},1433;Database=${CATALOG};User=sa;Password=${SA_PASSWORD};TrustServerCertificate=True
+        - ASPNETCORE_ENVIRONMENT=Development
+        - SMTP_USER=${SMTP_USER}
+        - SMTP_PASS=${SMTP_PASS}
+        - SMTP_HOST=${SMTP_HOST}
+        - ENABLE_SSL=${ENABLE_SSL}
+        - SMTP_PORT=${SMTP_PORT}
+        - RABBIT_MQ=${RABBIT_MQ}
+        - SA_PASSWORD=${SA_PASSWORD}
+      ports:
+        - 5203:5203
+      networks:
+        - virtualgardensnet2024
+      links:
+        - virtualgardens-sql
+      depends_on:
+        - virtualgardens-sql
+        - rabbitmq
+
+  # virtualgardens-console:
+  #   restart: on-failure
+  #   build:
+  #     context: ./VirtualGardens.Subscriber
+  #     dockerfile: Dockerfile
+  #   depends_on:
+  #     - rabbitmq      
+  #   environment:
+  #       - SMTP_USER=${SMTP_USER}
+  #       - SMTP_PASS=${SMTP_PASS}
+  #       - SMTP_HOST=${SMTP_HOST}
+  #       - ENABLE_SSL=${ENABLE_SSL}
+  #       - SMTP_PORT=${SMTP_PORT}
+  #       - RABBIT_MQ=${RABBIT_MQ}
+  #   networks:
+  #     - virtualgardensnet2024
+
+
+networks:
+  virtualgardensnet2024:
+    driver: bridge      

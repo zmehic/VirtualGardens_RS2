@@ -12,8 +12,8 @@ using VirtualGardens.Services.Database;
 namespace VirtualGardens.Services.Migrations
 {
     [DbContext(typeof(_210011Context))]
-    [Migration("20241001081246_PonudeStateMachine")]
-    partial class PonudeStateMachine
+    [Migration("20241003130948_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

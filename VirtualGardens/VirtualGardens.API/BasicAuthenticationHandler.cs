@@ -25,7 +25,7 @@ namespace VirtualGardens.API
             }
 
             var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
-            var credentialsBytes = Convert.FromBase64String(authHeader.Parameter);
+            var credentialsBytes = Convert.FromBase64String(authHeader.Parameter!);
             var credentials = Encoding.UTF8.GetString(credentialsBytes).Split(':');
 
             var username = credentials[0];
@@ -46,7 +46,7 @@ namespace VirtualGardens.API
 
                 foreach(var role in user.KorisniciUloges)
                 {
-                    claims.Add(new Claim(ClaimTypes.Role, role.Uloga.Naziv));
+                    claims.Add(new Claim(ClaimTypes.Role, role.Uloga!.Naziv));
                 }
 
                 var identity = new ClaimsIdentity(claims, Scheme.Name);

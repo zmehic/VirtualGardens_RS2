@@ -23,25 +23,27 @@ namespace VirtualGardens.Services.AllServices.Nalozi
             {
                 query = query.Where(x => x.BrojNaloga.ToLower().StartsWith(search.BrojNalogaGTE.ToLower()));
             }
-
-            if (search.DatumKreiranjaFrom.HasValue)
+            if(search != null)
             {
-                query = query.Where(x => x.DatumKreiranja >= search.DatumKreiranjaFrom.Value);
-            }
+                if (search.DatumKreiranjaFrom.HasValue)
+                {
+                    query = query.Where(x => x.DatumKreiranja >= search.DatumKreiranjaFrom.Value);
+                }
 
-            if (search.DatumKreiranjaTo.HasValue)
-            {
-                query = query.Where(x => x.DatumKreiranja <= search.DatumKreiranjaTo.Value);
-            }
+                if (search.DatumKreiranjaTo.HasValue)
+                {
+                    query = query.Where(x => x.DatumKreiranja <= search.DatumKreiranjaTo.Value);
+                }
 
-            if (search.ZaposlenikId.HasValue)
-            {
-                query = query.Where(x => x.ZaposlenikId == search.ZaposlenikId.Value);
-            }
+                if (search.ZaposlenikId.HasValue)
+                {
+                    query = query.Where(x => x.ZaposlenikId == search.ZaposlenikId.Value);
+                }
 
-            if (search.Zavrsen.HasValue)
-            {
-                query = query.Where(x => x.Zavrsen == search.Zavrsen.Value);
+                if (search.Zavrsen.HasValue)
+                {
+                    query = query.Where(x => x.Zavrsen == search.Zavrsen.Value);
+                }
             }
 
             return query;

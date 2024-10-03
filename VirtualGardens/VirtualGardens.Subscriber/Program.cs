@@ -1,6 +1,6 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using EasyNetQ;
-using VirtualGardens.Models.Messages;
+using VirtualGardens.Subscriber;
 using VirtualGardens.Subscriber.EmailService;
 
 
@@ -17,7 +17,7 @@ var emailService = new EmailService(smtpHost, smtpPort, smtpUser, smtpPass);
 var bus = RabbitHutch.CreateBus("host=localhost:5673");
 
 
-bus.PubSub.Subscribe<PonudaActivated>("seminarski",async msg =>
+bus.PubSub.Subscribe<PonudaActivatedMessage>("seminarski",async msg =>
 {
 
         string emailBody = $@"
@@ -63,12 +63,12 @@ bus.PubSub.Subscribe<PonudaActivated>("seminarski",async msg =>
 
                         <div class='container'>
                             <h1>Nova Ponuda!</h1>
-                            <p>Poštovani {msg.korisnik.Ime} {msg.korisnik.Prezime},</p>
+                            <p>Poštovani {msg.ime} {msg.prezime},</p>
                             <p>Želimo vas obavijestiti o našoj najnovijoj ponudi:</p>
     
                             <div class='offer'>
-                                <h2>{msg.ponuda.Naziv}</h2>
-                                <p>Popust: {msg.ponuda.Popust}%</p>
+                                <h2>{msg.nazivPonude}</h2>
+                                <p>Popust: {msg.popust}%</p>
                             </div>
     
                             <p>Iskoristite ovu sjajnu priliku i posjetite nas!</p>
@@ -87,7 +87,7 @@ bus.PubSub.Subscribe<PonudaActivated>("seminarski",async msg =>
 
         try
         {
-            await emailService.SendEmailAsync(msg.korisnik.Email, "Nova ponuda u VirtualGardens prodajnom mjestu!", emailBody);
+            await emailService.SendEmailAsync(msg.email, "Nova ponuda u VirtualGardens prodajnom mjestu!", emailBody);
         }
         catch (Exception ex)
         {

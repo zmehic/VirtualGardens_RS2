@@ -58,9 +58,9 @@ namespace VirtualGardens.Services.PonudeStateMachine
 
             foreach ( var user in users )
             {
-                PonudaActivated message = new PonudaActivated { ponuda = mappedEntity, korisnik=Mapper.Map<KorisniciDTO>(user) };
+                PonudaActivated message = new PonudaActivated { ime=user.Ime, prezime=user.Prezime, email=user.Email, nazivPonude=mappedEntity.Naziv, popust=mappedEntity.Popust };
                 bus.PubSub.Publish(message);
-            }
+            }   
             
             return mappedEntity;
         }

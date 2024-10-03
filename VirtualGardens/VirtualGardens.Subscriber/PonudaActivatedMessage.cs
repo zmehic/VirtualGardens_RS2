@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using VirtualGardens.Models.DTOs;
 
-namespace VirtualGardens.Models.Messages
+namespace VirtualGardens.Subscriber
 {
-    public class PonudaActivated
+    public class PonudaActivatedMessage
     {
         public string ime { get; set; }
         public string prezime { get; set; }

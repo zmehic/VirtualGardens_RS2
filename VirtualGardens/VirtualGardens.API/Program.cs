@@ -88,9 +88,7 @@ builder.Services.AddSwaggerGen(c =>
 
 });
 
-DotNetEnv.Env.Load();
-
-var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 builder.Services.AddDbContext<_210011Context>(options => options.UseSqlServer(connectionString));
 builder.Services.AddMapster();
 builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication",null);
@@ -109,5 +107,12 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var dataContext = scope.ServiceProvider.GetRequiredService<_210011Context>();
+
+    dataContext.Database.Migrate();
+}
 
 app.Run();
