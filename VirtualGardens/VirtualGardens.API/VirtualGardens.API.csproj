@@ -28,4 +28,10 @@
     <ProjectReference Include="..\VirtualGardens.Services\VirtualGardens.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update=".env">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

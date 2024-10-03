@@ -16,4 +16,10 @@
 	<ItemGroup>
 	  <ProjectReference Include="..\VirtualGardens.Models\VirtualGardens.Models.csproj" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update=".env">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
 </Project>

@@ -3,8 +3,8 @@ using EasyNetQ;
 using VirtualGardens.Models.Messages;
 using VirtualGardens.Subscriber.EmailService;
 
-string envFilePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "config", ".env");
-DotNetEnv.Env.Load(envFilePath);
+
+DotNetEnv.Env.Load();
 
 Console.WriteLine("Hello, World!");
 

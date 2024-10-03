@@ -23,7 +23,6 @@ using VirtualGardens.Services.AllServices.VrsteProizvoda;
 using VirtualGardens.Services.AllServices.Zaposlenici;
 using VirtualGardens.Services.Auth;
 using VirtualGardens.Services.Database;
-using VirtualGardens.Services.EmailService;
 using VirtualGardens.Services.NarudzbeStateMachine;
 using VirtualGardens.Services.PonudeStateMachine;
 
@@ -88,8 +87,8 @@ builder.Services.AddSwaggerGen(c =>
     } });
 
 });
-string envFilePath = Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).FullName, "config", ".env");
-DotNetEnv.Env.Load(envFilePath);
+
+DotNetEnv.Env.Load();
 
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_CONNECTION_STRING");
 builder.Services.AddDbContext<_210011Context>(options => options.UseSqlServer(connectionString));
