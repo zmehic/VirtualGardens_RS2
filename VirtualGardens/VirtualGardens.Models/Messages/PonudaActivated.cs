@@ -1,4 +1,5 @@
-﻿using System;
+﻿using EasyNetQ;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using VirtualGardens.Models.DTOs;

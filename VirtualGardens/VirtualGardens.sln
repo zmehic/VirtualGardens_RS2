@@ -15,7 +15,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.env = .env
 		docker-compose.yml = docker-compose.yml
-		Dockerfile = Dockerfile
+		Dockerfile.api = Dockerfile.api
+		Dockerfile.subscriber = Dockerfile.subscriber
 	EndProjectSection
 EndProject
 Global

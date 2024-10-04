@@ -1,5 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using EasyNetQ;
+using EasyNetQ.DI;
+using System.Net.Sockets;
+using VirtualGardens.Models.Messages;
 using VirtualGardens.Subscriber;
 using VirtualGardens.Subscriber.EmailService;
 
@@ -8,16 +11,18 @@ DotNetEnv.Env.Load();
 
 Console.WriteLine("Hello, World!");
 
+await WaitForRabbitMQAsync("rabbitmq", 5672); // Call the health check method
+
 string smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty;
 int smtpPort = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var port) ? port : 0;
 string smtpUser = Environment.GetEnvironmentVariable("SMTP_USER") ?? string.Empty;
 string smtpPass = Environment.GetEnvironmentVariable("SMTP_PASS") ?? string.Empty;
 
 var emailService = new EmailService(smtpHost, smtpPort, smtpUser, smtpPass);
-var bus = RabbitHutch.CreateBus("host=localhost:5673");
+var bus = RabbitHutch.CreateBus("host=rabbitmq:5672");
 
 
-bus.PubSub.Subscribe<PonudaActivatedMessage>("seminarski",async msg =>
+bus.PubSub.Subscribe<VirtualGardens.Models.Messages.PonudaActivated>(string.Empty,async msg =>
 {
 
         string emailBody = $@"
@@ -98,4 +103,29 @@ bus.PubSub.Subscribe<PonudaActivatedMessage>("seminarski",async msg =>
 });
 
 Console.WriteLine("Listening for messages, press <return> key to close!");
+Thread.Sleep(Timeout.Infinite);
 Console.ReadLine();
+
+async Task WaitForRabbitMQAsync(string host, int port, int maxRetries = 10, int delayMilliseconds = 2000)
+{
+    for (int i = 0; i < maxRetries; i++)
+    {
+        try
+        {
+            using (var client = new TcpClient())
+            {
+                await client.ConnectAsync(host, port);
+                Console.WriteLine("RabbitMQ is up and running!");
+                return; // Connection successful
+            }
+        }
+        catch (SocketException)
+        {
+            Console.WriteLine($"RabbitMQ is not available yet. Retrying in {delayMilliseconds / 1000} seconds...");
+            await Task.Delay(delayMilliseconds);
+        }
+    }
+
+    Console.WriteLine("Failed to connect to RabbitMQ after several attempts.");
+    Environment.Exit(1); // Exit the application if RabbitMQ is still down
+}

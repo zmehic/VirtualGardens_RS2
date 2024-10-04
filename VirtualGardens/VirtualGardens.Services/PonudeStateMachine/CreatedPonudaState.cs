@@ -1,4 +1,5 @@
 ﻿using EasyNetQ;
+using EasyNetQ.DI;
 using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,6 +12,7 @@ using VirtualGardens.Models.Messages;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Models.Requests.Ponude;
 using VirtualGardens.Models.Requests.SetoviPonude;
+using VirtualGardens.Services.Conventions;
 using VirtualGardens.Services.Database;
 
 namespace VirtualGardens.Services.PonudeStateMachine
@@ -51,7 +53,7 @@ namespace VirtualGardens.Services.PonudeStateMachine
             entity.StateMachine = "active";
             Context.SaveChanges();
 
-            var bus = RabbitHutch.CreateBus("host=localhost:5673");
+            var bus = RabbitHutch.CreateBus("host=rabbitmq:5672");
             var mappedEntity = Mapper.Map<PonudeDTO>(entity);
 
             var users = Context.Korisnicis.Where(x => x.KorisniciUloges.Any(role => role.Uloga != null && role.Uloga.Naziv == "Kupac")).ToList();
