@@ -1,4 +1,4 @@
 class AuthProvider {
-  static String? userName;
+  static String? username;
   static String? password;
 }

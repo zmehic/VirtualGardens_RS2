@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MultiProvider(
+    providers: [ChangeNotifierProvider(create: (_) => ProductProvider())],
+    child: const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -87,7 +91,7 @@ class LoginPage extends StatelessWidget {
                     onPressed: () async {
                       ProductProvider provider = new ProductProvider();
                       print("Login attempt");
-                      AuthProvider.userName = _usernameController.text;
+                      AuthProvider.username = _usernameController.text;
                       AuthProvider.password = _passwordController.text;
                       try {
                         var data = await provider.get();
