@@ -6,10 +6,13 @@ part 'proizvod.g.dart';
 class Proizvod {
   int? proizvodId;
   String? naziv;
+  String? opis;
+  int? dostupnaKolicina;
   String? slika;
   double? cijena;
   int? vrstaProizvodaId;
   int? jedinicaMjereId;
+  String? slikaThumb;
 
   Proizvod({this.proizvodId, this.naziv});
 

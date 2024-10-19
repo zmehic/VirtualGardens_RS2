@@ -8,6 +8,7 @@ import 'package:virtualgardens_admin/models/proizvod.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/screens/product_details_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -80,37 +81,56 @@ class _ProductListScreenState extends State<ProductListScreen> {
             SizedBox(
               width: 8,
             ),
-            ElevatedButton(onPressed: () async {}, child: Text("Dodaj")),
+            ElevatedButton(
+                onPressed: () async {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => ProductDetailsScreen()));
+                },
+                child: Text("Dodaj")),
           ],
         ));
   }
 
   Widget _buildResultView() {
     return Expanded(
-      child: SingleChildScrollView(
-          child: DataTable(
-              columns: [
-            DataColumn(label: Text("ID"), numeric: true),
-            DataColumn(label: Text("Naziv")),
-            DataColumn(label: Text("Cijena")),
-            DataColumn(label: Text("Slika")),
-          ],
-              rows: result?.result
-                      .map((e) => DataRow(cells: [
-                            DataCell(Text(e.proizvodId.toString())),
-                            DataCell(Text(e.naziv ?? "")),
-                            DataCell(Text(formatNumber(e.cijena))),
-                            DataCell(e.slika != null
-                                ? Container(
-                                    width: 100,
-                                    height: 100,
-                                    child: imageFromString(e.slika!),
-                                  )
-                                : Text(""))
-                          ]))
-                      .toList()
-                      .cast<DataRow>() ??
-                  [])),
+      child: Container(
+          width: double.infinity,
+          child: SingleChildScrollView(
+              child: DataTable(
+                  columns: [
+                DataColumn(label: Text("ID"), numeric: true),
+                DataColumn(label: Text("Naziv")),
+                DataColumn(label: Text("Cijena")),
+                DataColumn(label: Text("Slika")),
+              ],
+                  rows: result?.result
+                          .map((e) => DataRow(
+                                  onSelectChanged: (selected) => {
+                                        if (selected == true)
+                                          {
+                                            Navigator.of(context)
+                                                .pushReplacement(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            ProductDetailsScreen(
+                                                                product: e)))
+                                          }
+                                      },
+                                  cells: [
+                                    DataCell(Text(e.proizvodId.toString())),
+                                    DataCell(Text(e.naziv ?? "")),
+                                    DataCell(Text(formatNumber(e.cijena))),
+                                    DataCell(e.slika != null
+                                        ? Container(
+                                            width: 100,
+                                            height: 100,
+                                            child: imageFromString(e.slika!),
+                                          )
+                                        : Text(""))
+                                  ]))
+                          .toList()
+                          .cast<DataRow>() ??
+                      []))),
     );
   }
 }

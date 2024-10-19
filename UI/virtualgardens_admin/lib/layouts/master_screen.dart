@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:virtualgardens_admin/screens/product_details_screen.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 import 'package:virtualgardens_admin/screens/user_list_screen.dart';
 
@@ -29,15 +30,22 @@ class _MasterScreenState extends State<MasterScreen> {
               ListTile(
                 title: Text("Korisnici"),
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => UserListScreen()));
                 },
               ),
               ListTile(
                 title: Text("Proizvodi"),
                 onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
                       builder: (context) => ProductListScreen()));
+                },
+              ),
+              ListTile(
+                title: Text("Detalji"),
+                onTap: () {
+                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                      builder: (context) => ProductDetailsScreen()));
                 },
               )
             ],
