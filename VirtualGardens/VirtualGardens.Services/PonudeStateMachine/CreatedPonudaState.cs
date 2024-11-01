@@ -12,7 +12,6 @@ using VirtualGardens.Models.Messages;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Models.Requests.Ponude;
 using VirtualGardens.Models.Requests.SetoviPonude;
-using VirtualGardens.Services.Conventions;
 using VirtualGardens.Services.Database;
 
 namespace VirtualGardens.Services.PonudeStateMachine

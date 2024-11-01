@@ -1,0 +1,18 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
+import 'package:virtualgardens_admin/models/narudzbe.dart';
+import 'package:virtualgardens_admin/models/proizvod.dart';
+import 'package:virtualgardens_admin/models/search_result.dart';
+import 'package:virtualgardens_admin/providers/auth_provider.dart';
+import 'package:virtualgardens_admin/providers/base_provider.dart';
+
+class NarudzbaProvider extends BaseProvider<Narudzba> {
+  NarudzbaProvider() : super("api/Narudzbe");
+
+  @override
+  Narudzba fromJson(data) {
+    // TODO: implement fromJson
+    return Narudzba.fromJson(data);
+  }
+}

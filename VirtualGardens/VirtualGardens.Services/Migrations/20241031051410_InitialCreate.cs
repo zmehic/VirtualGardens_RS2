@@ -45,7 +45,8 @@ namespace VirtualGardens.Services.Migrations
                     DatumRegistracije = table.Column<DateTime>(type: "datetime", nullable: false),
                     ZadnjiLogin = table.Column<DateTime>(type: "datetime", nullable: true),
                     JeAktivan = table.Column<bool>(type: "bit", nullable: false),
-                    DatumRodjenja = table.Column<DateTime>(type: "datetime", nullable: true)
+                    DatumRodjenja = table.Column<DateTime>(type: "datetime", nullable: true),
+                    Slika = table.Column<byte[]>(type: "varbinary(max)", nullable: true)
                 },
                 constraints: table =>
                 {

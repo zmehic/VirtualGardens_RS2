@@ -16,7 +16,11 @@ Proizvod _$ProizvodFromJson(Map<String, dynamic> json) => Proizvod(
       ..cijena = (json['cijena'] as num?)?.toDouble()
       ..vrstaProizvodaId = (json['vrstaProizvodaId'] as num?)?.toInt()
       ..jedinicaMjereId = (json['jedinicaMjereId'] as num?)?.toInt()
-      ..slikaThumb = json['slikaThumb'] as String?;
+      ..slikaThumb = json['slikaThumb'] as String?
+      ..jedinicaMjere = json['jedinicaMjere'] == null
+          ? null
+          : JediniceMjere.fromJson(
+              json['jedinicaMjere'] as Map<String, dynamic>);
 
 Map<String, dynamic> _$ProizvodToJson(Proizvod instance) => <String, dynamic>{
       'proizvodId': instance.proizvodId,
@@ -28,4 +32,5 @@ Map<String, dynamic> _$ProizvodToJson(Proizvod instance) => <String, dynamic>{
       'vrstaProizvodaId': instance.vrstaProizvodaId,
       'jedinicaMjereId': instance.jedinicaMjereId,
       'slikaThumb': instance.slikaThumb,
+      'jedinicaMjere': instance.jedinicaMjere,
     };

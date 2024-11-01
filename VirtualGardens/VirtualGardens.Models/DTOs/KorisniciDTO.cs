@@ -32,6 +32,7 @@ namespace VirtualGardens.Models.DTOs
         public bool JeAktivan { get; set; }
 
         public DateTime? DatumRodjenja { get; set; }
+        public byte[]? Slika { get; set; }
 
         public virtual ICollection<KorisniciUlogeDTO> KorisniciUloges { get; set; } = new List<KorisniciUlogeDTO>();
 

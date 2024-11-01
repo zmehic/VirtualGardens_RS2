@@ -12,7 +12,7 @@ using VirtualGardens.Services.Database;
 namespace VirtualGardens.Services.Migrations
 {
     [DbContext(typeof(_210011Context))]
-    [Migration("20241003130948_InitialCreate")]
+    [Migration("20241031051410_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -125,6 +125,9 @@ namespace VirtualGardens.Services.Migrations
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
+
+                    b.Property<byte[]>("Slika")
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<DateTime?>("ZadnjiLogin")
                         .HasColumnType("datetime");

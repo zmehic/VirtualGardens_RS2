@@ -34,6 +34,7 @@ public partial class Korisnici
     public bool JeAktivan { get; set; } = true;
 
     public DateTime? DatumRodjenja { get; set; }
+    public byte[]? Slika { get; set; }
 
     public virtual ICollection<KorisniciUloge> KorisniciUloges { get; set; } = new List<KorisniciUloge>();
 

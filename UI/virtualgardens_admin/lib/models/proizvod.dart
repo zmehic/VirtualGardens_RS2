@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:virtualgardens_admin/models/jedinice_mjere.dart';
 
 part 'proizvod.g.dart';
 
@@ -13,6 +14,7 @@ class Proizvod {
   int? vrstaProizvodaId;
   int? jedinicaMjereId;
   String? slikaThumb;
+  JediniceMjere? jedinicaMjere;
 
   Proizvod({this.proizvodId, this.naziv});
 
