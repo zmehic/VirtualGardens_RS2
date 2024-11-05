@@ -54,6 +54,12 @@ namespace VirtualGardens.Services.AllServices
                 query = query.Where(x => x.BrojTelefona == search.BrojTelefona);
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
+
             return query;
         }
 

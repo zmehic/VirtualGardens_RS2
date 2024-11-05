@@ -41,6 +41,11 @@ namespace VirtualGardens.Services.AllServices.ProizvodiSetovi
                 query = query.Where(x => x.Kolicina <= search.KolicinaTo.Value);
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
             return query;
         }
 

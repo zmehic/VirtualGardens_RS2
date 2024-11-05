@@ -17,5 +17,15 @@ namespace VirtualGardens.Services.AllServices.KorisniciUloge
         public KorisniciUlogeService(_210011Context context, IMapper mapper) : base(context, mapper)
         {
         }
+
+        public override IQueryable<Database.KorisniciUloge> AddFilter(KorisniciUlogeSearchObject search, IQueryable<Database.KorisniciUloge> query)
+        {
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
+            return query;
+        }
     }
 }

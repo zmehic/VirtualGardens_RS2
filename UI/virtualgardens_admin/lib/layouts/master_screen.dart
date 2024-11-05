@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:virtualgardens_admin/providers/auth_provider.dart';
+import 'package:virtualgardens_admin/screens/home_screen.dart';
 import 'package:virtualgardens_admin/screens/product_details_screen.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 import 'package:virtualgardens_admin/screens/user_list_screen.dart';
@@ -52,28 +53,35 @@ class _MasterScreenState extends State<MasterScreen> {
         child: ListView(
           children: [
             ListTile(
-              title: Text("Back"),
+              title: Text("Home"),
+              onTap: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const HomeScreen()));
+              },
+            ),
+            ListTile(
+              title: Text("Profil"),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.pop(context);
               },
             ),
             ListTile(
-              title: Text("Korisnici"),
-              onTap: () {
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => UserListScreen()));
-              },
-            ),
-            ListTile(
-              title: Text("Proizvodi"),
+              title: Text("Skladište"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => ProductListScreen()));
               },
             ),
             ListTile(
-              title: Text("Detalji"),
+              title: Text("Narudžbe"),
+              onTap: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => ProductListScreen()));
+              },
+            ),
+            ListTile(
+              title: Text("Statistika"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => ProductDetailsScreen()));

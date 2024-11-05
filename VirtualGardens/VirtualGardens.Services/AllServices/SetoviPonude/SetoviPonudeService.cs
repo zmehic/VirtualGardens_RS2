@@ -32,6 +32,11 @@ namespace VirtualGardens.Services.AllServices.SetoviPonude
                 query = query.Where(x => x.PonudaId == search.PonudaId.Value);
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
             return query;
         }
 

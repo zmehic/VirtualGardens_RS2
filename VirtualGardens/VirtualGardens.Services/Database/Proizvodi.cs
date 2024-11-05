@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using VirtualGardens.Services.BaseInterfaces;
 
 namespace VirtualGardens.Services.Database;
 
-public partial class Proizvodi
+public partial class Proizvodi : ISoftDeletable
 {
     public int ProizvodId { get; set; }
 
@@ -32,4 +33,6 @@ public partial class Proizvodi
     public virtual ICollection<UlaziProizvodi> UlaziProizvodis { get; set; } = new List<UlaziProizvodi>();
 
     public virtual VrsteProizvodum VrstaProizvoda { get; set; } = null!;
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? VrijemeBrisanja { get; set; }
 }

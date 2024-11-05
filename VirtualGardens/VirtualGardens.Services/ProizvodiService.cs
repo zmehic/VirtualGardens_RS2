@@ -60,6 +60,10 @@ namespace VirtualGardens.Services
             {
                 query = query.Where(x => x.VrstaProizvodaId == search.VrstaProizvodaId.Value);
             }
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
 
             return query;
         }

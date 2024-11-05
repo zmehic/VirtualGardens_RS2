@@ -44,6 +44,11 @@ namespace VirtualGardens.Services.AllServices.Ponude
                 query = query.Where(x => x.Popust <= search.PopustTo.Value);
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
 
             return query;
         }

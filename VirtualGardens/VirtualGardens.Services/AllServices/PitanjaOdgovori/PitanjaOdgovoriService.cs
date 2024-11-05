@@ -40,6 +40,11 @@ namespace VirtualGardens.Services.AllServices.PitanjaOdgovori
                 query = query.Where(x => x.NarudzbaId == search.NarudzbaId.Value);
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
             return query;
         }
 

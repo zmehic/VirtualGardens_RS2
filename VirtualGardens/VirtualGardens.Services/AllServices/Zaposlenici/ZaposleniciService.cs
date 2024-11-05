@@ -55,6 +55,11 @@ namespace VirtualGardens.Services.AllServices.Zaposlenici
                 query = query.Where(x => x.JeAktivan == search.JeAktivan.Value);
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
             return query;
         }
     }

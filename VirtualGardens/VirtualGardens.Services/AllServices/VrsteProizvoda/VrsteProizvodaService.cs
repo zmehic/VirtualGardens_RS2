@@ -23,6 +23,11 @@ namespace VirtualGardens.Services.AllServices.VrsteProizvoda
             {
                 query = query.Where(x => x.Naziv.ToLower().StartsWith(search.NazivGTE.ToLower()));
             }
+
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
             return query;
         }
     }

@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
-
+import 'dart:math';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
@@ -13,7 +13,9 @@ import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/models/vrsta_proizvoda.dart';
 import 'package:virtualgardens_admin/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
+import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
+import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   Proizvod? product;
@@ -35,7 +37,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   SearchResult<VrstaProizvoda>? vrsteProizvodaResult;
 
   bool isLoading = true;
-
+  bool isLoadingSave = false;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -43,7 +45,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     productProvider = context.read<ProductProvider>();
     jediniceMjereProvider = context.read<JediniceMjereProvider>();
     vrsteProizvodaProvider = context.read<VrsteProizvodaProvider>();
@@ -55,13 +56,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       'vrstaProizvodaId': widget.product?.vrstaProizvodaId.toString(),
       'jedinicaMjereId': widget.product?.jedinicaMjereId.toString(),
       'dostupnaKolicina': widget.product?.dostupnaKolicina.toString(),
-      'cijena': widget.product?.cijena.toString()
+      'cijena': widget.product?.cijena.toString(),
     };
 
-    InitForm();
+    _base64Image = widget.product?.slika;
+
+    initForm();
   }
 
-  Future InitForm() async {
+  Future initForm() async {
     jediniceMjereResult = await jediniceMjereProvider.get();
     vrsteProizvodaResult = await vrsteProizvodaProvider.get();
 
@@ -73,131 +76,98 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-        Column(
-          children: [isLoading ? Container() : _buildForm(), _saveRow()],
+        Container(
+          margin:
+              const EdgeInsets.only(left: 40, right: 40, top: 20, bottom: 10),
+          color: const Color.fromRGBO(235, 241, 224, 1),
+          child: Column(
+            children: [
+              isLoading ? Container() : _buildBanner(),
+              isLoading ? Container() : _buildMain()
+            ],
+          ),
         ),
         "Detalji");
   }
 
-  Widget _buildForm() {
-    return FormBuilder(
-        key: _formKey,
-        initialValue: _initialValue,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                      child: FormBuilderTextField(
-                          decoration: InputDecoration(labelText: "Naziv"),
-                          name: "naziv",
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter some text';
-                            }
-                            return null;
-                          })),
-                  SizedBox(width: 10),
-                  Expanded(
-                      child: FormBuilderTextField(
-                    decoration: InputDecoration(labelText: "Opis"),
-                    name: "opis",
-                  )),
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderDropdown(
-                      name: "vrstaProizvodaId",
-                      decoration: InputDecoration(labelText: "Vrsta proizvoda"),
-                      items: vrsteProizvodaResult?.result
-                              .map((item) => DropdownMenuItem(
-                                  value: item.vrstaProizvodaId.toString(),
-                                  child: Text(item.naziv ?? "")))
-                              .toList() ??
-                          [],
-                    ),
-                  ),
-                  Expanded(
-                    child: FormBuilderDropdown(
-                      name: "jedinicaMjereId",
-                      decoration: InputDecoration(labelText: "Jedinica mjere"),
-                      items: jediniceMjereResult?.result
-                              .map((item) => DropdownMenuItem(
-                                  value: item.jedinicaMjereId.toString(),
-                                  child: Text(item.naziv ?? "")))
-                              .toList() ??
-                          [],
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Expanded(
-                      child: FormBuilderTextField(
-                    decoration: InputDecoration(labelText: "Dostupna količina"),
-                    name: "dostupnaKolicina",
-                  )),
-                  SizedBox(width: 10),
-                  Expanded(
-                      child: FormBuilderTextField(
-                    decoration: InputDecoration(labelText: "Cijena"),
-                    name: "cijena",
-                  ))
-                ],
-              ),
-              Row(
-                children: [
-                  Expanded(
-                      child: FormBuilderField(
-                    name: "imageId",
-                    builder: (field) {
-                      return InputDecorator(
-                        decoration:
-                            InputDecoration(labelText: "Choose an input image"),
-                        child: ListTile(
-                          leading: Icon(Icons.image),
-                          title: Text("Select an image"),
-                          trailing: Icon(Icons.file_upload),
-                          onTap: getImage,
-                        ),
-                      );
-                    },
-                  ))
-                ],
-              )
-            ],
-          ),
-        ));
+  Widget _buildBanner() {
+    return Container(
+      margin: const EdgeInsets.only(top: 30),
+      color: const Color.fromRGBO(32, 76, 56, 1),
+      width: double.infinity,
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(size: 45, color: Colors.white, Icons.sell_rounded),
+            const SizedBox(
+              width: 10,
+            ),
+            widget.product == null
+                ? const Text("Novi proizvod",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "arial",
+                        color: Colors.white))
+                : const Text("Detalji o proizvodu",
+                    style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        fontFamily: "arial",
+                        color: Colors.white))
+          ],
+        ),
+      ),
+    );
   }
 
-  Widget _saveRow() {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          ElevatedButton(
-              onPressed: () {
-                if (_formKey.currentState?.saveAndValidate() == true) {
-                  debugPrint(_formKey.currentState?.value.toString());
-
-                  var request = Map.from(_formKey.currentState!.value);
-                  request['slika'] = _base64Image;
-                  request['slikaThumb'] = _base64Image;
-
-                  if (widget.product == null) {
-                    productProvider.insert(request);
-                  } else {
-                    productProvider.update(
-                        widget.product!.proizvodId!, request);
-                  }
-                }
-              },
-              child: Text("Sačuvaj"))
-        ],
-      ),
+  Widget _buildMain() {
+    return Expanded(
+      child: Container(
+          height: 300,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            color: const Color.fromRGBO(32, 76, 56, 1),
+          ),
+          margin: const EdgeInsets.all(15),
+          width: double.infinity,
+          child: Container(
+            margin: const EdgeInsets.all(15),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Center(
+                          child: Container(
+                            margin: const EdgeInsets.all(50),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.rectangle,
+                                border: Border.all(
+                                    color:
+                                        const Color.fromRGBO(235, 241, 224, 1),
+                                    width: 5)),
+                            child: widget.product?.slika != null
+                                ? imageFromString(widget.product!.slika!)
+                                : const Text(""),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    color: const Color.fromRGBO(235, 241, 224, 1),
+                    child: _buildNewForm(),
+                  ),
+                )
+              ],
+            ),
+          )),
     );
   }
 
@@ -211,5 +181,249 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       _image = File(result.files.single.path!);
       _base64Image = base64Encode(_image!.readAsBytesSync());
     }
+  }
+
+  Widget _buildNewForm() {
+    return FormBuilder(
+        key: _formKey,
+        initialValue: _initialValue,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: FormBuilderTextField(
+                        decoration: const InputDecoration(labelText: "Naziv"),
+                        name: "naziv",
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter some text';
+                          }
+                          return null;
+                        }),
+                  )
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: FormBuilderTextField(
+                      decoration: const InputDecoration(labelText: "Opis"),
+                      name: "opis",
+                    ),
+                  )
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                children: [
+                  Expanded(
+                    child: FormBuilderDropdown(
+                        name: "vrstaProizvodaId",
+                        decoration:
+                            const InputDecoration(labelText: "Vrsta proizvoda"),
+                        items: vrsteProizvodaResult?.result
+                                .map((item) => DropdownMenuItem(
+                                    value: item.vrstaProizvodaId.toString(),
+                                    child: Text(item.naziv ?? "")))
+                                .toList() ??
+                            [],
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please choose some value';
+                          }
+                          return null;
+                        }),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                    child: FormBuilderDropdown(
+                        name: "jedinicaMjereId",
+                        decoration:
+                            const InputDecoration(labelText: "Jedinica mjere"),
+                        items: jediniceMjereResult?.result
+                                .map((item) => DropdownMenuItem(
+                                    value: item.jedinicaMjereId.toString(),
+                                    child: Text(item.naziv ?? "")))
+                                .toList() ??
+                            [],
+                        validator: (value) {
+                          if (value == null) {
+                            return 'Please choose some value';
+                          }
+                          return null;
+                        }),
+                  )
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                children: [
+                  Expanded(
+                      child: FormBuilderTextField(
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter
+                                .digitsOnly, // Allows only digits
+                          ],
+                          decoration: InputDecoration(
+                              labelText:
+                                  "Dostupna količina (${widget.product?.jedinicaMjere?.skracenica ?? ""})"),
+                          name: "dostupnaKolicina",
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'This field can not be empty';
+                            }
+                            return null;
+                          })),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Expanded(
+                      child: FormBuilderTextField(
+                          keyboardType: TextInputType.number,
+                          inputFormatters: <TextInputFormatter>[
+                            FilteringTextInputFormatter
+                                .digitsOnly, // Allows only digits
+                          ],
+                          decoration: InputDecoration(
+                              labelText:
+                                  "Cijena (KM/${widget.product?.jedinicaMjere?.skracenica ?? ""})"),
+                          name: "cijena",
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'This field can not be empty';
+                            }
+                            return null;
+                          }))
+                ],
+              ),
+              const SizedBox(
+                height: 15,
+              ),
+              Row(
+                children: [
+                  // Expanded widget for the image upload, taking up half of the width
+                  Expanded(
+                    child: FormBuilderField(
+                      name: "imageId",
+                      builder: (field) {
+                        return InputDecorator(
+                          decoration: const InputDecoration(
+                              labelText: "Choose an input image"),
+                          child: ListTile(
+                            leading: const Icon(Icons.image),
+                            title: const Text("Select an image"),
+                            trailing: const Icon(Icons.file_upload),
+                            onTap: getImage,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  // Expanded widget for the save button, taking up the other half of the width
+                  Expanded(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        SizedBox(
+                          width: 60,
+                          height: 60,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              if (_formKey.currentState?.saveAndValidate() ==
+                                  true) {
+                                debugPrint(
+                                    _formKey.currentState?.value.toString());
+
+                                var request =
+                                    Map.from(_formKey.currentState!.value);
+                                request['slika'] = _base64Image;
+                                request['slikaThumb'] = _base64Image;
+                                isLoadingSave = true;
+                                setState(() {});
+                                try {
+                                  if (widget.product == null) {
+                                    await productProvider.insert(request);
+                                  } else {
+                                    await productProvider.update(
+                                        widget.product!.proizvodId!, request);
+                                  }
+
+                                  Navigator.of(context).pushReplacement(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              const ProductListScreen()));
+                                } on Exception catch (e) {}
+                              }
+                            }, // Define this function to handle the save action
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green,
+                              shape:
+                                  const CircleBorder(), // Makes the button circular
+                              padding: const EdgeInsets.all(
+                                  8), // Adjust padding for icon size // Background color
+                            ),
+
+                            child: isLoadingSave
+                                ? CircularProgressIndicator()
+                                : const Icon(
+                                    Icons.save,
+                                    color: Colors.white,
+                                  ), // Save icon inside
+                          ),
+                        ),
+                        widget.product != null
+                            ? SizedBox(
+                                width: 60,
+                                height: 60,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    isLoadingSave = true;
+                                    setState(() {});
+                                    if (widget.product == null) {
+                                    } else {
+                                      await productProvider
+                                          .delete(widget.product!.proizvodId!);
+                                    }
+
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const ProductListScreen()));
+                                  }, // Define this function to handle the save action
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.red,
+                                    shape:
+                                        const CircleBorder(), // Makes the button circular
+                                    padding: const EdgeInsets.all(
+                                        8), // Adjust padding for icon size // Background color
+                                  ),
+
+                                  child: isLoadingSave
+                                      ? CircularProgressIndicator()
+                                      : const Icon(
+                                          Icons.delete,
+                                          color: Colors.white,
+                                        ), // Save icon inside
+                                ),
+                              )
+                            : Container()
+                      ],
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+        ));
   }
 }

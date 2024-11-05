@@ -32,6 +32,11 @@ namespace VirtualGardens.Services.AllServices.JediniceMjere
                 query = query.Where(x => x.Skracenica.ToLower().StartsWith(search.SkracenicaGTE.ToLower()));
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
             return query;
         }
     }

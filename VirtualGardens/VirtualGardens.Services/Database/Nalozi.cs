@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using VirtualGardens.Services.BaseInterfaces;
 
 namespace VirtualGardens.Services.Database;
 
-public partial class Nalozi
+public partial class Nalozi:ISoftDeletable
 {
     public int NalogId { get; set; }
 
@@ -18,4 +19,6 @@ public partial class Nalozi
     public virtual ICollection<Narudzbe> Narudzbes { get; set; } = new List<Narudzbe>();
 
     public virtual Zaposlenici Zaposlenik { get; set; } = null!;
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? VrijemeBrisanja { get; set; }
 }

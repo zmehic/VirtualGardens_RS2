@@ -50,6 +50,11 @@ namespace VirtualGardens.Services.AllServices.Recenzije
                 query = query.Where(x => x.ProizvodId == search.ProizvodId.Value);
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
             return query;
         }
 

@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using VirtualGardens.Services.BaseInterfaces;
 
 namespace VirtualGardens.Services.Database;
 
-public partial class PitanjaOdgovori
+public partial class PitanjaOdgovori : ISoftDeletable
 {
     public int PitanjeId { get; set; }
 
@@ -18,4 +19,6 @@ public partial class PitanjaOdgovori
     public virtual Korisnici Korisnik { get; set; } = null!;
 
     public virtual Narudzbe Narudzba { get; set; } = null!;
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? VrijemeBrisanja { get; set; }
 }

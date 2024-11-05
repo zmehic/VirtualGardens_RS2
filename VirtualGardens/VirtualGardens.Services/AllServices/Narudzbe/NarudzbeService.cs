@@ -78,6 +78,11 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
                 {
                     query = query.Where(x => x.NalogId == search.NalogId.Value);
                 }
+
+                if (search?.isDeleted != null)
+                {
+                    query = query.Where(x => x.IsDeleted == search.isDeleted);
+                }
             }
 
             return query;

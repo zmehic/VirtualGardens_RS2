@@ -44,6 +44,11 @@ namespace VirtualGardens.Services.AllServices.Ulazi
                 query = query.Where(x => x.KorisnikId == search.KorisnikId.Value);
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
             return query;
         }
     }

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.SearchObjects;
+using VirtualGardens.Services.BaseInterfaces;
 using VirtualGardens.Services.Database;
 
 namespace VirtualGardens.Services.BaseServices
@@ -54,7 +55,18 @@ namespace VirtualGardens.Services.BaseServices
                 throw new Exception("Nemoguće pronaći objekat sa poslanim id-om!");
             }
 
-            Context.Remove(entity);
+            if(entity is ISoftDeletable softDeletableEntity)
+            {
+                softDeletableEntity.IsDeleted = true;
+                softDeletableEntity.VrijemeBrisanja = DateTime.Now;
+
+                Context.Update(entity);
+            }
+            else
+            {
+                Context.Remove(entity);
+            }
+
             Context.SaveChanges();
         }
 

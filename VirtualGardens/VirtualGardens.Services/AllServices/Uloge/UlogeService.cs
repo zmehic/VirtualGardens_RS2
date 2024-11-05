@@ -24,7 +24,10 @@ namespace VirtualGardens.Services.AllServices.Uloge
             {
                 query = query.Where(x => x.Naziv.ToLower().StartsWith(search.NazivGTE.ToLower()));
             }
-
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
             return query;
         }
     }

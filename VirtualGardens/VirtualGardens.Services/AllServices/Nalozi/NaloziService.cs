@@ -44,6 +44,11 @@ namespace VirtualGardens.Services.AllServices.Nalozi
                 {
                     query = query.Where(x => x.Zavrsen == search.Zavrsen.Value);
                 }
+
+                if (search?.isDeleted != null)
+                {
+                    query = query.Where(x => x.IsDeleted == search.isDeleted);
+                }
             }
 
             return query;

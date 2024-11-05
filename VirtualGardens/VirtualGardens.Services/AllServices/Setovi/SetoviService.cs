@@ -55,6 +55,11 @@ namespace VirtualGardens.Services.AllServices.Setovi
                 query = query.Where(x => x.CijenaSaPopustom <= search.CijenaSaPopustomTo.Value);
             }
 
+            if (search?.isDeleted != null)
+            {
+                query = query.Where(x => x.IsDeleted == search.isDeleted);
+            }
+
             return query;
         }
 
