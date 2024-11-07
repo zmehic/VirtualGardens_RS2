@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
@@ -9,6 +11,7 @@ import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_admin/screens/product_details_screen.dart';
+import 'package:virtualgardens_admin/screens/ulazi_list_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -110,6 +113,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 child: TextField(
               controller: _cijenaOdEditingController,
               decoration: const InputDecoration(labelText: "Cijena od:"),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             )),
             const SizedBox(
               width: 8,
@@ -118,6 +123,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 child: TextField(
               controller: _cijenaDoEditingController,
               decoration: const InputDecoration(labelText: "Cijena do:"),
+              keyboardType: TextInputType.number,
+              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             )),
             ElevatedButton(
                 onPressed: () async {
@@ -147,6 +154,32 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       builder: (context) => ProductDetailsScreen()));
                 },
                 child: const Text("Dodaj")),
+            const SizedBox(
+              width: 8,
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const UlaziListScreen()));
+              },
+              child: const Text("Ulazi"),
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                isLoading = true;
+                setState(() {});
+                await provider.recalculatequantiy();
+                initScreen(selectedVrstaProizvoda);
+                setState(() {});
+              },
+              child: const Icon(
+                Icons.calculate,
+                color: Colors.green,
+              ),
+            )
           ],
         ));
   }

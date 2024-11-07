@@ -55,6 +55,8 @@ namespace VirtualGardens.Services.BaseServices
                 throw new Exception("Nemoguće pronaći objekat sa poslanim id-om!");
             }
 
+            BeforeDelete(id, entity);
+
             if(entity is ISoftDeletable softDeletableEntity)
             {
                 softDeletableEntity.IsDeleted = true;
@@ -68,11 +70,15 @@ namespace VirtualGardens.Services.BaseServices
             }
 
             Context.SaveChanges();
+
+            AfterDelete(id, entity);
         }
 
         public virtual void BeforeInsert(TInsert request, TDbEntity entity) { }
         public virtual void AfterInsert(TInsert request, TDbEntity entity) { }
         public virtual void BeforeUpdate(TUpdate request, TDbEntity entity) { }
         public virtual void AfterUpdate(TUpdate request, TDbEntity entity) { }
+        public virtual void BeforeDelete(int id, TDbEntity entity) { }
+        public virtual void AfterDelete(int id, TDbEntity entity) { }
     }
 }

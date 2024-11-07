@@ -12,5 +12,6 @@ namespace VirtualGardens.Services.AllServices.UlaziProizvodi
 {
     public interface IUlaziProizvodiService : ICRUDService<Models.DTOs.UlaziProizvodiDTO, UlaziProizvodiSearchObject, UlaziProizvodiUpsertRequest, UlaziProizvodiUpsertRequest>
     {
+
     }
 }

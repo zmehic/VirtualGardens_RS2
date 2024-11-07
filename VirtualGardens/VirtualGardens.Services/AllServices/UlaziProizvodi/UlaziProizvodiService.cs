@@ -52,5 +52,32 @@ namespace VirtualGardens.Services.AllServices.UlaziProizvodi
             return query;
         }
 
+        public override void AfterInsert(UlaziProizvodiUpsertRequest request, Database.UlaziProizvodi entity)
+        {
+            var proizvod = Context.Set<Proizvodi>().Find(request.ProizvodId);
+
+            if (proizvod != null)
+            {
+                proizvod.DostupnaKolicina += request.Kolicina;
+                Context.Update<Proizvodi>(proizvod);
+            }
+
+            Context.SaveChanges();
+
+        }
+
+        public override void BeforeDelete(int id, Database.UlaziProizvodi entity)
+        {
+            var proizvod = Context.Set<Proizvodi>().Find(entity.ProizvodId);
+
+            if(proizvod != null)
+            {
+                proizvod.DostupnaKolicina -= entity.Kolicina;
+                Context.Update<Proizvodi>(proizvod);
+            }
+
+            Context.SaveChanges();
+        }
+
     }
 }

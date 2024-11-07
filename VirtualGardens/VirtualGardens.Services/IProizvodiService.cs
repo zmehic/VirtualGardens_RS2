@@ -13,6 +13,6 @@ namespace VirtualGardens.Services
 {
     public interface IProizvodiService : ICRUDService<Models.DTOs.ProizvodiDTO, ProizvodiSearchObject, ProizvodiUpsertRequest, ProizvodiUpsertRequest>
     {
-
+        bool RecalcuclateQuantity();
     }
 }

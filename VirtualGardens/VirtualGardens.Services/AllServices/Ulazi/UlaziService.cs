@@ -51,5 +51,22 @@ namespace VirtualGardens.Services.AllServices.Ulazi
 
             return query;
         }
+
+        public override void AfterDelete(int id, Database.Ulazi entity)
+        {
+            var ulaziProizvodi = Context.Set<VirtualGardens.Services.Database.UlaziProizvodi>().Where(x => x.UlazId == id && x.IsDeleted==false).ToList();
+
+            foreach (var item in ulaziProizvodi)
+            {
+                var proizvod = Context.Set<Proizvodi>().Find(item.ProizvodId);
+                if(proizvod!=null)
+                {
+                    proizvod.DostupnaKolicina -= item.Kolicina;
+                    Context.Update<Proizvodi>(proizvod);
+                }
+
+            }
+            Context.SaveChanges();
+        }
     }
 }

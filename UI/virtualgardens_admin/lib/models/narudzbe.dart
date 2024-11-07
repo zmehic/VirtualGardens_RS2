@@ -1,8 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:virtualgardens_admin/models/korisnici.dart';
 import 'package:virtualgardens_admin/models/nalozi.dart';
-import 'package:virtualgardens_admin/models/uloga.dart';
-import 'package:virtualgardens_admin/models/zaposlenici.dart';
 
 part 'narudzbe.g.dart';
 

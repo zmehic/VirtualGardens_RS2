@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
+import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/jedinice_mjere.dart';
 import 'package:virtualgardens_admin/models/proizvod.dart';
@@ -17,6 +17,7 @@ import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 
+// ignore: must_be_immutable
 class ProductDetailsScreen extends StatefulWidget {
   Proizvod? product;
   ProductDetailsScreen({super.key, this.product});
@@ -55,7 +56,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
       'opis': widget.product?.opis,
       'vrstaProizvodaId': widget.product?.vrstaProizvodaId.toString(),
       'jedinicaMjereId': widget.product?.jedinicaMjereId.toString(),
-      'dostupnaKolicina': widget.product?.dostupnaKolicina.toString(),
+      'dostupnaKolicina': widget.product != null
+          ? widget.product?.dostupnaKolicina.toString()
+          : 0.toString(),
       'cijena': widget.product?.cijena.toString(),
     };
 
@@ -76,17 +79,16 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-        Container(
-          margin:
-              const EdgeInsets.only(left: 40, right: 40, top: 20, bottom: 10),
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
-            children: [
-              isLoading ? Container() : _buildBanner(),
-              isLoading ? Container() : _buildMain()
-            ],
-          ),
-        ),
+        FullScreenLoader(
+            isLoading: isLoading,
+            child: Container(
+              margin: const EdgeInsets.only(
+                  left: 40, right: 40, top: 20, bottom: 10),
+              color: const Color.fromRGBO(235, 241, 224, 1),
+              child: Column(
+                children: [_buildBanner(), _buildMain()],
+              ),
+            )),
         "Detalji");
   }
 
@@ -179,7 +181,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     if (result != null && result.files.single.path != null) {
       _image = File(result.files.single.path!);
-      _base64Image = base64Encode(_image!.readAsBytesSync());
+
+      int fileSizeInBytes = await _image!.length();
+      double fileSizeInMb = fileSizeInBytes / (1024 * 1024);
+
+      if (fileSizeInMb > 2) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("Please select an image up to 2 MB in size"),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        _base64Image = base64Encode(await _image!.readAsBytes());
+      }
     }
   }
 
@@ -269,6 +284,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 children: [
                   Expanded(
                       child: FormBuilderTextField(
+                          enabled: false,
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter
@@ -358,11 +374,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         widget.product!.proizvodId!, request);
                                   }
 
+                                  // ignore: use_build_context_synchronously
                                   Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
                                           builder: (context) =>
                                               const ProductListScreen()));
-                                } on Exception catch (e) {}
+                                  // ignore: empty_catches
+                                } on Exception {}
                               }
                             }, // Define this function to handle the save action
                             style: ElevatedButton.styleFrom(
@@ -374,7 +392,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             ),
 
                             child: isLoadingSave
-                                ? CircularProgressIndicator()
+                                ? const CircularProgressIndicator()
                                 : const Icon(
                                     Icons.save,
                                     color: Colors.white,
@@ -395,6 +413,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                           .delete(widget.product!.proizvodId!);
                                     }
 
+                                    // ignore: use_build_context_synchronously
                                     Navigator.of(context).pushReplacement(
                                         MaterialPageRoute(
                                             builder: (context) =>
@@ -409,7 +428,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   ),
 
                                   child: isLoadingSave
-                                      ? CircularProgressIndicator()
+                                      ? const CircularProgressIndicator()
                                       : const Icon(
                                           Icons.delete,
                                           color: Colors.white,

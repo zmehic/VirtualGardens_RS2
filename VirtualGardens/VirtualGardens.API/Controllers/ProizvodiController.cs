@@ -9,6 +9,7 @@ using VirtualGardens.Services.BaseInterfaces;
 using VirtualGardens.Models.DTOs;
 using VirtualGardens.Models.HelperClasses;
 using Microsoft.AspNetCore.Authorization;
+using VirtualGardens.Services.AllServices;
 
 namespace VirtualGardens.API.Controllers
 {
@@ -30,6 +31,17 @@ namespace VirtualGardens.API.Controllers
         public override ProizvodiDTO GetById(int id)
         {
             return base.GetById(id);
+        }
+
+        [HttpPut("recalculate")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult RecalculateQuantity()
+        {
+            if((_service as IProizvodiService).RecalcuclateQuantity())
+            {
+                return Ok();
+            }
+            else { return BadRequest(); }
         }
     }
 }

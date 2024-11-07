@@ -67,5 +67,28 @@ namespace VirtualGardens.Services
 
             return query;
         }
+
+        public bool RecalcuclateQuantity()
+        {
+            var proizvodi = Context.Set<Proizvodi>().Where(x=>x.IsDeleted==false).ToList();
+
+            foreach (var item in proizvodi)
+            {
+                var ulaziProizvodi = Context.Set<UlaziProizvodi>().Where(x=>x.ProizvodId==item.ProizvodId && x.IsDeleted==false && x.Ulaz.IsDeleted==false).ToList();
+
+                int suma = 0;
+                if(ulaziProizvodi.Count > 0)
+                {
+                    foreach (var item2 in ulaziProizvodi)
+                    {
+                        suma += item2.Kolicina;
+                    }
+                }
+                item.DostupnaKolicina = suma;
+                Context.Update<Proizvodi>(item);
+            }
+            Context.SaveChanges();
+            return true;
+        }
     }
 }

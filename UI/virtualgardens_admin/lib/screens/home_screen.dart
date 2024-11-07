@@ -304,9 +304,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           .map<Widget>((item) {
                                         return buildList(
                                             formatDateString(
-                                                        item.datum.toString())
-                                                    .toString() ??
-                                                "",
+                                                    item.datum.toString())
+                                                .toString(),
                                             "${item.korisnik?.ime} ${item.korisnik?.prezime}",
                                             "${item.ukupnaCijena.toString()} KM");
                                       }),

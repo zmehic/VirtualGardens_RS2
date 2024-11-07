@@ -6,9 +6,10 @@ import 'package:virtualgardens_admin/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_admin/providers/korisnik_provider.dart';
 import 'package:virtualgardens_admin/providers/narduzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
+import 'package:virtualgardens_admin/providers/ulazi_proizvodi_provider.dart';
+import 'package:virtualgardens_admin/providers/ulazi_provider.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_admin/screens/home_screen.dart';
-import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 
 void main() {
   runApp(MultiProvider(
@@ -17,7 +18,9 @@ void main() {
       ChangeNotifierProvider(create: (_) => JediniceMjereProvider()),
       ChangeNotifierProvider(create: (_) => VrsteProizvodaProvider()),
       ChangeNotifierProvider(create: (_) => KorisnikProvider()),
-      ChangeNotifierProvider(create: (_) => NarudzbaProvider())
+      ChangeNotifierProvider(create: (_) => NarudzbaProvider()),
+      ChangeNotifierProvider(create: (_) => UlaziProvider()),
+      ChangeNotifierProvider(create: (_) => UlaziProizvodiProvider())
     ],
     child: const MyApp(),
   ));
@@ -58,8 +61,8 @@ class MyApp extends StatelessWidget {
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
-  final TextEditingController _usernameController = new TextEditingController();
-  final TextEditingController _passwordController = new TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormBuilderState>();
 
   @override
@@ -129,26 +132,28 @@ class LoginPage extends StatelessWidget {
           ElevatedButton(
               onPressed: () async {
                 if (_formKey.currentState?.saveAndValidate() == true) {
-                  KorisnikProvider provider = new KorisnikProvider();
-                  print("Login attempt");
+                  KorisnikProvider provider = KorisnikProvider();
+                  debugPrint("Login attempt");
                   AuthProvider.username = _usernameController.text;
                   AuthProvider.password = _passwordController.text;
                   try {
-                    var data = await provider.login(
+                    await provider.login(
                         username: AuthProvider.username,
                         password: AuthProvider.password);
-                    Navigator.of(context).push(
-                        MaterialPageRoute(builder: (context) => HomeScreen()));
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => const HomeScreen()));
                   } on Exception catch (e) {
                     showDialog(
+                        // ignore: use_build_context_synchronously
                         context: context,
                         builder: (context) => AlertDialog(
-                              title: Text("Error"),
+                              title: const Text("Error"),
                               content: Text(e.toString()),
                               actions: [
                                 TextButton(
                                     onPressed: () => Navigator.pop(context),
-                                    child: Text("Ok"))
+                                    child: const Text("Ok"))
                               ],
                             ));
                   }

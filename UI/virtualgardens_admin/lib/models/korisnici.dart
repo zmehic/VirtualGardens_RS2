@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:virtualgardens_admin/models/korisnici_uloge.dart';
-import 'package:virtualgardens_admin/models/uloga.dart';
 
 part 'korisnici.g.dart';
 
