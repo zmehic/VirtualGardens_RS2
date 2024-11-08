@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.Exceptions;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.Auth;
@@ -98,13 +99,13 @@ namespace VirtualGardens.Services.AllServices
         public override void BeforeUpdate(KorisniciUpdateRequest request, Korisnici entity)
         {
 
-            if (request.Lozinka != null && request.LozinkaPotvrda != null)
+            if ((request.Lozinka != null && !string.IsNullOrEmpty(request.Lozinka)) && (request.LozinkaPotvrda != null && !string.IsNullOrEmpty(request.LozinkaPotvrda)))
             {
                 if (request.StaraLozinka == null)
-                    throw new Exception("Morate poslati staru lozinku!");
+                    throw new UserException("Morate poslati staru lozinku!");
                 var lozinkaCheck = _passwordService.GenerateHash(entity.LozinkaSalt, request.StaraLozinka) == entity.LozinkaHash;
                 if (lozinkaCheck == false)
-                    throw new Exception("Pogrešna stara lozinka");
+                    throw new UserException("Pogrešna stara lozinka");
                 if (request.Lozinka == request.LozinkaPotvrda)
                 {
                     entity.LozinkaHash = _passwordService.GenerateHash(entity.LozinkaSalt, request.Lozinka);

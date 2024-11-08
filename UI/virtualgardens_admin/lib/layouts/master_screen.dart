@@ -3,6 +3,7 @@ import 'package:virtualgardens_admin/providers/auth_provider.dart';
 import 'package:virtualgardens_admin/screens/home_screen.dart';
 import 'package:virtualgardens_admin/screens/product_details_screen.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
+import 'package:virtualgardens_admin/screens/profile_screen.dart';
 import 'package:virtualgardens_admin/screens/user_list_screen.dart';
 
 class MasterScreen extends StatefulWidget {
@@ -62,22 +63,22 @@ class _MasterScreenState extends State<MasterScreen> {
             ListTile(
               title: Text("Profil"),
               onTap: () {
-                Navigator.pop(context);
-                Navigator.pop(context);
+                Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(builder: (context) => ProfileScreen()));
               },
             ),
             ListTile(
               title: Text("Skladište"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => ProductListScreen()));
+                    builder: (context) => const ProductListScreen()));
               },
             ),
             ListTile(
               title: Text("Narudžbe"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => ProductListScreen()));
+                    builder: (context) => const ProductListScreen()));
               },
             ),
             ListTile(
