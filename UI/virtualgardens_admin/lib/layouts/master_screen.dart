@@ -5,6 +5,7 @@ import 'package:virtualgardens_admin/screens/product_details_screen.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 import 'package:virtualgardens_admin/screens/profile_screen.dart';
 import 'package:virtualgardens_admin/screens/user_list_screen.dart';
+import 'package:virtualgardens_admin/screens/zaposlenici_list_screen.dart';
 
 class MasterScreen extends StatefulWidget {
   MasterScreen(this.child, this.title, {super.key});
@@ -72,6 +73,13 @@ class _MasterScreenState extends State<MasterScreen> {
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const ProductListScreen()));
+              },
+            ),
+            ListTile(
+              title: Text("Zaposlenici"),
+              onTap: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const ZaposleniciListScreen()));
               },
             ),
             ListTile(

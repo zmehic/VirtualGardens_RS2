@@ -216,7 +216,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                   textStyle: const TextStyle(
                                       color: Colors.black, fontSize: 16),
                                   onSelected: (value) {
-                                    initScreen(int.tryParse(value.toString()));
+                                    if (value != null) {
+                                      initScreen(
+                                          int.tryParse(value.toString()));
+                                    } else {
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                          content: Text(
+                                              "Vrijednost može biti 'Tlo', 'Sjeme' ili 'Prihrana'!"),
+                                          backgroundColor: Colors.red,
+                                        ),
+                                      );
+                                    }
                                   },
                                 ),
                               )

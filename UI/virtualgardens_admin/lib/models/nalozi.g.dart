@@ -12,8 +12,9 @@ Nalog _$NalogFromJson(Map<String, dynamic> json) => Nalog(
       datumKreiranja: DateTime.parse(json['datumKreiranja'] as String),
       zaposlenikId: (json['zaposlenikId'] as num).toInt(),
       zavrsen: json['zavrsen'] as bool,
-      zaposlenik:
-          Zaposlenik.fromJson(json['zaposlenik'] as Map<String, dynamic>),
+      zaposlenik: json['zaposlenik'] == null
+          ? null
+          : Zaposlenik.fromJson(json['zaposlenik'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$NalogToJson(Nalog instance) => <String, dynamic>{

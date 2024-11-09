@@ -2,25 +2,16 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/main.dart';
-import 'package:virtualgardens_admin/models/jedinice_mjere.dart';
 import 'package:virtualgardens_admin/models/korisnici.dart';
-import 'package:virtualgardens_admin/models/proizvod.dart';
-import 'package:virtualgardens_admin/models/search_result.dart';
-import 'package:virtualgardens_admin/models/vrsta_proizvoda.dart';
 import 'package:virtualgardens_admin/providers/auth_provider.dart';
-import 'package:virtualgardens_admin/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_admin/providers/korisnik_provider.dart';
-import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
-import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_admin/screens/home_screen.dart';
-import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 
 // ignore: must_be_immutable
 class ProfileScreen extends StatefulWidget {
@@ -116,7 +107,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             SizedBox(
               width: 10,
             ),
-            Text("Detalji profilu",
+            Text("Detalji o profilu",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -156,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         const Color.fromRGBO(235, 241, 224, 1),
                                     width: 5)),
                             child: korisnikResult?.slika != null
-                                ? imageFromString(korisnikResult!.slika!)
+                                ? imageFromString(_base64Image!)
                                 : const Text(""),
                           ),
                         ),
@@ -166,7 +157,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 Expanded(
                   child: Container(
-                    color: const Color.fromRGBO(235, 241, 224, 1),
+                    decoration: BoxDecoration(
+                      color: const Color.fromRGBO(235, 241, 224, 1),
+                      borderRadius: BorderRadius.circular(20), // Rounded edges
+                    ),
                     child: _buildNewForm(),
                   ),
                 )
@@ -197,6 +191,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       } else {
         _base64Image = base64Encode(await _image!.readAsBytes());
+        setState(() {});
       }
     }
   }
@@ -207,279 +202,283 @@ class _ProfileScreenState extends State<ProfileScreen> {
         initialValue: _initialValue,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: FormBuilderTextField(
-                        decoration:
-                            const InputDecoration(labelText: "Korisničko ime"),
-                        name: "korisnickoIme",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        }),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: FormBuilderTextField(
-                        decoration: const InputDecoration(labelText: "Email"),
-                        name: "email",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        }),
-                  )
-                ],
-              ),
-              const SizedBox(height: 15),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: FormBuilderTextField(
-                        decoration: const InputDecoration(labelText: "Ime"),
-                        name: "ime",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        }),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: FormBuilderTextField(
-                        decoration: const InputDecoration(labelText: "Prezime"),
-                        name: "prezime",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        }),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: FormBuilderTextField(
-                      controller: _datumRodjenjaController,
-                      decoration:
-                          const InputDecoration(labelText: "Datum rođenja"),
-                      name: "datumRodjenja",
-                      readOnly: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please choose some value';
-                        }
-                        return null;
-                      },
-                      onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            firstDate: DateTime(1900),
-                            lastDate: DateTime(2101));
-                        if (pickedDate != null) {
-                          _datumRodjenjaController.text =
-                              formatDateString(pickedDate.toIso8601String());
-                          _initialValue['datumRodjenja'] =
-                              pickedDate.toIso8601String();
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderTextField(
-                      decoration:
-                          const InputDecoration(labelText: "Broj telefona"),
-                      name: "brojTelefona",
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: FormBuilderTextField(
-                      decoration: const InputDecoration(labelText: "Adresa"),
-                      name: "adresa",
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: FormBuilderTextField(
-                      decoration: const InputDecoration(labelText: "Grad"),
-                      name: "grad",
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: FormBuilderTextField(
-                      decoration: const InputDecoration(labelText: "Država"),
-                      name: "drzava",
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Expanded(
-                    child: FormBuilderTextField(
-                      decoration:
-                          const InputDecoration(labelText: "Nova lozinka"),
-                      obscureText: true,
-                      name: "lozinka",
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: FormBuilderTextField(
-                        decoration: const InputDecoration(
-                            labelText: "Potvrdite lozinku"),
-                        obscureText: true,
-                        name: "lozinkaPotvrda"),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: FormBuilderTextField(
-                        decoration:
-                            const InputDecoration(labelText: "Stara lozinka"),
-                        obscureText: true,
-                        name: "staraLozinka"),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  // Expanded widget for the image upload, taking up half of the width
-                  Expanded(
-                    child: FormBuilderField(
-                      name: "imageId",
-                      builder: (field) {
-                        return InputDecorator(
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: FormBuilderTextField(
                           decoration: const InputDecoration(
-                              labelText: "Choose an input image"),
-                          child: ListTile(
-                            leading: const Icon(Icons.image),
-                            title: const Text("Select an image"),
-                            trailing: const Icon(Icons.file_upload),
-                            onTap: getImage,
-                          ),
-                        );
-                      },
+                              labelText: "Korisničko ime"),
+                          name: "korisnickoIme",
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          }),
                     ),
-                  ),
-                  // Expanded widget for the save button, taking up the other half of the width
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              if (_formKey.currentState?.saveAndValidate() ==
-                                  true) {
-                                debugPrint(
-                                    _formKey.currentState?.value.toString());
-
-                                var request =
-                                    Map.from(_formKey.currentState!.value);
-                                request['slika'] = _base64Image;
-                                var key = request.entries.elementAt(4).key;
-                                request[key] = _initialValue['datumRodjenja'];
-                                isLoadingSave = true;
-                                setState(() {});
-                                try {
-                                  await _korisnikProvider.update(
-                                      AuthProvider.korisnikId!, request);
-
-                                  if (request['lozinka'].toString().isEmpty) {
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const HomeScreen()));
-                                  } else {
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginPage()));
-                                  }
-
-                                  // ignore: empty_catches
-                                } on Exception catch (e) {
-                                  isLoadingSave = false;
-                                  showDialog(
-                                      // ignore: use_build_context_synchronously
-                                      context: context,
-                                      builder: (context) => AlertDialog(
-                                            title: const Text("Error"),
-                                            content: Text(e.toString()),
-                                            actions: [
-                                              TextButton(
-                                                  onPressed: () =>
-                                                      Navigator.pop(context),
-                                                  child: const Text("Ok"))
-                                            ],
-                                          ));
-                                  setState(() {});
-                                }
-                              }
-                            }, // Define this function to handle the save action
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              shape:
-                                  const CircleBorder(), // Makes the button circular
-                              padding: const EdgeInsets.all(
-                                  8), // Adjust padding for icon size // Background color
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: FormBuilderTextField(
+                          decoration: const InputDecoration(labelText: "Email"),
+                          name: "email",
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          }),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: FormBuilderTextField(
+                          decoration: const InputDecoration(labelText: "Ime"),
+                          name: "ime",
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          }),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: FormBuilderTextField(
+                          decoration:
+                              const InputDecoration(labelText: "Prezime"),
+                          name: "prezime",
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter some text';
+                            }
+                            return null;
+                          }),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: FormBuilderTextField(
+                        controller: _datumRodjenjaController,
+                        decoration:
+                            const InputDecoration(labelText: "Datum rođenja"),
+                        name: "datumRodjenja",
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please choose some value';
+                          }
+                          return null;
+                        },
+                        onTap: () async {
+                          DateTime? pickedDate = await showDatePicker(
+                              context: context,
+                              firstDate: DateTime(1900),
+                              lastDate: DateTime(2101));
+                          if (pickedDate != null) {
+                            _datumRodjenjaController.text =
+                                formatDateString(pickedDate.toIso8601String());
+                            _initialValue['datumRodjenja'] =
+                                pickedDate.toIso8601String();
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FormBuilderTextField(
+                        decoration:
+                            const InputDecoration(labelText: "Broj telefona"),
+                        name: "brojTelefona",
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: FormBuilderTextField(
+                        decoration: const InputDecoration(labelText: "Adresa"),
+                        name: "adresa",
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: FormBuilderTextField(
+                        decoration: const InputDecoration(labelText: "Grad"),
+                        name: "grad",
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: FormBuilderTextField(
+                        decoration: const InputDecoration(labelText: "Država"),
+                        name: "drzava",
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: FormBuilderTextField(
+                        decoration:
+                            const InputDecoration(labelText: "Nova lozinka"),
+                        obscureText: true,
+                        name: "lozinka",
+                      ),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: FormBuilderTextField(
+                          decoration: const InputDecoration(
+                              labelText: "Potvrdite lozinku"),
+                          obscureText: true,
+                          name: "lozinkaPotvrda"),
+                    ),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                    Expanded(
+                      child: FormBuilderTextField(
+                          decoration:
+                              const InputDecoration(labelText: "Stara lozinka"),
+                          obscureText: true,
+                          name: "staraLozinka"),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Row(
+                  children: [
+                    // Expanded widget for the image upload, taking up half of the width
+                    Expanded(
+                      child: FormBuilderField(
+                        name: "imageId",
+                        builder: (field) {
+                          return InputDecorator(
+                            decoration: const InputDecoration(
+                                labelText: "Choose an input image"),
+                            child: ListTile(
+                              leading: const Icon(Icons.image),
+                              title: const Text("Select an image"),
+                              trailing: const Icon(Icons.file_upload),
+                              onTap: getImage,
                             ),
-
-                            child: isLoadingSave
-                                ? const CircularProgressIndicator()
-                                : const Icon(
-                                    Icons.save,
-                                    color: Colors.white,
-                                  ), // Save icon inside
-                          ),
-                        ),
-                      ],
+                          );
+                        },
+                      ),
                     ),
-                  )
-                ],
-              )
-            ],
+                    // Expanded widget for the save button, taking up the other half of the width
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState?.saveAndValidate() ==
+                                    true) {
+                                  debugPrint(
+                                      _formKey.currentState?.value.toString());
+
+                                  var request =
+                                      Map.from(_formKey.currentState!.value);
+                                  request['slika'] = _base64Image;
+                                  var key = request.entries.elementAt(4).key;
+                                  request[key] = _initialValue['datumRodjenja'];
+                                  isLoadingSave = true;
+                                  setState(() {});
+                                  try {
+                                    await _korisnikProvider.update(
+                                        AuthProvider.korisnikId!, request);
+
+                                    if (request['lozinka'].toString().isEmpty) {
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const HomeScreen()));
+                                    } else {
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  LoginPage()));
+                                    }
+
+                                    // ignore: empty_catches
+                                  } on Exception catch (e) {
+                                    isLoadingSave = false;
+                                    showDialog(
+                                        // ignore: use_build_context_synchronously
+                                        context: context,
+                                        builder: (context) => AlertDialog(
+                                              title: const Text("Error"),
+                                              content: Text(e.toString()),
+                                              actions: [
+                                                TextButton(
+                                                    onPressed: () =>
+                                                        Navigator.pop(context),
+                                                    child: const Text("Ok"))
+                                              ],
+                                            ));
+                                    setState(() {});
+                                  }
+                                }
+                              }, // Define this function to handle the save action
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                shape:
+                                    const CircleBorder(), // Makes the button circular
+                                padding: const EdgeInsets.all(
+                                    8), // Adjust padding for icon size // Background color
+                              ),
+
+                              child: isLoadingSave
+                                  ? const CircularProgressIndicator()
+                                  : const Icon(
+                                      Icons.save,
+                                      color: Colors.white,
+                                    ), // Save icon inside
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                )
+              ],
+            ),
           ),
         ));
   }

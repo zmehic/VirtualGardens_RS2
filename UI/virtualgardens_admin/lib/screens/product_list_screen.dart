@@ -322,10 +322,20 @@ class _ProductListScreenState extends State<ProductListScreen> {
                         side: BorderSide(color: Colors.grey.shade300)))),
                 textStyle: const TextStyle(color: Colors.black, fontSize: 16),
                 onSelected: (value) {
-                  selectedVrstaProizvoda = int.tryParse(value.toString());
-                  isLoading = true;
-                  setState(() {});
-                  initScreen(selectedVrstaProizvoda);
+                  if (value != null) {
+                    selectedVrstaProizvoda = int.tryParse(value.toString());
+                    isLoading = true;
+                    setState(() {});
+                    initScreen(selectedVrstaProizvoda);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                            "Molimo odaberite neku od ponuđenih vrijednosti!"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
                 },
               ),
             ),

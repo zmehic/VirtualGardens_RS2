@@ -12,7 +12,7 @@ namespace VirtualGardens.Models.SearchObjects
 
         public string? BrojTelefona { get; set; }
 
-        public string? Adresa { get; set; }
+        public string? AdresaGTE { get; set; }
 
         public string? GradGTE { get; set; }
 

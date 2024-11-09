@@ -19,6 +19,7 @@ namespace VirtualGardens.Models.Requests.Zaposlenici
         public string? Grad { get; set; }
 
         public string? Drzava { get; set; }
+        public bool JeAktivan { get; set; }
 
         public DateTime? DatumRodjenja { get; set; }
     }

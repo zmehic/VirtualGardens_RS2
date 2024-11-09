@@ -10,7 +10,7 @@ class Nalog {
   DateTime datumKreiranja;
   int zaposlenikId;
   bool zavrsen;
-  Zaposlenik zaposlenik;
+  Zaposlenik? zaposlenik;
 
   Nalog({
     required this.nalogId,
@@ -18,7 +18,7 @@ class Nalog {
     required this.datumKreiranja,
     required this.zaposlenikId,
     required this.zavrsen,
-    required this.zaposlenik,
+    this.zaposlenik,
   });
 
   factory Nalog.fromJson(Map<String, dynamic> json) => _$NalogFromJson(json);

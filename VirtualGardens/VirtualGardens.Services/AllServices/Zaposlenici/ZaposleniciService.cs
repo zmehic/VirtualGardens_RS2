@@ -35,9 +35,9 @@ namespace VirtualGardens.Services.AllServices.Zaposlenici
                 query = query.Where(x => x.BrojTelefona == search.BrojTelefona);
             }
 
-            if (!string.IsNullOrEmpty(search?.Adresa))
+            if (!string.IsNullOrEmpty(search?.AdresaGTE))
             {
-                query = query.Where(x => x.Adresa.ToLower().StartsWith(search.Adresa.ToLower()));
+                query = query.Where(x => x.Adresa.ToLower().StartsWith(search.AdresaGTE.ToLower()));
             }
 
             if (!string.IsNullOrEmpty(search?.GradGTE))

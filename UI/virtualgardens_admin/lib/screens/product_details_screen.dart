@@ -153,7 +153,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                         const Color.fromRGBO(235, 241, 224, 1),
                                     width: 5)),
                             child: widget.product?.slika != null
-                                ? imageFromString(widget.product!.slika!)
+                                ? imageFromString(_base64Image!)
                                 : const Text(""),
                           ),
                         ),
@@ -194,6 +194,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         );
       } else {
         _base64Image = base64Encode(await _image!.readAsBytes());
+        setState(() {});
       }
     }
   }
