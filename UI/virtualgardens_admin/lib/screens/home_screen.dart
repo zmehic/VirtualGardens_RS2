@@ -8,7 +8,7 @@ import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/models/vrsta_proizvoda.dart';
 import 'package:virtualgardens_admin/providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/korisnik_provider.dart';
-import 'package:virtualgardens_admin/providers/narduzbe_provider.dart';
+import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';

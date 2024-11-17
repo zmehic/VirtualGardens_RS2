@@ -23,7 +23,7 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
 
   bool isLoading = true;
 
-  bool jeAktivan = true;
+  bool? jeAktivan = null;
 
   final TextEditingController _imeEditingController = TextEditingController();
   final TextEditingController _prezimeEditingController =
@@ -170,11 +170,12 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey.shade400)),
               child: DropdownMenu(
-                initialSelection: true,
+                initialSelection: 0,
                 enableFilter: false,
                 dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: true, label: "Aktivan"),
-                  DropdownMenuEntry(value: false, label: "Neaktivan"),
+                  DropdownMenuEntry(value: 0, label: "Svi"),
+                  DropdownMenuEntry(value: 1, label: "Aktivan"),
+                  DropdownMenuEntry(value: 2, label: "Neaktivan"),
                 ],
                 menuStyle: MenuStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.white),
@@ -185,7 +186,13 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
                 textStyle: const TextStyle(color: Colors.black, fontSize: 16),
                 onSelected: (value) {
                   if (value != null) {
-                    jeAktivan = value;
+                    if (value == 0) {
+                      jeAktivan = null;
+                    } else if (value == 1) {
+                      jeAktivan = true;
+                    } else {
+                      jeAktivan = false;
+                    }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(

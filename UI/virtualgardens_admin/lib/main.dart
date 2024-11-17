@@ -5,7 +5,7 @@ import 'package:virtualgardens_admin/providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_admin/providers/korisnik_provider.dart';
 import 'package:virtualgardens_admin/providers/nalozi_provider.dart';
-import 'package:virtualgardens_admin/providers/narduzbe_provider.dart';
+import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/ulazi_proizvodi_provider.dart';
 import 'package:virtualgardens_admin/providers/ulazi_provider.dart';

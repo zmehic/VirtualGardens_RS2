@@ -83,6 +83,11 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
                 {
                     query = query.Where(x => x.IsDeleted == search.isDeleted);
                 }
+
+                if(search?.StateMachine != null)
+                {
+                    query = query.Where(x=>x.StateMachine == search.StateMachine);
+                }
             }
 
             return query;

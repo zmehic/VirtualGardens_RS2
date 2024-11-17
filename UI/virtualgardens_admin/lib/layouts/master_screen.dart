@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:virtualgardens_admin/providers/auth_provider.dart';
 import 'package:virtualgardens_admin/screens/home_screen.dart';
+import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
 import 'package:virtualgardens_admin/screens/product_details_screen.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 import 'package:virtualgardens_admin/screens/profile_screen.dart';
@@ -86,7 +87,7 @@ class _MasterScreenState extends State<MasterScreen> {
               title: Text("Narudžbe"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const ProductListScreen()));
+                    builder: (context) => const NarduzbeListScreen()));
               },
             ),
             ListTile(
