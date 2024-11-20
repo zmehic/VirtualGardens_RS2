@@ -31,6 +31,7 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
   late SetoviProvider _setoviProvider;
 
   SearchResult<Set>? setoviResult;
+  List<String>? allowedActions;
 
   UlazProizvod? zaposlenik;
 
@@ -81,6 +82,8 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
       'IncludeTables': "ProizvodiSets"
     };
     setoviResult = await _setoviProvider.get(filter: filter);
+    allowedActions =
+        await _narudzbaProvider.AllowedActions(id: widget.narudzba?.narudzbaId);
     setState(() {
       isLoading = false;
       isLoadingSave = false;
@@ -261,8 +264,8 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                 ),
                 Expanded(
                     child: FormBuilderDropdown(
-                  enabled: false,
                   name: "stateMachine",
+                  enabled: false,
                   decoration: const InputDecoration(labelText: "Status"),
                   initialValue: _initialValue['stateMachine'] ?? true,
                   items: const [
@@ -278,6 +281,7 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                     }
                     return null;
                   },
+                  onChanged: (value) {},
                 ))
               ],
             ),
@@ -340,93 +344,183 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState?.saveAndValidate() == true) {
-                        debugPrint(_formKey.currentState?.value.toString());
+                allowedActions != null && allowedActions!.contains("edit")
+                    ? SizedBox(
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              isLoadingSave = true;
+                              setState(() {});
 
-                        var request = Map.from(_formKey.currentState!.value);
-                        isLoadingSave = true;
-                        setState(() {});
-                        try {
-                          await _narudzbaProvider.update(
-                              widget.narudzba!.narudzbaId, request);
-                          // ignore: use_build_context_synchronously
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const NarduzbeListScreen()));
-                          // ignore: empty_catches
-                        } on Exception catch (e) {
-                          isLoadingSave = false;
-                          showDialog(
+                              await _narudzbaProvider.narudzbeState(
+                                  action: "edit",
+                                  id: widget.narudzba?.narudzbaId);
+
                               // ignore: use_build_context_synchronously
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                    title: const Text("Error"),
-                                    content: Text(e.toString()),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: const Text("Ok"))
-                                    ],
-                                  ));
-                          setState(() {});
-                        }
-                      }
-                    }, // Define this function to handle the save action
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      shape: const CircleBorder(), // Makes the button circular
-                      padding: const EdgeInsets.all(
-                          8), // Adjust padding for icon size // Background color
-                    ),
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NarduzbeListScreen()));
+                            }, // Define this function to handle the save action
+                            child: const Text("Kreirana")))
+                    : Container(),
+                allowedActions != null && allowedActions!.contains("inprogress")
+                    ? const SizedBox(
+                        width: 20,
+                      )
+                    : Container(),
+                allowedActions != null && allowedActions!.contains("inprogress")
+                    ? SizedBox(
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              isLoadingSave = true;
+                              setState(() {});
 
-                    child: isLoadingSave
-                        ? const CircularProgressIndicator()
-                        : const Icon(
-                            Icons.save,
-                            color: Colors.white,
-                          ), // Save icon inside
-                  ),
-                ),
-                const SizedBox(
-                  width: 20,
-                ),
-                SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      isLoadingSave = true;
-                      setState(() {});
+                              await _narudzbaProvider.narudzbeState(
+                                  action: "inprogress",
+                                  id: widget.narudzba?.narudzbaId);
 
-                      await _narudzbaProvider
-                          .delete(widget.narudzba!.narudzbaId);
+                              // ignore: use_build_context_synchronously
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NarduzbeListScreen()));
+                            }, // Define this function to handle the save action
+                            child: const Text("U procesu")))
+                    : Container(),
+                allowedActions != null && allowedActions!.contains("finish")
+                    ? const SizedBox(
+                        width: 20,
+                      )
+                    : Container(),
+                allowedActions != null && allowedActions!.contains("finish")
+                    ? SizedBox(
+                        child: ElevatedButton(
+                            onPressed: () async {
+                              isLoadingSave = true;
+                              setState(() {});
 
-                      // ignore: use_build_context_synchronously
-                      Navigator.of(context).pushReplacement(MaterialPageRoute(
-                          builder: (context) => const ZaposleniciListScreen()));
-                    }, // Define this function to handle the save action
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: const CircleBorder(), // Makes the button circular
-                      padding: const EdgeInsets.all(
-                          8), // Adjust padding for icon size // Background color
-                    ),
+                              await _narudzbaProvider.narudzbeState(
+                                  action: "finish",
+                                  id: widget.narudzba?.narudzbaId);
 
-                    child: isLoadingSave
-                        ? const CircularProgressIndicator()
-                        : const Icon(
-                            Icons.delete,
-                            color: Colors.white,
-                          ), // Save icon inside
-                  ),
-                )
+                              // ignore: use_build_context_synchronously
+                              Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const NarduzbeListScreen()));
+                            }, // Define this function to handle the save action
+                            child: const Text("Završena")))
+                    : Container(),
+                widget.narudzba?.stateMachine == "created"
+                    ? Row(
+                        children: [
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: widget.narudzba?.stateMachine == "created"
+                                ? ElevatedButton(
+                                    onPressed: () async {
+                                      if (_formKey.currentState
+                                              ?.saveAndValidate() ==
+                                          true) {
+                                        debugPrint(_formKey.currentState?.value
+                                            .toString());
+
+                                        var request = Map.from(
+                                            _formKey.currentState!.value);
+                                        isLoadingSave = true;
+                                        setState(() {});
+                                        try {
+                                          await _narudzbaProvider.update(
+                                              widget.narudzba!.narudzbaId,
+                                              request);
+                                          // ignore: use_build_context_synchronously
+                                          Navigator.of(context).pushReplacement(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const NarduzbeListScreen()));
+                                          // ignore: empty_catches
+                                        } on Exception catch (e) {
+                                          isLoadingSave = false;
+                                          showDialog(
+                                              // ignore: use_build_context_synchronously
+                                              context: context,
+                                              builder: (context) => AlertDialog(
+                                                    title: const Text("Error"),
+                                                    content: Text(e.toString()),
+                                                    actions: [
+                                                      TextButton(
+                                                          onPressed: () =>
+                                                              Navigator.pop(
+                                                                  context),
+                                                          child:
+                                                              const Text("Ok"))
+                                                    ],
+                                                  ));
+                                          setState(() {});
+                                        }
+                                      }
+                                    }, // Define this function to handle the save action
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      shape:
+                                          const CircleBorder(), // Makes the button circular
+                                      padding: const EdgeInsets.all(
+                                          8), // Adjust padding for icon size // Background color
+                                    ),
+
+                                    child: isLoadingSave
+                                        ? const CircularProgressIndicator()
+                                        : const Icon(
+                                            Icons.save,
+                                            color: Colors.white,
+                                          ), // Save icon inside
+                                  )
+                                : Container(),
+                          ),
+                          const SizedBox(
+                            width: 20,
+                          ),
+                          SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: widget.narudzba?.stateMachine == "created"
+                                ? ElevatedButton(
+                                    onPressed: () async {
+                                      isLoadingSave = true;
+                                      setState(() {});
+
+                                      await _narudzbaProvider
+                                          .delete(widget.narudzba!.narudzbaId);
+
+                                      // ignore: use_build_context_synchronously
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const ZaposleniciListScreen()));
+                                    }, // Define this function to handle the save action
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors
+                                          .red, // Makes the button circular
+                                      padding: const EdgeInsets.all(
+                                          8), // Adjust padding for icon size // Background color
+                                    ),
+
+                                    child: isLoadingSave
+                                        ? const CircularProgressIndicator()
+                                        : const Icon(
+                                            Icons.delete,
+                                            color: Colors.white,
+                                          ), // Save icon inside
+                                  )
+                                : Container(),
+                          ),
+                        ],
+                      )
+                    : Container()
               ],
             ),
           ],
