@@ -5,8 +5,6 @@ import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/models/zaposlenici.dart';
 import 'package:virtualgardens_admin/providers/zaposlenici_provider.dart';
-import 'package:virtualgardens_admin/screens/home_screen.dart';
-import 'package:virtualgardens_admin/screens/ulazi_details_screen.dart';
 import 'package:virtualgardens_admin/screens/zaposlenici_details_screen.dart';
 
 class ZaposleniciListScreen extends StatefulWidget {

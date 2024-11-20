@@ -14,8 +14,9 @@ namespace VirtualGardens.Models.DTOs
 
         public int Kolicina { get; set; }
 
+        
         public virtual ProizvodiDTO Proizvod { get; set; } = null!;
 
-        public virtual SetoviDTO Set { get; set; } = null!;
+        //public virtual SetoviDTO Set { get; set; } = null!;
     }
 }

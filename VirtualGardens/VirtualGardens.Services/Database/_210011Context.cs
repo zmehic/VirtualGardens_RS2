@@ -232,7 +232,9 @@ public partial class _210011Context : DbContext
             entity.HasOne(d => d.JedinicaMjere).WithMany(p => p.Proizvodis)
                 .HasForeignKey(d => d.JedinicaMjereId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FKProizvodi730772");
+                .HasConstraintName("FKProizvodi730772").IsRequired();
+
+            entity.Navigation(d => d.JedinicaMjere).AutoInclude();
 
             entity.HasOne(d => d.VrstaProizvoda).WithMany(p => p.Proizvodis)
                 .HasForeignKey(d => d.VrstaProizvodaId)
@@ -253,7 +255,9 @@ public partial class _210011Context : DbContext
             entity.HasOne(d => d.Proizvod).WithMany(p => p.ProizvodiSets)
                 .HasForeignKey(d => d.ProizvodId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FKProizvodi_145528");
+                .HasConstraintName("FKProizvodi_145528").IsRequired();
+
+            entity.Navigation(d => d.Proizvod).AutoInclude();
 
             entity.HasOne(d => d.Set).WithMany(p => p.ProizvodiSets)
                 .HasForeignKey(d => d.SetId)

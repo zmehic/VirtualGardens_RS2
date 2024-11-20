@@ -2,15 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
-import 'package:virtualgardens_admin/models/korisnici.dart';
 import 'package:virtualgardens_admin/models/narudzbe.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
-import 'package:virtualgardens_admin/models/zaposlenici.dart';
 import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
-import 'package:virtualgardens_admin/screens/home_screen.dart';
-import 'package:virtualgardens_admin/screens/zaposlenici_details_screen.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:virtualgardens_admin/screens/narudzbe_details_screen.dart';
 
 class NarduzbeListScreen extends StatefulWidget {
   const NarduzbeListScreen({super.key});
@@ -45,11 +41,6 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
       TextEditingController();
   final TextEditingController _cijenaDoEditingController =
       TextEditingController();
-  /*final TextEditingController _adresaEditingController =
-      TextEditingController();
-  final TextEditingController _gradEditingController = TextEditingController();
-  final TextEditingController _drzavaEditingController =
-      TextEditingController();*/
 
   @override
   void initState() {
@@ -355,10 +346,9 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                 initialSelection: 0,
                 enableFilter: false,
                 dropdownMenuEntries: korisnici.keys
-                        .map((e) =>
-                            DropdownMenuEntry(value: e, label: korisnici[e]!))
-                        .toList() ??
-                    [],
+                    .map((e) =>
+                        DropdownMenuEntry(value: e, label: korisnici[e]!))
+                    .toList(),
                 menuStyle: MenuStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.white),
                     elevation: MaterialStateProperty.all(4),
@@ -415,13 +405,7 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                 child: const Text("Pretraga")),
             const SizedBox(
               width: 8,
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => ZaposleniciDetailsScreen()));
-                },
-                child: const Text("Dodaj")),
+            )
           ],
         ));
   }
@@ -474,11 +458,12 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                                   onSelectChanged: (selected) => {
                                         if (selected == true)
                                           {
-                                            Navigator.of(context)
-                                                .pushReplacement(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            HomeScreen()))
+                                            Navigator.of(context).pushReplacement(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        NarudzbeDetailsScreen(
+                                                          narudzba: e,
+                                                        )))
                                           }
                                       },
                                   cells: [
@@ -507,8 +492,7 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                                             color: Colors.white,
                                             fontSize: 18))),
                                     DataCell(Text(
-                                        "${e.korisnik?.ime} ${e.korisnik?.prezime}" ??
-                                            "",
+                                        "${e.korisnik?.ime} ${e.korisnik?.prezime}",
                                         style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 18))),

@@ -7,6 +7,7 @@ import 'package:virtualgardens_admin/providers/korisnik_provider.dart';
 import 'package:virtualgardens_admin/providers/nalozi_provider.dart';
 import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
+import 'package:virtualgardens_admin/providers/setovi_provider.dart';
 import 'package:virtualgardens_admin/providers/ulazi_proizvodi_provider.dart';
 import 'package:virtualgardens_admin/providers/ulazi_provider.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
@@ -24,7 +25,8 @@ void main() {
       ChangeNotifierProvider(create: (_) => UlaziProvider()),
       ChangeNotifierProvider(create: (_) => UlaziProizvodiProvider()),
       ChangeNotifierProvider(create: (_) => ZaposlenikProvider()),
-      ChangeNotifierProvider(create: (_) => NaloziProvider())
+      ChangeNotifierProvider(create: (_) => NaloziProvider()),
+      ChangeNotifierProvider(create: (_) => SetoviProvider())
     ],
     child: const MyApp(),
   ));

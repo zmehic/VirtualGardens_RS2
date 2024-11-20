@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:virtualgardens_admin/models/proizvod.dart';
-import 'package:virtualgardens_admin/models/ulazi.dart';
 
 part 'ulazi_proizvodi.g.dart';
 

@@ -1,26 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/nalozi.dart';
-import 'package:virtualgardens_admin/models/narudzbe.dart';
-import 'package:virtualgardens_admin/models/proizvod.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
-import 'package:virtualgardens_admin/models/ulazi.dart';
 import 'package:virtualgardens_admin/models/ulazi_proizvodi.dart';
 import 'package:virtualgardens_admin/models/zaposlenici.dart';
-import 'package:virtualgardens_admin/providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/nalozi_provider.dart';
-import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
-import 'package:virtualgardens_admin/providers/product_provider.dart';
-import 'package:virtualgardens_admin/providers/ulazi_proizvodi_provider.dart';
-import 'package:virtualgardens_admin/providers/ulazi_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/providers/zaposlenici_provider.dart';
-import 'package:virtualgardens_admin/screens/ulazi_list_screen.dart';
 import 'package:virtualgardens_admin/screens/zaposlenici_list_screen.dart';
 
 // ignore: must_be_immutable
@@ -35,13 +24,10 @@ class ZaposleniciDetailsScreen extends StatefulWidget {
 
 class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
-  final _formKey2 = GlobalKey<FormBuilderState>();
 
   Map<String, dynamic> _initialValue = {};
-  Map<String, dynamic> _initialValue2 = {};
 
   late ZaposlenikProvider _zaposlenikProvider;
-  late NarudzbaProvider _narudzbaProvider;
   late NaloziProvider _naloziProvider;
 
   UlazProizvod? zaposlenik;
@@ -52,7 +38,6 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
 
   final TextEditingController _datumRodjenjaController =
       TextEditingController();
-  final Map<int, TextEditingController> _controllers = {};
 
   @override
   void didChangeDependencies() {
@@ -62,7 +47,6 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
   @override
   void initState() {
     _zaposlenikProvider = context.read<ZaposlenikProvider>();
-    _narudzbaProvider = context.read<NarudzbaProvider>();
     _naloziProvider = context.read<NaloziProvider>();
 
     super.initState();
@@ -211,7 +195,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                         return null;
                       }),
                 ),
-                SizedBox(
+                const SizedBox(
                   width: 10,
                 ),
                 Expanded(
@@ -359,6 +343,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                             await _zaposlenikProvider.update(
                                 widget.zaposlenik!.zaposlenikId, request);
                           }
+                          // ignore: use_build_context_synchronously
                           Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                   builder: (context) =>
