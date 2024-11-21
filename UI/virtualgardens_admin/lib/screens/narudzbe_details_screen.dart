@@ -182,7 +182,6 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
               shrinkWrap: true,
               itemCount: setoviResult?.result.length,
               itemBuilder: (context, index) {
-                final record = setoviResult?.result[index];
                 return setoviResult != null &&
                         setoviResult?.result[index] != null &&
                         setoviResult?.result[index].proizvodiSets.length == 3

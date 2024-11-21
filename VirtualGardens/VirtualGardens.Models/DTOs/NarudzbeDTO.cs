@@ -28,7 +28,7 @@ namespace VirtualGardens.Models.DTOs
         // Optional: Include simplified versions of related entities if needed
         public KorisniciDTO? Korisnik { get; set; }
 
-        public NaloziDTO? Nalog { get; set; }
+        // public NaloziDTO? Nalog { get; set; }
 
         // Optional: Include simplified lists if needed
         //public List<PitanjaOdgovoriDTO>? PitanjaOdgovoris { get; set; }

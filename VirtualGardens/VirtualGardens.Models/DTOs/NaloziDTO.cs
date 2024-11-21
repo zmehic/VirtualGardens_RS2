@@ -16,7 +16,7 @@ namespace VirtualGardens.Models.DTOs
 
         public bool Zavrsen { get; set; }
         
-        //public virtual ICollection<Narudzbe> Narudzbes { get; set; } = new List<Narudzbe>();
+        public virtual ICollection<NarudzbeDTO> Narudzbes { get; set; } = new List<NarudzbeDTO>();
 
         public virtual ZaposleniciDTO Zaposlenik { get; set; } = null!;
     }

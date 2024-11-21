@@ -15,6 +15,10 @@ Nalog _$NalogFromJson(Map<String, dynamic> json) => Nalog(
       zaposlenik: json['zaposlenik'] == null
           ? null
           : Zaposlenik.fromJson(json['zaposlenik'] as Map<String, dynamic>),
+      narudzbes: (json['narudzbes'] as List<dynamic>?)
+              ?.map((e) => Narudzba.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          const [],
     );
 
 Map<String, dynamic> _$NalogToJson(Nalog instance) => <String, dynamic>{
@@ -24,4 +28,5 @@ Map<String, dynamic> _$NalogToJson(Nalog instance) => <String, dynamic>{
       'zaposlenikId': instance.zaposlenikId,
       'zavrsen': instance.zavrsen,
       'zaposlenik': instance.zaposlenik,
+      'narudzbes': instance.narudzbes,
     };

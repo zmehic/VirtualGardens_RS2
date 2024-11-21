@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Schema;
 using VirtualGardens.Models.DTOs;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Narudzbe;
@@ -73,8 +74,11 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
                 {
                     query = query.Where(x => x.KorisnikId == search.KorisnikId.Value);
                 }
-
-                if (search.NalogId.HasValue)
+                if(search.NalogId == 0)
+                {
+                    query = query.Where(x => x.NalogId == null);
+                }
+                if (search.NalogId.HasValue && search.NalogId.Value!=0)
                 {
                     query = query.Where(x => x.NalogId == search.NalogId.Value);
                 }

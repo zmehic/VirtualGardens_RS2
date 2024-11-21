@@ -1,4 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
+import 'package:virtualgardens_admin/models/narudzbe.dart';
 import 'package:virtualgardens_admin/models/zaposlenici.dart';
 
 part 'nalozi.g.dart';
@@ -11,6 +12,7 @@ class Nalog {
   int zaposlenikId;
   bool zavrsen;
   Zaposlenik? zaposlenik;
+  List<Narudzba> narudzbes;
 
   Nalog({
     required this.nalogId,
@@ -19,6 +21,7 @@ class Nalog {
     required this.zaposlenikId,
     required this.zavrsen,
     this.zaposlenik,
+    this.narudzbes = const [],
   });
 
   factory Nalog.fromJson(Map<String, dynamic> json) => _$NalogFromJson(json);
