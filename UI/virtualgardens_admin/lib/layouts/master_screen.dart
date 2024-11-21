@@ -3,11 +3,13 @@ import 'package:virtualgardens_admin/providers/auth_provider.dart';
 import 'package:virtualgardens_admin/screens/home_screen.dart';
 import 'package:virtualgardens_admin/screens/nalozi_list_screen.dart';
 import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
+import 'package:virtualgardens_admin/screens/ponude_list_screen.dart';
 import 'package:virtualgardens_admin/screens/product_details_screen.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 import 'package:virtualgardens_admin/screens/profile_screen.dart';
 import 'package:virtualgardens_admin/screens/zaposlenici_list_screen.dart';
 
+// ignore: must_be_immutable
 class MasterScreen extends StatefulWidget {
   MasterScreen(this.child, this.title, {super.key});
   String title;
@@ -95,6 +97,13 @@ class _MasterScreenState extends State<MasterScreen> {
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const NaloziListScreen()));
+              },
+            ),
+            ListTile(
+              title: Text("Ponude"),
+              onTap: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => const PonudeListScreen()));
               },
             ),
             ListTile(

@@ -13,8 +13,8 @@ namespace VirtualGardens.Models.DTOs
         public int? Popust { get; set; }
         public string? StateMachine { get; set; }
 
-        //public DateTime DatumKreiranja { get; set; } = DateTime.Now;
+        public DateTime DatumKreiranja { get; set; }
 
-        //public virtual ICollection<SetoviPonude> SetoviPonudes { get; set; } = new List<SetoviPonude>();
+        public virtual ICollection<SetoviPonudeDTO> SetoviPonudes { get; set; } = new List<SetoviPonudeDTO>();
     }
 }

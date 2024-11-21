@@ -3,31 +3,39 @@ import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/nalozi.dart';
+import 'package:virtualgardens_admin/models/ponuda.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/providers/nalozi_provider.dart';
+import 'package:virtualgardens_admin/providers/ponude_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/screens/home_screen.dart';
 import 'package:virtualgardens_admin/screens/nalozi_details_screen.dart';
 
-class NaloziListScreen extends StatefulWidget {
-  const NaloziListScreen({super.key});
+class PonudeListScreen extends StatefulWidget {
+  const PonudeListScreen({super.key});
 
   @override
-  State<NaloziListScreen> createState() => _NaloziListScreenState();
+  State<PonudeListScreen> createState() => _PonudeListScreenState();
 }
 
-class _NaloziListScreenState extends State<NaloziListScreen> {
-  late NaloziProvider _naloziProvider;
+class _PonudeListScreenState extends State<PonudeListScreen> {
+  late PonudeProvider _ponudeProvider;
 
-  SearchResult<Nalog>? result;
+  SearchResult<Ponuda>? result;
 
   bool isLoading = true;
-  bool? jeZavrsen;
+  String? stateMachine = null;
   bool? jeObrisan;
+
+  RangeValues selectedRange = RangeValues(0, 100);
 
   String datumOdString = "";
   String datumDoString = "";
 
   final TextEditingController _ftsEditingController = TextEditingController();
+
+  final TextEditingController _popustEditingController =
+      TextEditingController();
   final TextEditingController _datumOdEditingController =
       TextEditingController();
   final TextEditingController _datumDoEditingController =
@@ -35,7 +43,7 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
 
   @override
   void initState() {
-    _naloziProvider = context.read<NaloziProvider>();
+    _ponudeProvider = context.read<PonudeProvider>();
     super.initState();
     initScreen();
   }
@@ -43,14 +51,15 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
   Future initScreen() async {
     var filter = {
       'isDeleted': jeObrisan,
-      'IncludeTables': "Zaposlenik,Narudzbes"
     };
 
-    result = await _naloziProvider.get(filter: filter);
+    result = await _ponudeProvider.get(filter: filter);
 
     _datumOdEditingController.text = "";
     _ftsEditingController.text = "";
     _datumDoEditingController.text = "";
+    _popustEditingController.text = "";
+    selectedRange = RangeValues(0, 100);
 
     setState(() {
       isLoading = false;
@@ -75,7 +84,7 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
           ),
         ),
       ),
-      "Nalozi",
+      "Ponude",
     );
   }
 
@@ -89,11 +98,11 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
+            Icon(size: 45, color: Colors.white, Icons.local_offer),
             SizedBox(
               width: 10,
             ),
-            Text("Nalozi",
+            Text("Ponude",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -177,23 +186,42 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
             const SizedBox(
               width: 8,
             ),
+            Text("Popust:"),
+            RangeSlider(
+                values: selectedRange,
+                min: 0,
+                max: 100,
+                divisions: 100,
+                labels: RangeLabels(selectedRange.start.round().toString(),
+                    selectedRange.end.round().toString()),
+                onChanged: (values) {
+                  setState(() {
+                    selectedRange = values;
+                  });
+                }),
+            const SizedBox(
+              width: 8,
+            ),
             Container(
               decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey.shade400)),
               child: DropdownMenu(
-                initialSelection: jeZavrsen == true
-                    ? 1
-                    : jeZavrsen == false
-                        ? 2
-                        : 0,
+                initialSelection: stateMachine == "created"
+                    ? "created"
+                    : stateMachine == "active"
+                        ? "active"
+                        : stateMachine == "finished"
+                            ? "finished"
+                            : "all",
                 enableFilter: false,
                 label: const Text("Završen"),
                 dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: 0, label: "Svi"),
-                  DropdownMenuEntry(value: 1, label: "Da"),
-                  DropdownMenuEntry(value: 2, label: "Ne"),
+                  DropdownMenuEntry(value: "all", label: "Svi"),
+                  DropdownMenuEntry(value: "created", label: "Kreirana"),
+                  DropdownMenuEntry(value: "active", label: "Aktivna"),
+                  DropdownMenuEntry(value: "finished", label: "Završena"),
                 ],
                 menuStyle: MenuStyle(
                     backgroundColor: MaterialStateProperty.all(Colors.white),
@@ -204,12 +232,14 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
                 textStyle: const TextStyle(color: Colors.black, fontSize: 16),
                 onSelected: (value) {
                   if (value != null) {
-                    if (value == 0) {
-                      jeZavrsen = null;
-                    } else if (value == 1) {
-                      jeZavrsen = true;
+                    if (value == "all") {
+                      stateMachine = null;
+                    } else if (value == "created") {
+                      stateMachine = "created";
+                    } else if (value == "active") {
+                      stateMachine = "active";
                     } else {
-                      jeZavrsen = false;
+                      stateMachine = "finished";
                     }
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -276,14 +306,15 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
                   isLoading = true;
                   setState(() {});
                   var filter = {
-                    'BrojNalogaGTE': _ftsEditingController.text,
-                    'DatumKreiranjaFrom': datumOdString,
-                    'DatumKreiranjaTo': datumDoString,
+                    'NazivContains': _ftsEditingController.text,
+                    'PopustFrom': selectedRange.start.toInt(),
+                    'PopustTo': selectedRange.end.toInt(),
+                    'DatumFrom': datumOdString,
+                    'DatumTo': datumDoString,
                     'isDeleted': jeObrisan,
-                    'IncludeTables': "Zaposlenik,Narudzbes",
-                    'Zavrsen': jeZavrsen,
+                    'StateMachine': stateMachine
                   };
-                  result = await _naloziProvider.get(filter: filter);
+                  result = await _ponudeProvider.get(filter: filter);
                   isLoading = false;
                   setState(() {});
                 },
@@ -315,7 +346,7 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
                   columns: const [
                 DataColumn(
                     label: Text(
-                  "Broj naloga",
+                  "Naziv ponude",
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 )),
                 DataColumn(
@@ -325,7 +356,12 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
                 )),
                 DataColumn(
                     label: Text(
-                  "Zaposlenik",
+                  "Status",
+                  style: TextStyle(color: Colors.white, fontSize: 18),
+                )),
+                DataColumn(
+                    label: Text(
+                  "Popust",
                   style: TextStyle(color: Colors.white, fontSize: 18),
                 )),
               ],
@@ -338,13 +374,11 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
                                                 .pushReplacement(
                                                     MaterialPageRoute(
                                                         builder: (context) =>
-                                                            NaloziDetailsScreen(
-                                                              nalog: e,
-                                                            )))
+                                                            HomeScreen()))
                                           }
                                       },
                                   cells: [
-                                    DataCell(Text(e.brojNaloga,
+                                    DataCell(Text(e.naziv,
                                         style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 18))),
@@ -355,7 +389,17 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
                                             color: Colors.white,
                                             fontSize: 18))),
                                     DataCell(Text(
-                                        "${e.zaposlenik?.ime} ${e.zaposlenik?.prezime}",
+                                        e.stateMachine == "created"
+                                            ? "Kreirana"
+                                            : e.stateMachine == "active"
+                                                ? "Aktivna"
+                                                : e.stateMachine == "finished"
+                                                    ? "Završena"
+                                                    : "Greška",
+                                        style: const TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 18))),
+                                    DataCell(Text("${e.popust} %",
                                         style: const TextStyle(
                                             color: Colors.white,
                                             fontSize: 18))),

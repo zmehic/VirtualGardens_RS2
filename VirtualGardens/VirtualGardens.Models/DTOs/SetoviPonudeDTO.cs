@@ -12,7 +12,7 @@ namespace VirtualGardens.Models.DTOs
 
         public int PonudaId { get; set; }
 
-        public virtual PonudeDTO Ponuda { get; set; } = null!;
+        //public virtual PonudeDTO Ponuda { get; set; } = null!;
 
         public virtual SetoviDTO Set { get; set; } = null!;
     }

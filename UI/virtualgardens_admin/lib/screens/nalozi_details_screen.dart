@@ -13,7 +13,6 @@ import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/providers/zaposlenici_provider.dart';
 import 'package:virtualgardens_admin/screens/nalozi_list_screen.dart';
-import 'package:virtualgardens_admin/screens/ulazi_list_screen.dart';
 
 // ignore: must_be_immutable
 class NaloziDetailsScreen extends StatefulWidget {
@@ -526,7 +525,7 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
                             narudzba!.narudzbaId, request);
                         widget.nalog!.narudzbes.add(Narudzba(
                             narudzbaId: narudzba.narudzbaId,
-                            brojNarudzbe: narudzba!.brojNarudzbe,
+                            brojNarudzbe: narudzba.brojNarudzbe,
                             datum: narudzba.datum,
                             placeno: narudzba.placeno,
                             ukupnaCijena: narudzba.ukupnaCijena,

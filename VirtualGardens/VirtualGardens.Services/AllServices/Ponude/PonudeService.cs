@@ -44,11 +44,30 @@ namespace VirtualGardens.Services.AllServices.Ponude
                 query = query.Where(x => x.Popust <= search.PopustTo.Value);
             }
 
-            if (search?.isDeleted != null)
+            if(search != null)
             {
-                query = query.Where(x => x.IsDeleted == search.isDeleted);
+                if (search.isDeleted != null)
+                {
+                    query = query.Where(x => x.IsDeleted == search.isDeleted);
+                }
+
+                if (search.StateMachine != null)
+                {
+                    query = query.Where(x => x.StateMachine == search.StateMachine);
+                }
+
+                if (search.DatumFrom.HasValue)
+                {
+                    query = query.Where(x => x.DatumKreiranja >= search.DatumFrom.Value);
+                }
+
+                if (search.DatumTo.HasValue)
+                {
+                    query = query.Where(x => x.DatumKreiranja <= search.DatumTo.Value);
+                }
             }
 
+            
 
             return query;
         }

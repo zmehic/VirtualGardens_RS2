@@ -12,5 +12,10 @@ namespace VirtualGardens.Models.SearchObjects
 
         public int? PopustTo { get; set; }
 
+        public string? StateMachine { get; set; }
+        public DateTime? DatumFrom { get; set; }
+
+        public DateTime? DatumTo { get; set; }
+
     }
 }
