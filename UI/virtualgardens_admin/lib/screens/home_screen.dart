@@ -13,6 +13,7 @@ import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
+import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -293,7 +294,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           ),
                           IconButton(
-                              onPressed: () {},
+                              onPressed: () {
+                                Navigator.of(context).pushReplacement(
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            const NarduzbeListScreen()));
+                              },
                               icon: const Icon(
                                   size: 45, color: Colors.white, Icons.search))
                         ],

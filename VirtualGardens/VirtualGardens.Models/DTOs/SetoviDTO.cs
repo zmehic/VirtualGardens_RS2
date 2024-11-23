@@ -18,7 +18,7 @@ namespace VirtualGardens.Models.DTOs
 
         public virtual NarudzbeDTO Narudzba { get; set; } = null!;
 
-        public virtual ICollection<ProizvodiSetDTO> ProizvodiSets { get; set; } = new List<ProizvodiSetDTO>();
+        public virtual ICollection<ProizvodiSetDTO>? ProizvodiSets { get; set; };
 
         //public virtual ICollection<SetoviPonude> SetoviPonudes { get; set; } = new List<SetoviPonude>();
     }

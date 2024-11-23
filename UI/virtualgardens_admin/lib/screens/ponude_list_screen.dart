@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
-import 'package:virtualgardens_admin/models/nalozi.dart';
 import 'package:virtualgardens_admin/models/ponuda.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
-import 'package:virtualgardens_admin/providers/nalozi_provider.dart';
 import 'package:virtualgardens_admin/providers/ponude_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/screens/home_screen.dart';
 import 'package:virtualgardens_admin/screens/nalozi_details_screen.dart';
+import 'package:virtualgardens_admin/screens/ponude_details_screen.dart';
 
 class PonudeListScreen extends StatefulWidget {
   const PonudeListScreen({super.key});
@@ -186,7 +185,7 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
             const SizedBox(
               width: 8,
             ),
-            Text("Popust:"),
+            const Text("Popust:"),
             RangeSlider(
                 values: selectedRange,
                 min: 0,
@@ -325,7 +324,7 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
             ElevatedButton(
                 onPressed: () async {
                   Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => NaloziDetailsScreen()));
+                      builder: (context) => PonudeDetailsScreen()));
                 },
                 child: const Text("Dodaj")),
           ],
@@ -374,7 +373,9 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
                                                 .pushReplacement(
                                                     MaterialPageRoute(
                                                         builder: (context) =>
-                                                            HomeScreen()))
+                                                            PonudeDetailsScreen(
+                                                              ponuda: e,
+                                                            )))
                                           }
                                       },
                                   cells: [

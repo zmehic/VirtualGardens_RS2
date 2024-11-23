@@ -9,6 +9,7 @@ namespace VirtualGardens.Models.Requests.Ponude
         public string Naziv { get; set; } = null!;
 
         public int? Popust { get; set; }
+        public DateTime? Datum { get; set; }
 
     }
 }

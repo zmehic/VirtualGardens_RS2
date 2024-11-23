@@ -1,5 +1,6 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:virtualgardens_admin/models/jedinice_mjere.dart';
+import 'package:virtualgardens_admin/models/vrsta_proizvoda.dart';
 
 part 'proizvod.g.dart';
 
@@ -15,8 +16,20 @@ class Proizvod {
   int? jedinicaMjereId;
   String? slikaThumb;
   JediniceMjere? jedinicaMjere;
+  VrstaProizvoda? vrstaProizvoda;
 
-  Proizvod({this.proizvodId, this.naziv});
+  Proizvod(
+      {this.proizvodId,
+      this.naziv,
+      this.opis,
+      this.dostupnaKolicina,
+      this.slika,
+      this.cijena,
+      this.vrstaProizvodaId,
+      this.jedinicaMjereId,
+      this.slikaThumb,
+      this.jedinicaMjere,
+      this.vrstaProizvoda});
 
   factory Proizvod.fromJson(Map<String, dynamic> json) =>
       _$ProizvodFromJson(json);

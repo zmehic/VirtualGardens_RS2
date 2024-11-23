@@ -262,7 +262,9 @@ public partial class _210011Context : DbContext
             entity.HasOne(d => d.Set).WithMany(p => p.ProizvodiSets)
                 .HasForeignKey(d => d.SetId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FKProizvodi_86253");
+                .HasConstraintName("FKProizvodi_86253").IsRequired();
+
+            entity.Navigation(d => d.Proizvod).AutoInclude();
         });
 
         modelBuilder.Entity<Recenzije>(entity =>
@@ -303,6 +305,8 @@ public partial class _210011Context : DbContext
                 .HasForeignKey(d => d.NarudzbaId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FKSetovi958895");
+
+            entity.Navigation(d => d.ProizvodiSets).AutoInclude();
         });
 
         modelBuilder.Entity<SetoviPonude>(entity =>
