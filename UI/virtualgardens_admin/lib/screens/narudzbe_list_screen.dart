@@ -362,8 +362,7 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                   } else {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                            "Vrijednost može biti 'Plaćeno' ili 'Neplaćeno'"),
+                        content: Text("Odaberite validnu vrijednost"),
                         backgroundColor: Colors.red,
                       ),
                     );

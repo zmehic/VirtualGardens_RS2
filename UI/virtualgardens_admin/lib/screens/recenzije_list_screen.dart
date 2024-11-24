@@ -1,22 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
-import 'package:virtualgardens_admin/models/narudzbe.dart';
 import 'package:virtualgardens_admin/models/proizvod.dart';
 import 'package:virtualgardens_admin/models/recenzija.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
-import 'package:virtualgardens_admin/models/ulazi_proizvodi.dart';
-import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/recenzije_provider.dart';
-import 'package:virtualgardens_admin/providers/setovi_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
-import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
-import 'package:virtualgardens_admin/screens/pitanja_list_screen.dart';
-import 'package:virtualgardens_admin/screens/zaposlenici_list_screen.dart';
-import 'package:virtualgardens_admin/models/set.dart';
 
 // ignore: must_be_immutable
 class RecenzijeListScreen extends StatefulWidget {
@@ -28,9 +19,7 @@ class RecenzijeListScreen extends StatefulWidget {
 }
 
 class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
-  final _formKey = GlobalKey<FormBuilderState>();
-
-  Map<String, dynamic> _initialValue = {};
+  late Map<int, String> korisnici = {};
 
   late RecenzijeProvider _recenzijeProvider;
 
@@ -38,6 +27,20 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
 
   bool isLoading = true;
   bool isLoadingSave = false;
+
+  int? korisnik;
+
+  RangeValues selectedRange = RangeValues(1, 5);
+
+  String datumOdString = "";
+  String datumDoString = "";
+
+  final TextEditingController _ocjenaEditingController =
+      TextEditingController();
+  final TextEditingController _datumOdEditingController =
+      TextEditingController();
+  final TextEditingController _datumDoEditingController =
+      TextEditingController();
 
   @override
   void didChangeDependencies() {
@@ -54,12 +57,27 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
   }
 
   Future initForm() async {
+    korisnici[0] = "Svi";
+    _datumOdEditingController.text = "";
+    _datumDoEditingController.text = "";
+    _ocjenaEditingController.text = "";
+    selectedRange = RangeValues(1, 5);
+
     var filter = {
       'ProizvodId': widget.proizvod?.proizvodId,
       'isDeleted': false,
       'IncludeTables': "Korisnik"
     };
     recenzijeResult = await _recenzijeProvider.get(filter: filter);
+
+    if (recenzijeResult != null) {
+      for (var element in recenzijeResult!.result) {
+        if (korisnici.keys.contains(element.korisnikId) == false) {
+          korisnici[element.korisnikId] =
+              "${element.korisnik?.ime} ${element.korisnik?.prezime}";
+        }
+      }
+    }
     setState(() {
       isLoading = false;
       isLoadingSave = false;
@@ -76,7 +94,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
                   left: 40, right: 40, top: 20, bottom: 10),
               color: const Color.fromRGBO(235, 241, 224, 1),
               child: Column(
-                children: [_buildBanner(), _buildMain()],
+                children: [_buildBanner(), _buildSearch(), _buildMain()],
               ),
             )),
         "Recenzije");
@@ -191,7 +209,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
             ),
             const SizedBox(width: 10),
             Text(
-              "${recenzijeResult?.result[index].korisnik?.ime} ${recenzijeResult?.result[index].korisnik?.prezime}",
+              "${recenzijeResult?.result[index].korisnik?.ime} ${recenzijeResult?.result[index].korisnik?.prezime} - ${formatDateString(recenzijeResult?.result[index].datum.toIso8601String())}",
               style: const TextStyle(color: Colors.black),
             ),
             const Spacer(),
@@ -221,5 +239,140 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
         ],
       ),
     );
+  }
+
+  Widget _buildSearch() {
+    return Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.grey.shade400)),
+              child: DropdownMenu(
+                initialSelection: 0,
+                enableFilter: false,
+                dropdownMenuEntries: korisnici.keys
+                    .map((e) =>
+                        DropdownMenuEntry(value: e, label: korisnici[e]!))
+                    .toList(),
+                menuStyle: MenuStyle(
+                    backgroundColor: MaterialStateProperty.all(Colors.white),
+                    elevation: MaterialStateProperty.all(4),
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(color: Colors.grey.shade300)))),
+                textStyle: const TextStyle(color: Colors.black, fontSize: 16),
+                onSelected: (value) {
+                  if (value != null) {
+                    korisnik = int.tryParse(value.toString());
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text("Odaberite validnu vrijednost"),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
+                  }
+                },
+              ),
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            Expanded(
+                child: TextField(
+              controller: _datumOdEditingController,
+              decoration: const InputDecoration(labelText: "Datum od:"),
+              readOnly: true,
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101));
+                if (pickedDate != null) {
+                  datumOdString = pickedDate.toIso8601String();
+                  _datumOdEditingController.text =
+                      formatDateString(pickedDate.toIso8601String());
+                }
+              },
+            )),
+            IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                _datumOdEditingController.clear();
+                datumOdString = "";
+              },
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            Expanded(
+                child: TextField(
+              controller: _datumDoEditingController,
+              decoration: const InputDecoration(labelText: "Datum do:"),
+              readOnly: true,
+              onTap: () async {
+                DateTime? pickedDate = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2101));
+                if (pickedDate != null) {
+                  pickedDate = DateTime(pickedDate.year, pickedDate.month,
+                      pickedDate.day, 23, 59, 59);
+                  datumDoString = pickedDate.toIso8601String();
+                  _datumDoEditingController.text =
+                      formatDateString(pickedDate.toIso8601String());
+                }
+              },
+            )),
+            IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                _datumDoEditingController.clear();
+                datumDoString = "";
+              },
+            ),
+            const SizedBox(
+              width: 8,
+            ),
+            const Text("Ocjena:"),
+            RangeSlider(
+                values: selectedRange,
+                min: 1,
+                max: 5,
+                divisions: 5,
+                labels: RangeLabels(selectedRange.start.round().toString(),
+                    selectedRange.end.round().toString()),
+                onChanged: (values) {
+                  setState(() {
+                    selectedRange = values;
+                  });
+                }),
+            const SizedBox(
+              width: 8,
+            ),
+            ElevatedButton(
+                onPressed: () async {
+                  setState(() {});
+                  var filter = {
+                    'OcjenaFrom': selectedRange.start.toInt(),
+                    'OcjenaTo': selectedRange.end.toInt(),
+                    'DatumFrom': datumOdString,
+                    'DatumTo': datumDoString,
+                    'ProizvodId': widget.proizvod?.proizvodId,
+                    'KorisnikId': korisnik != 0 ? korisnik : null,
+                    'isDeleted': false,
+                    'IncludeTables': "Korisnik"
+                  };
+                  recenzijeResult =
+                      await _recenzijeProvider.get(filter: filter);
+                  setState(() {});
+                },
+                child: const Text("Pretraga")),
+          ],
+        ));
   }
 }

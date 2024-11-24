@@ -33,14 +33,6 @@ class _MasterScreenState extends State<MasterScreen> {
         ),
         actions: [
           IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.question_answer,
-              size: 36,
-              color: Colors.green.shade900,
-            ),
-          ),
-          IconButton(
               onPressed: () {
                 Navigator.of(context).popUntil((route) => route.isFirst);
                 AuthProvider.korisnikId = 0;

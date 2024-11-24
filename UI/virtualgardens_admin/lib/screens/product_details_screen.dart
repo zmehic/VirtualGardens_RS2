@@ -127,7 +127,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ? Container()
                 : IconButton(
                     icon: const Icon(
-                      Icons.question_answer,
+                      Icons.star,
                       color: Colors.white,
                     ),
                     onPressed: () {
