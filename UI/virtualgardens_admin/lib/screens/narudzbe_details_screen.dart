@@ -10,6 +10,7 @@ import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
+import 'package:virtualgardens_admin/screens/pitanja_list_screen.dart';
 import 'package:virtualgardens_admin/screens/zaposlenici_list_screen.dart';
 import 'package:virtualgardens_admin/models/set.dart';
 
@@ -111,21 +112,36 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
       margin: const EdgeInsets.only(top: 30),
       color: const Color.fromRGBO(32, 76, 56, 1),
       width: double.infinity,
-      child: const Padding(
+      child: Padding(
         padding: EdgeInsets.all(15.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
-            SizedBox(
+            const Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
+            const SizedBox(
               width: 10,
             ),
-            Text("Detalji o narudžbi",
+            const Text("Detalji o narudžbi",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     fontFamily: "arial",
-                    color: Colors.white))
+                    color: Colors.white)),
+            const SizedBox(
+              width: 10,
+            ),
+            IconButton(
+              icon: const Icon(
+                Icons.question_answer,
+                color: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: (context) => PitanjaOdgovoriListScreen(
+                          narudzba: widget.narudzba,
+                        )));
+              },
+            )
           ],
         ),
       ),
