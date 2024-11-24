@@ -58,56 +58,56 @@ class _MasterScreenState extends State<MasterScreen> {
         child: ListView(
           children: [
             ListTile(
-              title: Text("Home"),
+              title: const Text("Home"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const HomeScreen()));
               },
             ),
             ListTile(
-              title: Text("Profil"),
+              title: const Text("Profil"),
               onTap: () {
                 Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => ProfileScreen()));
               },
             ),
             ListTile(
-              title: Text("Skladište"),
+              title: const Text("Skladište"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const ProductListScreen()));
               },
             ),
             ListTile(
-              title: Text("Zaposlenici"),
+              title: const Text("Zaposlenici"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const ZaposleniciListScreen()));
               },
             ),
             ListTile(
-              title: Text("Narudžbe"),
+              title: const Text("Narudžbe"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const NarduzbeListScreen()));
               },
             ),
             ListTile(
-              title: Text("Nalozi"),
+              title: const Text("Nalozi"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const NaloziListScreen()));
               },
             ),
             ListTile(
-              title: Text("Ponude"),
+              title: const Text("Ponude"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const PonudeListScreen()));
               },
             ),
             ListTile(
-              title: Text("Statistika"),
+              title: const Text("Statistika"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => ProductDetailsScreen()));
@@ -117,7 +117,7 @@ class _MasterScreenState extends State<MasterScreen> {
         ),
       ),
       body: widget.child,
-      backgroundColor: Color.fromRGBO(103, 122, 105, 1),
+      backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
     );
   }
 }

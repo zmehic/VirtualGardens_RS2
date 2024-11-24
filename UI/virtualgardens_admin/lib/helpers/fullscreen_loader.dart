@@ -5,8 +5,7 @@ class FullScreenLoader extends StatelessWidget {
   final Widget child;
 
   const FullScreenLoader(
-      {Key? key, required this.isLoading, required this.child})
-      : super(key: key);
+      {super.key, required this.isLoading, required this.child});
 
   @override
   Widget build(BuildContext context) {

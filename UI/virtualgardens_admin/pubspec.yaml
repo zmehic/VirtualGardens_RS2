@@ -43,6 +43,7 @@ dependencies:
   flutter_form_builder: ^9.2.1
   file_picker: ^8.0.5
   accordion: ^2.6.0
+  flutter_rating_bar: ^4.0.1
 
 dev_dependencies:
   flutter_test:

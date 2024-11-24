@@ -9,6 +9,7 @@ import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/pitanja_odgovori_provider.dart';
 import 'package:virtualgardens_admin/providers/ponude_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
+import 'package:virtualgardens_admin/providers/recenzije_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_ponude_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_proizvodi_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_provider.dart';
@@ -34,7 +35,8 @@ void main() {
       ChangeNotifierProvider(create: (_) => SetoviPonudeProvider()),
       ChangeNotifierProvider(create: (_) => PonudeProvider()),
       ChangeNotifierProvider(create: (_) => SetProizvodProvider()),
-      ChangeNotifierProvider(create: (_) => PitanjaOdgovoriProvider())
+      ChangeNotifierProvider(create: (_) => PitanjaOdgovoriProvider()),
+      ChangeNotifierProvider(create: (_) => RecenzijeProvider())
     ],
     child: const MyApp(),
   ));

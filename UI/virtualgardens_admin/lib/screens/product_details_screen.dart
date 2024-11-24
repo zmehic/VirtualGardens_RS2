@@ -16,6 +16,7 @@ import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
+import 'package:virtualgardens_admin/screens/recenzije_list_screen.dart';
 
 // ignore: must_be_immutable
 class ProductDetailsScreen extends StatefulWidget {
@@ -118,7 +119,24 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         fontFamily: "arial",
-                        color: Colors.white))
+                        color: Colors.white)),
+            const SizedBox(
+              width: 10,
+            ),
+            widget.product == null
+                ? Container()
+                : IconButton(
+                    icon: const Icon(
+                      Icons.question_answer,
+                      color: Colors.white,
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(
+                          builder: (context) => RecenzijeListScreen(
+                                proizvod: widget.product,
+                              )));
+                    },
+                  )
           ],
         ),
       ),

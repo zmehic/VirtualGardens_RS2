@@ -9,6 +9,7 @@ import 'package:virtualgardens_admin/providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/pitanja_odgovori_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 
+// ignore: must_be_immutable
 class PitanjaOdgovoriListScreen extends StatefulWidget {
   Narudzba? narudzba;
   PitanjaOdgovoriListScreen({super.key, this.narudzba});
@@ -93,7 +94,6 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                   var message = result?.result[index];
                   var isLoggedInUser =
                       message?.korisnikId == AuthProvider.korisnikId;
-                  var userImage = message?.korisnik?.slika ?? '';
 
                   return Padding(
                     padding:
@@ -142,7 +142,7 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                                 const SizedBox(height: 5),
                                 Text(
                                   formatDateString(
-                                      message?.datum?.toIso8601String() ?? ""),
+                                      message?.datum.toIso8601String() ?? ""),
                                   style: const TextStyle(
                                     fontSize: 12,
                                     color: Colors.grey,
@@ -220,7 +220,7 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
       color: const Color.fromRGBO(32, 76, 56, 1),
       width: double.infinity,
       child: Padding(
-        padding: EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(15.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -247,7 +247,7 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
       'korisnikId': AuthProvider.korisnikId,
       'narudzbaId': widget.narudzba?.narudzbaId
     };
-    var result = await provider.insert(request);
+    await provider.insert(request);
     initScreen();
   }
 }
