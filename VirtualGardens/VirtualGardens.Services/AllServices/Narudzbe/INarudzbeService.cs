@@ -17,5 +17,6 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
         public NarudzbeDTO Edit(int id);
         public NarudzbeDTO Finish(int id);
         public List<string> AllowedActions(int id);
+        List<int> MonthlyStatistics(int year);
     }
 }

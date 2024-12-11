@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:virtualgardens_admin/providers/auth_provider.dart';
-import 'package:virtualgardens_admin/screens/home_screen.dart';
-import 'package:virtualgardens_admin/screens/nalozi_list_screen.dart';
-import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
-import 'package:virtualgardens_admin/screens/ponude_list_screen.dart';
-import 'package:virtualgardens_admin/screens/product_details_screen.dart';
-import 'package:virtualgardens_admin/screens/product_list_screen.dart';
-import 'package:virtualgardens_admin/screens/profile_screen.dart';
-import 'package:virtualgardens_admin/screens/statistics_screen.dart';
-import 'package:virtualgardens_admin/screens/zaposlenici_list_screen.dart';
+import 'package:virtualgardens_mobile/providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/screens/home_screen.dart';
+import 'package:virtualgardens_mobile/screens/nalozi_list_screen.dart';
+import 'package:virtualgardens_mobile/screens/narudzbe_list_screen.dart';
+import 'package:virtualgardens_mobile/screens/ponude_list_screen.dart';
+import 'package:virtualgardens_mobile/screens/product_list_screen.dart';
+import 'package:virtualgardens_mobile/screens/profile_screen.dart';
+import 'package:virtualgardens_mobile/screens/statistics_screen.dart';
+import 'package:virtualgardens_mobile/screens/zaposlenici_list_screen.dart';
 
 // ignore: must_be_immutable
 class MasterScreen extends StatefulWidget {

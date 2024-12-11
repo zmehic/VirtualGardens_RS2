@@ -64,5 +64,11 @@ namespace VirtualGardens.API.Controllers
         {
             return (_service as INarudzbeService).AllowedActions(id);
         }
+
+        [Authorize(Roles ="Admin")]
+        [HttpGet("MonthlyStatistics")]
+        public List<int> MonthlyStatistics(int year) {
+            return (_service as INarudzbeService).MonthlyStatistics(year);
+        }
     }
 }

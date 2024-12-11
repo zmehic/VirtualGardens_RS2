@@ -154,5 +154,18 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
                 return state.AllowedActions(entity);
             }
         }
+
+        public List<int> MonthlyStatistics(int year)
+        {
+            var list = Context.Narudzbes.Where(x=>x.Datum.Year==year && x.IsDeleted == false).ToList();
+            List<int> result = new List<int> { 0,0,0,0,0,0,0,0,0,0,0,0};
+
+            foreach(var item in list)
+            {
+                result[item.Datum.Month - 1]++;
+            }
+
+            return result;
+        }
     }
 }

@@ -16,10 +16,3 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
-
-android {
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_23
-        targetCompatibility JavaVersion.VERSION_23
-    }
-}
