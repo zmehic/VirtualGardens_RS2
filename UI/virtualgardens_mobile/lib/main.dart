@@ -20,6 +20,7 @@ import 'package:virtualgardens_mobile/providers/ulazi_provider.dart';
 import 'package:virtualgardens_mobile/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_mobile/providers/zaposlenici_provider.dart';
 import 'package:virtualgardens_mobile/screens/home_screen.dart';
+import 'package:virtualgardens_mobile/screens/register_screen.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -101,7 +102,7 @@ class LoginPage extends StatelessWidget {
           children: [
             Container(
               height: 500,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                   image: DecorationImage(
                       image: AssetImage("assets/images/background.png"),
                       fit: BoxFit.fill)),
@@ -113,7 +114,7 @@ class LoginPage extends StatelessWidget {
                       top: 100,
                       width: 300,
                       child: Container(
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                             image: DecorationImage(
                                 image: AssetImage("assets/images/logo.png"))),
                       ))
@@ -122,7 +123,7 @@ class LoginPage extends StatelessWidget {
             ),
             Container(
               child: Padding(
-                padding: EdgeInsets.all(20),
+                padding: const EdgeInsets.all(20),
                 child: FormBuilder(
                   key: _formKey,
                   child: Column(
@@ -172,18 +173,20 @@ class LoginPage extends StatelessWidget {
                           height: 50,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10),
-                              gradient: LinearGradient(colors: [
+                              gradient: const LinearGradient(colors: [
                                 Color.fromRGBO(32, 76, 56, 1),
                                 Color.fromRGBO(157, 186, 155, 1)
                               ])),
                           child: InkWell(
                             onTap: () async {
-                              KorisnikProvider provider =
-                                  new KorisnikProvider();
+                              final navigator = Navigator.of(context);
+                              final provider = Provider.of<KorisnikProvider>(
+                                  context,
+                                  listen: false);
 
                               if (_formKey.currentState?.saveAndValidate() ==
                                   true) {
-                                print(
+                                debugPrint(
                                     "credentials: ${_usernameController.text} : ${_passwordController.text}");
                                 AuthProvider.username =
                                     _usernameController.text;
@@ -195,10 +198,11 @@ class LoginPage extends StatelessWidget {
                                     username: AuthProvider.username,
                                     password: AuthProvider.password);
                                 // ignore: use_build_context_synchronously
-                                Navigator.of(context).push(MaterialPageRoute(
+                                navigator.push(MaterialPageRoute(
                                     builder: (context) => const HomeScreen()));
                               } on Exception catch (e) {
                                 showDialog(
+                                    // ignore: use_build_context_synchronously
                                     context: context,
                                     builder: (context) => AlertDialog(
                                           title: const Text("Greška :("),
@@ -206,7 +210,7 @@ class LoginPage extends StatelessWidget {
                                             TextButton(
                                                 onPressed: () =>
                                                     Navigator.pop(context),
-                                                child: Text("OK"))
+                                                child: const Text("OK"))
                                           ],
                                           content: Text(e.toString()),
                                         ));
@@ -222,6 +226,47 @@ class LoginPage extends StatelessWidget {
                               ),
                             ),
                           ),
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 30),
+                        child: Column(
+                          children: [
+                            Text("Niste registrovani?"),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    width: 100,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        gradient: const LinearGradient(colors: [
+                                          Color.fromRGBO(32, 76, 56, 1),
+                                          Color.fromRGBO(157, 186, 155, 1)
+                                        ])),
+                                    child: InkWell(
+                                      child: const Center(
+                                          child: Text(
+                                        "Registruj se",
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      )),
+                                      onTap: () async {
+                                        Navigator.of(context).pushReplacement(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    RegisterScreen()));
+                                      },
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            )
+                          ],
                         ),
                       )
                     ],
