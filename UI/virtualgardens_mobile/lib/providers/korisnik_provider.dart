@@ -37,7 +37,7 @@ class KorisnikProvider extends BaseProvider<Korisnik> {
       AuthProvider.korisnikId = fromJson(data).korisnikId;
 
       for (var item in fromJson(data).korisniciUloges) {
-        if (item.uloga.naziv == "Admin") {
+        if (item.uloga.naziv == "Kupac") {
           break;
         } else {
           throw Exception("Not authorized");

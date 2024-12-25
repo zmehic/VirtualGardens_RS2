@@ -1,26 +1,21 @@
 ﻿using MapsterMapper;
-using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
-using VirtualGardens.Models.DTOs;
-using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Proizvodi;
 using VirtualGardens.Models.SearchObjects;
-using VirtualGardens.Services.AllServices;
 using VirtualGardens.Services.BaseServices;
 using VirtualGardens.Services.Database;
 
-namespace VirtualGardens.Services
+namespace VirtualGardens.Services.AllServices.ProizvodiNoImage
 {
-    public class ProizvodiService : BaseCRUDService<Models.DTOs.ProizvodiDTO, ProizvodiSearchObject, Database.Proizvodi, ProizvodiUpsertRequest, ProizvodiUpsertRequest>, IProizvodiService
+    public class ProizvodiNoImageService : BaseService<Models.DTOs.ProizvodiNoImageDTO, ProizvodiSearchObject, Database.Proizvodi>, IProizvodiNoImageService
     {
         public _210011Context Context { get; set; }
         public IMapper Mapper { get; set; }
-        public ProizvodiService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public ProizvodiNoImageService(_210011Context context, IMapper mapper) : base(context, mapper)
         {
             Context = context;
             Mapper = mapper;
@@ -73,29 +68,6 @@ namespace VirtualGardens.Services
             }
 
             return query;
-        }
-
-        public bool RecalcuclateQuantity()
-        {
-            var proizvodi = Context.Set<Proizvodi>().Where(x=>x.IsDeleted==false).ToList();
-
-            foreach (var item in proizvodi)
-            {
-                var ulaziProizvodi = Context.Set<UlaziProizvodi>().Where(x=>x.ProizvodId==item.ProizvodId && x.IsDeleted==false && x.Ulaz.IsDeleted==false).ToList();
-
-                int suma = 0;
-                if(ulaziProizvodi.Count > 0)
-                {
-                    foreach (var item2 in ulaziProizvodi)
-                    {
-                        suma += item2.Kolicina;
-                    }
-                }
-                item.DostupnaKolicina = suma;
-                Context.Update<Proizvodi>(item);
-            }
-            Context.SaveChanges();
-            return true;
         }
     }
 }

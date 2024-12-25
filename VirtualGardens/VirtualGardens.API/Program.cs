@@ -12,6 +12,7 @@ using VirtualGardens.Services.AllServices.Nalozi;
 using VirtualGardens.Services.AllServices.Narudzbe;
 using VirtualGardens.Services.AllServices.PitanjaOdgovori;
 using VirtualGardens.Services.AllServices.Ponude;
+using VirtualGardens.Services.AllServices.ProizvodiNoImage;
 using VirtualGardens.Services.AllServices.ProizvodiSetovi;
 using VirtualGardens.Services.AllServices.Recenzije;
 using VirtualGardens.Services.AllServices.Setovi;
@@ -47,6 +48,7 @@ builder.Services.AddTransient<IPonudeService, PonudeService>();
 builder.Services.AddTransient<IProizvodiSetoviService, ProizvodiSetoviService>();
 builder.Services.AddTransient<IRecenzijeService, RecenzijeService>();
 builder.Services.AddTransient<ISetoviPonudeService,SetoviPonudeService>();
+builder.Services.AddTransient<IProizvodiNoImageService, ProizvodiNoImageService>();
 
 builder.Services.AddTransient<BaseNarudzbaState>();
 builder.Services.AddTransient<InitialNarudzbaState>();

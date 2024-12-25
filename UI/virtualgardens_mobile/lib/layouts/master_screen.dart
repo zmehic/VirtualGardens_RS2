@@ -52,14 +52,14 @@ class _MasterScreenState extends State<MasterScreen> {
             ListTile(
               title: const Text("Home"),
               onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const HomeScreen()));
               },
             ),
             ListTile(
               title: const Text("Profil"),
               onTap: () {
-                Navigator.of(context).pushReplacement(
+                Navigator.of(context).push(
                     MaterialPageRoute(builder: (context) => ProfileScreen()));
               },
             ),

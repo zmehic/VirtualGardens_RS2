@@ -27,7 +27,7 @@ namespace VirtualGardens.API.Controllers.BaseControllers
 
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Kupac")]
         public virtual TModel Update(int id, TUpdate request)
         {
             return _service.Update(id, request);

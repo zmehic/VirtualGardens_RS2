@@ -31,10 +31,16 @@ namespace VirtualGardens.API.Controllers
             return base.Insert(request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Kupac")]
         public override KorisniciDTO GetById(int id)
         {
             return base.GetById(id);
+        }
+
+        [Authorize(Roles = "Admin,Kupac")]
+        public override KorisniciDTO Update(int id, KorisniciUpdateRequest request)
+        {
+            return base.Update(id, request);
         }
 
         [Authorize(Roles = "Admin")]

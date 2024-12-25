@@ -257,8 +257,6 @@ public partial class _210011Context : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FKProizvodi_145528").IsRequired();
 
-            entity.Navigation(d => d.Proizvod).AutoInclude();
-
             entity.HasOne(d => d.Set).WithMany(p => p.ProizvodiSets)
                 .HasForeignKey(d => d.SetId)
                 .OnDelete(DeleteBehavior.ClientSetNull)

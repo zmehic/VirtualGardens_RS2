@@ -1,12 +1,14 @@
 ﻿using Azure.Core;
 using EasyNetQ;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.HelperClasses;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Ponude;
 using VirtualGardens.Models.Requests.SetoviPonude;
@@ -21,9 +23,11 @@ namespace VirtualGardens.Services.AllServices.Ponude
     public class PonudeService : BaseCRUDService<Models.DTOs.PonudeDTO, PonudeSearchObject, Database.Ponude, PonudeUpsertRequest, PonudeUpsertRequest>, IPonudeService
     {
         public BasePonudaState BasePonudaState { get; set; }
+        public _210011Context _210011Context { get; set; }
         public PonudeService(_210011Context context, BasePonudaState basePonudaState, IMapper mapper) : base(context, mapper)
         {
             BasePonudaState = basePonudaState;
+            _210011Context = context;
         }
 
         public override IQueryable<Database.Ponude> AddFilter(PonudeSearchObject search, IQueryable<Database.Ponude> query)

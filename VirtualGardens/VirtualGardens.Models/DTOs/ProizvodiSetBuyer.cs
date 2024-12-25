@@ -4,19 +4,14 @@ using System.Text;
 
 namespace VirtualGardens.Models.DTOs
 {
-    public class ProizvodiSetDTO
+    public class ProizvodiSetBuyer
     {
         public int ProizvodSetId { get; set; }
 
         public int ProizvodId { get; set; }
 
         public int SetId { get; set; }
+        public string NazivProizvoda { get; set; }
 
-        public int Kolicina { get; set; }
-
-        
-        public virtual ProizvodiNoImageDTO Proizvod { get; set; } = null!;
-
-        //public virtual SetoviDTO Set { get; set; } = null!;
     }
 }
