@@ -11,7 +11,6 @@ import 'package:virtualgardens_mobile/providers/product_provider.dart';
 import 'package:virtualgardens_mobile/providers/utils.dart';
 import 'package:virtualgardens_mobile/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_mobile/screens/product_details_screen.dart';
-import 'package:virtualgardens_mobile/screens/ulazi_list_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
   const ProductListScreen({super.key});
@@ -154,16 +153,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       builder: (context) => ProductDetailsScreen()));
                 },
                 child: const Text("Dodaj")),
-            const SizedBox(
-              width: 8,
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const UlaziListScreen()));
-              },
-              child: const Text("Ulazi"),
-            ),
             const SizedBox(
               width: 8,
             ),

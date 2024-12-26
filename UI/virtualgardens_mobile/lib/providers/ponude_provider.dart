@@ -14,7 +14,7 @@ class PonudeProvider extends BaseProvider<Ponuda> {
   Future AllowedActions({int? id}) async {
     var endpoint = "api/Ponude/$id/allowedActions";
     var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:7011/");
+        defaultValue: "https://10.0.2.2:7011/");
 
     var url = "$baseUrl$endpoint";
 

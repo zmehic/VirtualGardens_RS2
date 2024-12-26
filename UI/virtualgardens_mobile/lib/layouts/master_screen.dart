@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:virtualgardens_mobile/providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/screens/home_screen.dart';
-import 'package:virtualgardens_mobile/screens/nalozi_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/narudzbe_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/ponude_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/product_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/profile_screen.dart';
-import 'package:virtualgardens_mobile/screens/statistics_screen.dart';
-import 'package:virtualgardens_mobile/screens/zaposlenici_list_screen.dart';
 
 // ignore: must_be_immutable
 class MasterScreen extends StatefulWidget {
@@ -71,24 +68,10 @@ class _MasterScreenState extends State<MasterScreen> {
               },
             ),
             ListTile(
-              title: const Text("Zaposlenici"),
-              onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const ZaposleniciListScreen()));
-              },
-            ),
-            ListTile(
               title: const Text("Narudžbe"),
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const NarduzbeListScreen()));
-              },
-            ),
-            ListTile(
-              title: const Text("Nalozi"),
-              onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const NaloziListScreen()));
+                    builder: (context) => const UserOrdersScreen()));
               },
             ),
             ListTile(
@@ -98,13 +81,6 @@ class _MasterScreenState extends State<MasterScreen> {
                     builder: (context) => const PonudeListScreen()));
               },
             ),
-            ListTile(
-              title: const Text("Statistika"),
-              onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const StatisticsScreen()));
-              },
-            )
           ],
         ),
       ),

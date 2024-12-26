@@ -5,74 +5,36 @@ import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/narudzbe.dart';
 import 'package:virtualgardens_mobile/models/search_result.dart';
-import 'package:virtualgardens_mobile/models/ulazi_proizvodi.dart';
+import 'package:virtualgardens_mobile/models/set.dart';
 import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_mobile/providers/setovi_provider.dart';
 import 'package:virtualgardens_mobile/providers/utils.dart';
-import 'package:virtualgardens_mobile/screens/narudzbe_list_screen.dart';
-import 'package:virtualgardens_mobile/screens/pitanja_list_screen.dart';
-import 'package:virtualgardens_mobile/screens/zaposlenici_list_screen.dart';
-import 'package:virtualgardens_mobile/models/set.dart';
 
 // ignore: must_be_immutable
-class NarudzbeDetailsScreen extends StatefulWidget {
-  Narudzba? narudzba;
-  NarudzbeDetailsScreen({super.key, this.narudzba});
+class NarudzbaUserDetailsScreen extends StatefulWidget {
+  final Narudzba? narudzba;
+  NarudzbaUserDetailsScreen({super.key, this.narudzba});
 
   @override
-  State<NarudzbeDetailsScreen> createState() => _NarudzbeDetailsScreenState();
+  State<NarudzbaUserDetailsScreen> createState() =>
+      _NarudzbaUserDetailsScreenState();
 }
 
-class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
-  final _formKey = GlobalKey<FormBuilderState>();
-
-  Map<String, dynamic> _initialValue = {};
-
+class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
   late NarudzbaProvider _narudzbaProvider;
   late SetoviProvider _setoviProvider;
 
   SearchResult<Set>? setoviResult;
-  List<String>? allowedActions;
-
-  UlazProizvod? zaposlenik;
-
-  String? korisnik;
 
   bool isLoading = true;
-  bool isLoadingSave = false;
-
-  final TextEditingController _datumNarudzbeController =
-      TextEditingController();
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
 
   @override
   void initState() {
+    super.initState();
     _narudzbaProvider = context.read<NarudzbaProvider>();
     _setoviProvider = context.read<SetoviProvider>();
 
-    super.initState();
-
-    _initialValue = {
-      "narudzbaId": widget.narudzba?.narudzbaId,
-      "brojNarudzbe": widget.narudzba?.brojNarudzbe,
-      "otkazana": widget.narudzba?.otkazana,
-      "datum": widget.narudzba?.datum.toIso8601String(),
-      "placeno": widget.narudzba?.placeno,
-      "status": widget.narudzba?.status,
-      "stateMachine": widget.narudzba?.stateMachine,
-      "ukupnaCijena": widget.narudzba?.ukupnaCijena,
-      "korisnikId": widget.narudzba?.korisnikId,
-    };
-
-    korisnik = "${widget.narudzba?.korisnik?.korisnickoIme}";
-    _datumNarudzbeController.text = widget.narudzba != null
-        ? formatDateString(widget.narudzba!.datum.toIso8601String())
-        : "";
-
+    // Initialize the form values and fetch sets
     initForm();
   }
 
@@ -83,463 +45,120 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
       'IncludeTables': "ProizvodiSets"
     };
     setoviResult = await _setoviProvider.get(filter: filter);
-    allowedActions =
-        await _narudzbaProvider.AllowedActions(id: widget.narudzba?.narudzbaId);
     setState(() {
       isLoading = false;
-      isLoadingSave = false;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-        FullScreenLoader(
-            isLoading: isLoading,
-            child: Container(
-              margin: const EdgeInsets.only(
-                  left: 40, right: 40, top: 20, bottom: 10),
-              color: const Color.fromRGBO(235, 241, 224, 1),
-              child: Column(
-                children: [_buildBanner(), _buildMain()],
-              ),
-            )),
-        "Detalji o narudžbi");
+      FullScreenLoader(
+        isLoading: isLoading,
+        child: Container(
+          color: const Color.fromRGBO(235, 241, 224, 1),
+          child: Column(
+            children: [
+              _buildBanner(),
+              _buildOrderDetails(),
+              _buildSetsList(),
+            ],
+          ),
+        ),
+      ),
+      "Detalji narudžbe",
+    );
   }
 
   Widget _buildBanner() {
     return Container(
-      margin: const EdgeInsets.only(top: 30),
       color: const Color.fromRGBO(32, 76, 56, 1),
       width: double.infinity,
-      child: Padding(
+      child: const Padding(
         padding: EdgeInsets.all(15.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
-            const SizedBox(
-              width: 10,
-            ),
-            const Text("Detalji o narudžbi",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "arial",
-                    color: Colors.white)),
-            const SizedBox(
-              width: 10,
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.question_answer,
+            Icon(size: 45, color: Colors.white, Icons.shopping_basket),
+            SizedBox(width: 10),
+            Text(
+              "Detalji narudžbe",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                fontFamily: "arial",
                 color: Colors.white,
               ),
-              onPressed: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => PitanjaOdgovoriListScreen(
-                          narudzba: widget.narudzba,
-                        )));
-              },
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMain() {
+  Widget _buildOrderDetails() {
     return Expanded(
       child: Container(
-          height: 300,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: const Color.fromRGBO(32, 76, 56, 1),
-          ),
-          margin: const EdgeInsets.all(15),
-          child: Container(
-            margin: const EdgeInsets.all(15),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    color: const Color.fromRGBO(235, 241, 224, 1),
-                    child: Column(children: [
-                      Expanded(
-                        child: _buildResultView(),
-                      )
-                    ]),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: const Color.fromRGBO(235, 241, 224, 1),
-                    child: _buildNewForm(),
-                  ),
-                )
-              ],
-            ),
-          )),
-    );
-  }
-
-  Widget _buildResultView() {
-    return Container(
+        margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20),
           color: const Color.fromRGBO(32, 76, 56, 1),
         ),
-        margin: const EdgeInsets.all(15),
-        width: double.infinity,
-        child: SingleChildScrollView(
-            child: Column(
-          children: [
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: setoviResult?.result.length,
-              itemBuilder: (context, index) {
-                return setoviResult != null &&
-                        setoviResult?.result[index] != null &&
-                        setoviResult?.result[index].proizvodiSets.length == 3
-                    ? _buildExpansionTile(index)
-                    : Container();
-              },
-            )
-          ],
-        )));
-  }
-
-  Widget _buildNewForm() {
-    return FormBuilder(
-      key: _formKey,
-      initialValue: _initialValue,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: FormBuilderTextField(
-                      readOnly: true,
-                      decoration:
-                          const InputDecoration(labelText: "Broj narudžbe"),
-                      name: "brojNarudzbe",
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      }),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: FormBuilderDropdown(
-                  enabled: false,
-                  name: "otkazana",
-                  decoration: const InputDecoration(labelText: "Otkazana"),
-                  initialValue: _initialValue['otkazana'] ?? true,
-                  items: const [
-                    DropdownMenuItem(value: true, child: Text("Da")),
-                    DropdownMenuItem(value: false, child: Text("Ne")),
-                  ],
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please choose some value';
-                    }
-                    return null;
-                  },
-                )),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: FormBuilderDropdown(
-                  enabled: false,
-                  name: "placeno",
-                  decoration: const InputDecoration(labelText: "Plaćeno"),
-                  initialValue: _initialValue['placeno'] ?? true,
-                  items: const [
-                    DropdownMenuItem(value: true, child: Text("Da")),
-                    DropdownMenuItem(value: false, child: Text("Ne")),
-                  ],
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please choose some value';
-                    }
-                    return null;
-                  },
-                )),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: FormBuilderDropdown(
-                  name: "stateMachine",
-                  enabled: false,
-                  decoration: const InputDecoration(labelText: "Status"),
-                  initialValue: _initialValue['stateMachine'] ?? true,
-                  items: const [
-                    DropdownMenuItem(value: "created", child: Text("Kreirana")),
-                    DropdownMenuItem(
-                        value: "inprogress", child: Text("U procesu")),
-                    DropdownMenuItem(
-                        value: "finished", child: Text("Završena")),
-                  ],
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please choose some value';
-                    }
-                    return null;
-                  },
-                  onChanged: (value) {},
-                ))
-              ],
-            ),
-            const SizedBox(height: 15),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: FormBuilderTextField(
-                      decoration:
-                          const InputDecoration(labelText: "Datum narudžbe"),
-                      readOnly: true,
-                      controller: _datumNarudzbeController,
-                      name: "datum",
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      }),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: FormBuilderTextField(
-                      decoration:
-                          const InputDecoration(labelText: "Ukupna cijena"),
-                      readOnly: true,
-                      name: "ukupnaCijena",
-                      initialValue: _initialValue['ukupnaCijena'].toString(),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      }),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                  child: FormBuilderTextField(
-                      decoration: const InputDecoration(labelText: "Kupac"),
-                      readOnly: true,
-                      name: "korisnickoIme",
-                      initialValue: korisnik ?? "",
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      }),
-                ),
-              ],
-            ),
-            const SizedBox(height: 15),
-            // Expanded widget for the save button, taking up the other half of the width
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                allowedActions != null && allowedActions!.contains("edit")
-                    ? SizedBox(
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              isLoadingSave = true;
-                              setState(() {});
-
-                              await _narudzbaProvider.narudzbeState(
-                                  action: "edit",
-                                  id: widget.narudzba?.narudzbaId);
-
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NarduzbeListScreen()));
-                            }, // Define this function to handle the save action
-                            child: const Text("Kreirana")))
-                    : Container(),
-                allowedActions != null && allowedActions!.contains("inprogress")
-                    ? const SizedBox(
-                        width: 20,
-                      )
-                    : Container(),
-                allowedActions != null && allowedActions!.contains("inprogress")
-                    ? SizedBox(
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              isLoadingSave = true;
-                              setState(() {});
-
-                              await _narudzbaProvider.narudzbeState(
-                                  action: "inprogress",
-                                  id: widget.narudzba?.narudzbaId);
-
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NarduzbeListScreen()));
-                            }, // Define this function to handle the save action
-                            child: const Text("U procesu")))
-                    : Container(),
-                allowedActions != null && allowedActions!.contains("finish")
-                    ? const SizedBox(
-                        width: 20,
-                      )
-                    : Container(),
-                allowedActions != null && allowedActions!.contains("finish")
-                    ? SizedBox(
-                        child: ElevatedButton(
-                            onPressed: () async {
-                              isLoadingSave = true;
-                              setState(() {});
-
-                              await _narudzbaProvider.narudzbeState(
-                                  action: "finish",
-                                  id: widget.narudzba?.narudzbaId);
-
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NarduzbeListScreen()));
-                            }, // Define this function to handle the save action
-                            child: const Text("Završena")))
-                    : Container(),
-                widget.narudzba?.stateMachine == "created"
-                    ? Row(
-                        children: [
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          SizedBox(
-                            width: 60,
-                            height: 60,
-                            child: widget.narudzba?.stateMachine == "created"
-                                ? ElevatedButton(
-                                    onPressed: () async {
-                                      if (_formKey.currentState
-                                              ?.saveAndValidate() ==
-                                          true) {
-                                        debugPrint(_formKey.currentState?.value
-                                            .toString());
-
-                                        var request = Map.from(
-                                            _formKey.currentState!.value);
-                                        isLoadingSave = true;
-                                        setState(() {});
-                                        try {
-                                          await _narudzbaProvider.update(
-                                              widget.narudzba!.narudzbaId,
-                                              request);
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).pushReplacement(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const NarduzbeListScreen()));
-                                          // ignore: empty_catches
-                                        } on Exception catch (e) {
-                                          isLoadingSave = false;
-                                          showDialog(
-                                              // ignore: use_build_context_synchronously
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                    title: const Text("Error"),
-                                                    content: Text(e.toString()),
-                                                    actions: [
-                                                      TextButton(
-                                                          onPressed: () =>
-                                                              Navigator.pop(
-                                                                  context),
-                                                          child:
-                                                              const Text("Ok"))
-                                                    ],
-                                                  ));
-                                          setState(() {});
-                                        }
-                                      }
-                                    }, // Define this function to handle the save action
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
-                                      shape:
-                                          const CircleBorder(), // Makes the button circular
-                                      padding: const EdgeInsets.all(
-                                          8), // Adjust padding for icon size // Background color
-                                    ),
-
-                                    child: isLoadingSave
-                                        ? const CircularProgressIndicator()
-                                        : const Icon(
-                                            Icons.save,
-                                            color: Colors.white,
-                                          ), // Save icon inside
-                                  )
-                                : Container(),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          SizedBox(
-                            width: 60,
-                            height: 60,
-                            child: widget.narudzba?.stateMachine == "created"
-                                ? ElevatedButton(
-                                    onPressed: () async {
-                                      isLoadingSave = true;
-                                      setState(() {});
-
-                                      await _narudzbaProvider
-                                          .delete(widget.narudzba!.narudzbaId);
-
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ZaposleniciListScreen()));
-                                    }, // Define this function to handle the save action
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors
-                                          .red, // Makes the button circular
-                                      padding: const EdgeInsets.all(
-                                          8), // Adjust padding for icon size // Background color
-                                    ),
-
-                                    child: isLoadingSave
-                                        ? const CircularProgressIndicator()
-                                        : const Icon(
-                                            Icons.delete,
-                                            color: Colors.white,
-                                          ), // Save icon inside
-                                  )
-                                : Container(),
-                          ),
-                        ],
-                      )
-                    : Container()
-              ],
-            ),
+            _buildDetailRow(
+                "Broj narudžbe:", widget.narudzba?.brojNarudzbe ?? "N/A"),
+            _buildDetailRow(
+                "Datum narudžbe:",
+                formatDateString(widget.narudzba?.datum.toIso8601String()) ??
+                    "N/A"),
+            _buildDetailRow("Status:",
+                widget.narudzba?.status == true ? "Aktivna" : "Neaktivna"),
+            _buildDetailRow(
+                "Otkazana:", widget.narudzba?.otkazana == true ? "Da" : "Ne"),
+            _buildDetailRow(
+                "Plaćena:", widget.narudzba?.placeno == true ? "Da" : "Ne"),
+            _buildDetailRow(
+                "Ukupna cijena:", "${widget.narudzba?.ukupnaCijena} KM"),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+      child: Row(
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          const Spacer(),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 16, color: Colors.white),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSetsList() {
+    return Expanded(
+      child: ListView.builder(
+        itemCount: setoviResult?.result.length ?? 0,
+        itemBuilder: (context, index) {
+          return (setoviResult != null
+                      ? setoviResult?.result[index].proizvodiSets.length
+                      : -1)! >
+                  0
+              ? _buildExpansionTile(index)
+              : Container();
+        },
       ),
     );
   }
@@ -559,20 +178,20 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
           "Set ${index + 1} - ${setoviResult?.result[index].cijenaSaPopustom} KM",
           style: TextStyle(color: Colors.black),
         ),
-        textColor: Colors.white,
         children: [
-          ListTile(
-              title: Text(
-                  "${setoviResult?.result[index].proizvodiSets[0].proizvod?.naziv ?? ""} x ${setoviResult?.result[index].proizvodiSets[0].kolicina ?? ""} ${setoviResult?.result[index].proizvodiSets[0].proizvod?.jedinicaMjere?.skracenica ?? ""} = ${(setoviResult?.result[index].proizvodiSets[0].kolicina ?? 0) * (setoviResult?.result[index].proizvodiSets[0].proizvod?.cijena ?? 0.0)} KM",
-                  style: TextStyle(color: Colors.black))),
-          ListTile(
-              title: Text(
-                  "${setoviResult?.result[index].proizvodiSets[1].proizvod?.naziv ?? ""} x ${setoviResult?.result[index].proizvodiSets[1].kolicina ?? ""} ${setoviResult?.result[index].proizvodiSets[1].proizvod?.jedinicaMjere?.skracenica ?? ""} = ${(setoviResult?.result[index].proizvodiSets[1].kolicina ?? 0) * (setoviResult?.result[index].proizvodiSets[1].proizvod?.cijena ?? 0.0)} KM",
-                  style: TextStyle(color: Colors.black))),
-          ListTile(
-              title: Text(
-                  "${setoviResult?.result[index].proizvodiSets[2].proizvod?.naziv ?? ""} x ${setoviResult?.result[index].proizvodiSets[2].kolicina ?? ""} ${setoviResult?.result[index].proizvodiSets[2].proizvod?.jedinicaMjere?.skracenica ?? ""} = ${(setoviResult?.result[index].proizvodiSets[2].kolicina ?? 0) * (setoviResult?.result[index].proizvodiSets[2].proizvod?.cijena ?? 0.0)} KM",
-                  style: TextStyle(color: Colors.black)))
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: setoviResult?.result[index].proizvodiSets.length ?? 0,
+            itemBuilder: (context, subIndex) {
+              var product = setoviResult?.result[index].proizvodiSets[subIndex];
+              return ListTile(
+                title: Text(
+                  "${product?.proizvod?.naziv ?? ""} x ${product?.kolicina ?? ""} ${product?.proizvod?.jedinicaMjere?.skracenica ?? ""} = ${(product?.kolicina ?? 0) * (product?.proizvod?.cijena ?? 0.0)} KM",
+                  style: TextStyle(color: Colors.black),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

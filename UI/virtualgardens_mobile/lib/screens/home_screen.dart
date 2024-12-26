@@ -3,25 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/korisnici.dart';
-import 'package:virtualgardens_mobile/models/narudzbe.dart';
 import 'package:virtualgardens_mobile/models/ponuda.dart';
-import 'package:virtualgardens_mobile/models/proizvod.dart';
 import 'package:virtualgardens_mobile/models/search_result.dart';
-import 'package:virtualgardens_mobile/models/setovi_ponude.dart';
-import 'package:virtualgardens_mobile/models/vrsta_proizvoda.dart';
 import 'package:virtualgardens_mobile/providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/korisnik_provider.dart';
-import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_mobile/providers/ponude_provider.dart';
-import 'package:virtualgardens_mobile/providers/product_provider.dart';
-import 'package:virtualgardens_mobile/providers/setovi_ponude_provider.dart';
-import 'package:virtualgardens_mobile/providers/setovi_proizvodi_provider.dart';
-import 'package:virtualgardens_mobile/providers/setovi_provider.dart';
 import 'package:virtualgardens_mobile/providers/utils.dart';
-import 'package:virtualgardens_mobile/providers/vrste_proizvoda_provider.dart';
-import 'package:virtualgardens_mobile/screens/ponude_details_screen.dart';
-import 'package:virtualgardens_mobile/screens/product_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/narudzbe_list_screen.dart';
+import 'package:virtualgardens_mobile/screens/ponude_details_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,37 +20,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late VrsteProizvodaProvider vrsteProizvodaProvider;
-  late ProductProvider productProvider;
   late KorisnikProvider korisnikProvider;
-  late NarudzbaProvider narudzbaProvider;
   late PonudeProvider _ponudeProvider;
-  late SetoviPonudeProvider _setoviPonudeProvider;
-  late SetoviProvider _setoviProvider;
-  late SetProizvodProvider _proizvodiSet;
 
-  SearchResult<VrstaProizvoda>? vrsteProizvodaResult;
-  SearchResult<Proizvod>? proizvodiResult;
-  SearchResult<SetoviPonude>? setoviPonudeResult;
-  Set? set;
-  SetoviPonude? setPonuda;
   Korisnik? korisnikResult;
   SearchResult<Ponuda>? ponudeResult;
 
   bool isLoading = true;
-  int? selectedVrstaProizvoda;
-
-  int? expandedIndex;
 
   @override
   void initState() {
-    vrsteProizvodaProvider = context.read<VrsteProizvodaProvider>();
-    productProvider = context.read<ProductProvider>();
     korisnikProvider = context.read<KorisnikProvider>();
     _ponudeProvider = context.read<PonudeProvider>();
-    _setoviPonudeProvider = context.read<SetoviPonudeProvider>();
-    _setoviProvider = context.read<SetoviProvider>();
-    _proizvodiSet = context.read<SetProizvodProvider>();
 
     super.initState();
 
@@ -69,19 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future initScreen(int? value) async {
-    vrsteProizvodaResult = await vrsteProizvodaProvider.get();
-    selectedVrstaProizvoda = vrsteProizvodaResult?.result[0].vrstaProizvodaId;
-
-    var filterProizvodi = {
-      'Page': 1,
-      'OrderBy': "DostupnaKolicina",
-      'SortDirection': "ASC",
-      'VrstaProizvodaId': value ?? selectedVrstaProizvoda,
-      'PageSize': 3,
-      'IncludeTables': "JedinicaMjere"
-    };
-
-    proizvodiResult = await productProvider.get(filter: filterProizvodi);
     korisnikResult = await korisnikProvider.getById(AuthProvider.korisnikId!);
 
     var filterPonude = {
@@ -105,7 +62,7 @@ class _HomeScreenState extends State<HomeScreen> {
       FullScreenLoader(
         isLoading: isLoading,
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
           color: const Color.fromRGBO(235, 241, 224, 1),
           child: SingleChildScrollView(
             child: Column(
@@ -113,6 +70,29 @@ class _HomeScreenState extends State<HomeScreen> {
                 _greeting(screenWidth),
                 const SizedBox(height: 20),
                 _basicInfo(screenWidth),
+                const SizedBox(
+                  height: 8,
+                ),
+                Container(
+                  margin: EdgeInsets.only(bottom: 30, left: 20, right: 20),
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all(
+                            const Color.fromRGBO(32, 76, 56, 1)),
+                        foregroundColor: MaterialStateProperty.all(
+                            const Color.fromRGBO(235, 241, 224, 1))),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UserOrdersScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('Kreiraj narudžbu'),
+                  ),
+                ),
               ],
             ),
           ),
@@ -142,7 +122,6 @@ class _HomeScreenState extends State<HomeScreen> {
             radius: screenWidth * 0.2,
             backgroundImage: korisnikResult?.slika != null
                 ? imageFromString(korisnikResult!.slika!).image
-                    as ImageProvider<Object>
                 : const AssetImage('assets/images/user.png'),
           ),
         ],
@@ -159,13 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Icons.local_offer,
           SingleChildScrollView(
               child: ponude()), // Replace with appropriate content for orders
-          onSearch: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const NarduzbeListScreen(),
-              ),
-            );
-          },
+          onSearch: () {},
         ),
       ],
     );
@@ -214,7 +187,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
-      )
+      ),
     ]);
   }
 
@@ -260,49 +233,6 @@ class _HomeScreenState extends State<HomeScreen> {
             child: content,
           ),
         ],
-      ),
-    );
-  }
-
-  Widget buildCardList() {
-    return SizedBox(
-      height: 180,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        children: (proizvodiResult?.result ?? [])
-            .map<Widget>((item) => buildCard(item.naziv ?? "",
-                "${item.dostupnaKolicina} ${item.jedinicaMjere?.skracenica}"))
-            .toList(),
-      ),
-    );
-  }
-
-  Widget buildCard(String name, String number) {
-    return Expanded(
-      child: AspectRatio(
-        aspectRatio: 1, // Makes the card a square
-        child: Card(
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                name,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8), // Adds spacing between name and number
-              Text(
-                number,
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

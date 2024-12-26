@@ -6,10 +6,8 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/main.dart';
 import 'package:virtualgardens_mobile/models/korisnici.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/korisnik_provider.dart';
 import 'package:virtualgardens_mobile/providers/utils.dart';
-import 'package:virtualgardens_mobile/screens/home_screen.dart';
 
 // ignore: must_be_immutable
 class RegisterScreen extends StatefulWidget {
@@ -433,8 +431,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 isLoadingSave = true;
                                 setState(() {});
                                 try {
-                                  var korisnik =
-                                      await _korisnikProvider.insert(request);
+                                  await _korisnikProvider.insert(request);
                                   // ignore: use_build_context_synchronously
                                   Navigator.of(context).pushReplacement(
                                       MaterialPageRoute(
