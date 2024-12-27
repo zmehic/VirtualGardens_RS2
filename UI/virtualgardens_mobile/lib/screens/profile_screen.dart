@@ -197,12 +197,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: GestureDetector(
                   onTap: _pickImage,
                   child: CircleAvatar(
+                    backgroundColor: Color.fromRGBO(32, 76, 56, 1),
                     radius: 60,
                     backgroundImage: _profileImage != null
                         ? FileImage(_profileImage!)
                         : null,
                     child: _profileImage == null
-                        ? const Icon(Icons.camera_alt, size: 50)
+                        ? const Icon(
+                            Icons.camera_alt,
+                            size: 50,
+                            color: Colors.white,
+                          )
                         : null,
                   ),
                 ),
@@ -288,7 +293,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
+                  backgroundColor: Color.fromRGBO(32, 76, 56, 1),
                   padding: const EdgeInsets.symmetric(vertical: 15),
                 ),
                 child: const Text(

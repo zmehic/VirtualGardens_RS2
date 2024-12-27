@@ -21,6 +21,24 @@ namespace VirtualGardens.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        public override NaloziDTO Insert(NaloziInsertRequest request)
+        {
+            return base.Insert(request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override NaloziDTO Update(int id, NaloziUpdateRequest request)
+        {
+            return base.Update(id, request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
+        }
+
+        [Authorize(Roles = "Admin")]
         public override NaloziDTO GetById(int id)
         {
             return base.GetById(id);

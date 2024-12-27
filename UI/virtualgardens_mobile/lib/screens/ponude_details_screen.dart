@@ -5,10 +5,9 @@ import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/ponuda.dart';
 import 'package:virtualgardens_mobile/models/search_result.dart';
 import 'package:virtualgardens_mobile/models/setovi_ponude.dart';
-import 'package:virtualgardens_mobile/providers/ponude_provider.dart';
-import 'package:virtualgardens_mobile/providers/product_provider.dart';
 import 'package:virtualgardens_mobile/providers/setovi_ponude_provider.dart';
 
+// ignore: must_be_immutable
 class PonudeDetailsScreen extends StatefulWidget {
   Ponuda? ponuda;
   PonudeDetailsScreen({super.key, this.ponuda});
@@ -18,9 +17,7 @@ class PonudeDetailsScreen extends StatefulWidget {
 }
 
 class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
-  late PonudeProvider _ponudeProvider;
   late SetoviPonudeProvider _setoviPonudeProvider;
-  late ProductProvider _proizvodiProvider;
 
   bool isLoading = true;
   SearchResult<SetoviPonude>? setoviPonudeResult;
@@ -31,9 +28,7 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _ponudeProvider = context.read<PonudeProvider>();
     _setoviPonudeProvider = context.read<SetoviPonudeProvider>();
-    _proizvodiProvider = context.read<ProductProvider>();
 
     _offerNameController.text = widget.ponuda?.naziv ?? "Unnamed Offer";
     _discountController.text = widget.ponuda?.popust?.toString() ?? "0";

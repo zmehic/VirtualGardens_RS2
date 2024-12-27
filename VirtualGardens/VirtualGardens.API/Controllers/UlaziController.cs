@@ -31,5 +31,23 @@ namespace VirtualGardens.API.Controllers
         {
             return base.GetById(id);
         }
+
+        [Authorize(Roles = "Admin")]
+        public override UlaziDTO Insert(UlaziUpsertRequest request)
+        {
+            return base.Insert(request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override UlaziDTO Update(int id, UlaziUpsertRequest request)
+        {
+            return base.Update(id, request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
+        }
     }
 }

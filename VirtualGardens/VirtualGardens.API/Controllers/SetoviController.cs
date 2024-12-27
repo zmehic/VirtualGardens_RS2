@@ -19,22 +19,5 @@ namespace VirtualGardens.API.Controllers
         {
         }
 
-        [Authorize(Roles = "Kupac,Admin")]
-        public override SetoviDTO Insert(SetoviUpsertRequest request)
-        {
-            return base.Insert(request);
-        }
-
-        [Authorize(Roles = "Kupac,Admin")]
-        public override SetoviDTO Update(int id, SetoviUpsertRequest request)
-        {
-            return base.Update(id, request);
-        }
-
-        [Authorize(Roles = "Kupac,Admin")]
-        public override void Delete(int id)
-        {
-            base.Delete(id);
-        }
     }
 }

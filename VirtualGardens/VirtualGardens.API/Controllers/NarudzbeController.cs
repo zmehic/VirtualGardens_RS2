@@ -19,24 +19,6 @@ namespace VirtualGardens.API.Controllers
         {
         }
 
-        [Authorize(Roles = "Admin,Kupac")]
-        public override NarudzbeDTO Update(int id, NarudzbeUpsertRequest request)
-        {
-            return base.Update(id, request);
-        }
-
-        [Authorize(Roles = "Admin,Kupac")]
-        public override void Delete(int id)
-        {
-            base.Delete(id);
-        }
-
-        [Authorize(Roles = "Admin,Kupac")]
-        public override NarudzbeDTO Insert(NarudzbeUpsertRequest request)
-        {
-            return base.Insert(request);
-        }
-
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/inprogress")]
         public NarudzbeDTO InProgress(int id)

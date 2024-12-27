@@ -22,6 +22,23 @@ namespace VirtualGardens.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        public override PonudeDTO Insert(PonudeUpsertRequest request)
+        {
+            return base.Insert(request);
+        }
+        [Authorize(Roles = "Admin")]
+        public override PonudeDTO Update(int id, PonudeUpsertRequest request)
+        {
+            return base.Update(id, request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
+        }
+
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}/activate")]
         public PonudeDTO Activate(int id)
         {

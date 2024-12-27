@@ -48,5 +48,11 @@ namespace VirtualGardens.API.Controllers
         {
             return base.GetList(searchObject);
         }
+
+        [Authorize(Roles = "Admin")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
+        }
     }
 }

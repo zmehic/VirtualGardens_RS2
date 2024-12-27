@@ -20,6 +20,24 @@ namespace VirtualGardens.API.Controllers
         }
 
         [Authorize(Roles = "Admin")]
+        public override KorisniciUlogeDTO Insert(KorisniciUlogeUpsertRequest request)
+        {
+            return base.Insert(request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override KorisniciUlogeDTO Update(int id, KorisniciUlogeUpsertRequest request)
+        {
+            return base.Update(id, request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
+        }
+
+        [Authorize(Roles = "Admin")]
         public override KorisniciUlogeDTO GetById(int id)
         {
             return base.GetById(id);

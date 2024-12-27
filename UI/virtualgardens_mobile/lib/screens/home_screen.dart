@@ -62,39 +62,45 @@ class _HomeScreenState extends State<HomeScreen> {
       FullScreenLoader(
         isLoading: isLoading,
         child: Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
           color: const Color.fromRGBO(235, 241, 224, 1),
-          child: SingleChildScrollView(
-            child: Column(
-              children: [
-                _greeting(screenWidth),
-                const SizedBox(height: 20),
-                _basicInfo(screenWidth),
-                const SizedBox(
-                  height: 8,
-                ),
-                Container(
-                  margin: EdgeInsets.only(bottom: 30, left: 20, right: 20),
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all(
-                            const Color.fromRGBO(32, 76, 56, 1)),
-                        foregroundColor: MaterialStateProperty.all(
-                            const Color.fromRGBO(235, 241, 224, 1))),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => UserOrdersScreen(),
-                        ),
-                      );
-                    },
-                    child: const Text('Kreiraj narudžbu'),
+          child: Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      _greeting(screenWidth),
+                      const SizedBox(height: 20),
+                      _basicInfo(screenWidth),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              Container(
+                margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.all(
+                      const Color.fromRGBO(32, 76, 56, 1),
+                    ),
+                    foregroundColor: MaterialStateProperty.all(
+                      const Color.fromRGBO(235, 241, 224, 1),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UserOrdersScreen(),
+                      ),
+                    );
+                  },
+                  child: const Text('Kreiraj narudžbu'),
+                ),
+              ),
+            ],
           ),
         ),
       ),

@@ -65,20 +65,6 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
     );
   }
 
-  Widget _buildHeader() {
-    return Container(
-      margin: const EdgeInsets.only(top: 20, bottom: 10),
-      child: const Text(
-        "Moje Narudžbe",
-        style: TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: Color.fromRGBO(32, 76, 56, 1),
-        ),
-      ),
-    );
-  }
-
   Widget _buildBanner() {
     return Container(
       color: const Color.fromRGBO(32, 76, 56, 1),

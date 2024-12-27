@@ -31,5 +31,23 @@ namespace VirtualGardens.API.Controllers
         {
             return base.GetList(searchObject);
         }
+
+        [Authorize(Roles = "Admin")]
+        public override UlaziProizvodiDTO Insert(UlaziProizvodiUpsertRequest request)
+        {
+            return base.Insert(request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override UlaziProizvodiDTO Update(int id, UlaziProizvodiUpsertRequest request)
+        {
+            return base.Update(id, request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
+        }
     }
 }

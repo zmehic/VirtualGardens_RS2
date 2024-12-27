@@ -20,22 +20,5 @@ namespace VirtualGardens.API.Controllers
         {
         }
 
-        [Authorize(Roles = "Admin,Kupac")]
-        public override RecenzijeDTO Insert(RecenzijeUpsertRequest request)
-        {
-            return base.Insert(request);
-        }
-
-        [Authorize(Roles = "Admin,Kupac")]
-        public override void Delete(int id)
-        {
-            base.Delete(id);
-        }
-
-        [Authorize(Roles = "Admin,Kupac")]
-        public override RecenzijeDTO Update(int id, RecenzijeUpsertRequest request)
-        {
-            return base.Update(id, request);
-        }
     }
 }

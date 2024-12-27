@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/narudzbe.dart';
 import 'package:virtualgardens_mobile/models/search_result.dart';
 import 'package:virtualgardens_mobile/models/set.dart';
-import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_mobile/providers/setovi_provider.dart';
 import 'package:virtualgardens_mobile/providers/utils.dart';
+import 'package:virtualgardens_mobile/screens/pitanja_list_screen.dart';
 
 // ignore: must_be_immutable
 class NarudzbaUserDetailsScreen extends StatefulWidget {
@@ -21,7 +20,6 @@ class NarudzbaUserDetailsScreen extends StatefulWidget {
 }
 
 class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
-  late NarudzbaProvider _narudzbaProvider;
   late SetoviProvider _setoviProvider;
 
   SearchResult<Set>? setoviResult;
@@ -31,7 +29,6 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    _narudzbaProvider = context.read<NarudzbaProvider>();
     _setoviProvider = context.read<SetoviProvider>();
 
     // Initialize the form values and fetch sets
@@ -74,20 +71,52 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
     return Container(
       color: const Color.fromRGBO(32, 76, 56, 1),
       width: double.infinity,
-      child: const Padding(
-        padding: EdgeInsets.all(15.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+      child: Padding(
+        padding: const EdgeInsets.all(15.0),
+        child: Stack(
           children: [
-            Icon(size: 45, color: Colors.white, Icons.shopping_basket),
-            SizedBox(width: 10),
-            Text(
-              "Detalji narudžbe",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                fontFamily: "arial",
-                color: Colors.white,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: const [
+                Icon(size: 45, color: Colors.white, Icons.shopping_basket),
+                SizedBox(width: 10),
+                Text(
+                  "Detalji narudžbe",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    fontFamily: "arial",
+                    color: Colors.white,
+                  ),
+                ),
+              ],
+            ),
+            Align(
+              alignment: Alignment.centerRight,
+              child: GestureDetector(
+                onTap: () {
+                  // Replace 'QuestionsScreen' with your actual screen/widget
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => PitanjaOdgovoriListScreen(
+                              narudzba: widget.narudzba,
+                            )),
+                  );
+                },
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.blue, // Set your desired color here
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.question_answer,
+                    size: 20, // Adjust the size as needed
+                    color: Colors.white, // Icon color
+                  ),
+                ),
               ),
             ),
           ],
@@ -109,10 +138,8 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
           children: [
             _buildDetailRow(
                 "Broj narudžbe:", widget.narudzba?.brojNarudzbe ?? "N/A"),
-            _buildDetailRow(
-                "Datum narudžbe:",
-                formatDateString(widget.narudzba?.datum.toIso8601String()) ??
-                    "N/A"),
+            _buildDetailRow("Datum narudžbe:",
+                formatDateString(widget.narudzba?.datum.toIso8601String())),
             _buildDetailRow("Status:",
                 widget.narudzba?.status == true ? "Aktivna" : "Neaktivna"),
             _buildDetailRow(

@@ -19,7 +19,7 @@ namespace VirtualGardens.API.Controllers.BaseControllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Kupac")]
         public virtual TModel Insert(TInsert request)
         {
             return _service.Insert(request);
@@ -35,7 +35,7 @@ namespace VirtualGardens.API.Controllers.BaseControllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Kupac")]
         public virtual void Delete(int id)
         {
             _service.Delete(id);

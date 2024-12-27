@@ -31,5 +31,23 @@ namespace VirtualGardens.API.Controllers
         {
             return base.GetById(id);
         }
+
+        [Authorize(Roles = "Admin")]
+        public override ZaposleniciDTO Insert(ZaposleniciInsertRequest request)
+        {
+            return base.Insert(request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override ZaposleniciDTO Update(int id, ZaposleniciUpdateRequest request)
+        {
+            return base.Update(id, request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
+        }
     }
 }

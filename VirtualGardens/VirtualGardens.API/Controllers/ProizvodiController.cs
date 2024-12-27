@@ -21,16 +21,22 @@ namespace VirtualGardens.API.Controllers
         {
         }
 
-        [Authorize(Roles = "Admin,Kupac")]
-        public override PagedResult<ProizvodiDTO> GetList([FromQuery] ProizvodiSearchObject searchObject)
+        [Authorize(Roles = "Admin")]
+        public override ProizvodiDTO Insert(ProizvodiUpsertRequest request)
         {
-            return base.GetList(searchObject);
+            return base.Insert(request);
         }
 
-        [Authorize(Roles = "Admin,Kupac")]
-        public override ProizvodiDTO GetById(int id)
+        [Authorize(Roles = "Admin")]
+        public override ProizvodiDTO Update(int id, ProizvodiUpsertRequest request)
         {
-            return base.GetById(id);
+            return base.Update(id, request);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public override void Delete(int id)
+        {
+            base.Delete(id);
         }
 
         [HttpPut("recalculate")]

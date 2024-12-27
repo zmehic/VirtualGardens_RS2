@@ -59,8 +59,6 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
       FullScreenLoader(
         isLoading: isLoading, // Your loading state
         child: Container(
-          margin:
-              const EdgeInsets.only(left: 40, right: 40, top: 20, bottom: 10),
           color: const Color.fromRGBO(235, 241, 224, 1),
           child: Column(
             children: [
@@ -216,7 +214,6 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
 
   Widget _buildBanner() {
     return Container(
-      margin: const EdgeInsets.only(top: 30),
       color: const Color.fromRGBO(32, 76, 56, 1),
       width: double.infinity,
       child: Padding(

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:virtualgardens_mobile/providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/screens/home_screen.dart';
 import 'package:virtualgardens_mobile/screens/narudzbe_list_screen.dart';
-import 'package:virtualgardens_mobile/screens/ponude_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/product_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/profile_screen.dart';
 
@@ -72,13 +71,6 @@ class _MasterScreenState extends State<MasterScreen> {
               onTap: () {
                 Navigator.of(context).pushReplacement(MaterialPageRoute(
                     builder: (context) => const UserOrdersScreen()));
-              },
-            ),
-            ListTile(
-              title: const Text("Ponude"),
-              onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const PonudeListScreen()));
               },
             ),
           ],
