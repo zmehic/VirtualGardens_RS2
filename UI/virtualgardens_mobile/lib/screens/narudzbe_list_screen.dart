@@ -15,15 +15,18 @@ class UserOrdersScreen extends StatefulWidget {
   State<UserOrdersScreen> createState() => _UserOrdersScreenState();
 }
 
-class _UserOrdersScreenState extends State<UserOrdersScreen> {
+class _UserOrdersScreenState extends State<UserOrdersScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   late NarudzbaProvider _narudzbaProvider;
   SearchResult<Narudzba>? result;
   bool isLoading = true;
 
   @override
   void initState() {
-    _narudzbaProvider = context.read<NarudzbaProvider>();
     super.initState();
+    _tabController = TabController(length: 3, vsync: this);
+    _narudzbaProvider = context.read<NarudzbaProvider>();
     fetchUserOrders();
   }
 
@@ -32,12 +35,8 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
       isLoading = true;
     });
 
-    // Assuming "currentUserId" is available via a provider or context.
-
     final currentUserId = AuthProvider.korisnikId;
-
     var filter = {'korisnikId': currentUserId, 'isDeleted': false};
-
     result = await _narudzbaProvider.get(filter: filter);
 
     setState(() {
@@ -46,19 +45,41 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return MasterScreen(
       FullScreenLoader(
         isLoading: isLoading,
-        child: Container(
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
-            children: [
-              _buildBanner(),
-              _buildResultView(),
-              _buildCreateOrderButton(),
-            ],
-          ),
+        child: Column(
+          children: [
+            _buildBanner(),
+            TabBar(
+              controller: _tabController,
+              labelColor: Colors.white,
+              unselectedLabelColor: Colors.white70,
+              indicatorColor: Colors.white,
+              tabs: const [
+                Tab(text: "Kreirane"),
+                Tab(text: "U procesu"),
+                Tab(text: "Završene"),
+              ],
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _buildOrdersView("created"),
+                  _buildOrdersView("inprogress"),
+                  _buildOrdersView("finished"),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
       "Moje Narudžbe",
@@ -91,73 +112,137 @@ class _UserOrdersScreenState extends State<UserOrdersScreen> {
     );
   }
 
-  Widget _buildResultView() {
-    return Expanded(
-      child: ListView.builder(
-        itemCount: result?.result.length ?? 0,
-        itemBuilder: (context, index) {
-          final order = result!.result[index];
-          return Card(
-            color: Colors.green.shade100,
-            margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-            ),
-            elevation: 5,
-            child: ListTile(
-              contentPadding: const EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 15,
+  Widget _buildOrdersView(String state) {
+    final orders =
+        result?.result.where((order) => order.stateMachine == state).toList() ??
+            [];
+
+    return Stack(
+      children: [
+        ListView.builder(
+          itemCount: orders.length,
+          itemBuilder: (context, index) {
+            final order = orders[index];
+            return Card(
+              color: Colors.green.shade100,
+              margin: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
               ),
-              title: Text(
-                "Broj narudžbe: ${order.brojNarudzbe}",
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+              elevation: 5,
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(
+                  vertical: 10,
+                  horizontal: 15,
+                ),
+                title: Text(
+                  "Broj narudžbe: ${order.brojNarudzbe}",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Text(
+                  "Stanje: ${state == 'created' ? "Kreirana" : state == 'finished' ? "Završena" : "U procesu"}",
+                  style: const TextStyle(fontSize: 16),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (state == 'created')
+                      IconButton(
+                        icon: const Icon(Icons.delete, color: Colors.red),
+                        onPressed: () async {
+                          final confirm = await showDialog<bool>(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                title: const Text("Brisanje narudžbe"),
+                                content: const Text(
+                                    "Jeste li sigurni da želite obrisati ovu narudžbu?"),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(false),
+                                    child: const Text("Ne"),
+                                  ),
+                                  TextButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).pop(true),
+                                    child: const Text("Da"),
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+
+                          if (confirm == true) {
+                            setState(() {
+                              isLoading = true;
+                            });
+                            await _narudzbaProvider.delete(order.narudzbaId);
+                            await fetchUserOrders();
+                            setState(() {
+                              isLoading = false;
+                            });
+                          }
+                        },
+                      ),
+                    IconButton(
+                      icon:
+                          const Icon(Icons.arrow_forward, color: Colors.green),
+                      onPressed: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => NarudzbaUserDetailsScreen(
+                              narudzba: order,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
                 ),
               ),
-              subtitle: Text(
-                "Stanje: ${order.stateMachine == 'created' ? "Zaprimljena" : order.stateMachine == 'finished' ? "Završena" : "U procesu"}",
-                style: const TextStyle(fontSize: 16),
+            );
+          },
+        ),
+        if (state == 'created')
+          Positioned(
+            bottom: 20,
+            left: 20,
+            right: 20,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+                padding: const EdgeInsets.symmetric(vertical: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
               ),
-              trailing: IconButton(
-                icon: const Icon(Icons.arrow_forward, color: Colors.green),
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => NarudzbaUserDetailsScreen(
-                        narudzba: order,
-                      ),
-                    ),
-                  );
-                },
+              onPressed: () async {
+                setState(() {
+                  isLoading = true;
+                });
+                var request = {
+                  'brojNarudzbe': null,
+                  'ukupnaCijena': 0,
+                  'korisnikId': AuthProvider.korisnikId,
+                  'nalogId': null
+                };
+                await _narudzbaProvider.insert(request);
+                await fetchUserOrders();
+                setState(() {
+                  isLoading = false;
+                });
+              },
+              child: const Text(
+                "Kreiraj novu narudžbu",
+                style: TextStyle(color: Colors.white, fontSize: 18),
               ),
             ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _buildCreateOrderButton() {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 30),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
           ),
-        ),
-        onPressed: () {
-          // Navigate to create order screen when implemented
-        },
-        child: const Text(
-          "Kreiraj novu narudžbu",
-          style: TextStyle(color: Colors.white, fontSize: 18),
-        ),
-      ),
+      ],
     );
   }
 }

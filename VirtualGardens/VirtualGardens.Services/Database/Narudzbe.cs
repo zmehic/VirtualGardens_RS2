@@ -19,7 +19,7 @@ public partial class Narudzbe: ISoftDeletable
 
     public bool? Status { get; set; }
 
-    public int UkupnaCijena { get; set; }
+    public float UkupnaCijena { get; set; }
 
     public int KorisnikId { get; set; }
 

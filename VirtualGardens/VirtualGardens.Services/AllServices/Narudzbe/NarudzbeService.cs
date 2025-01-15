@@ -1,5 +1,6 @@
 ﻿using Azure.Core;
 using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -21,9 +22,11 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
     {
         public BaseNarudzbaState BaseNarudzbaState { get; set; }
         ILogger<ProizvodiService> _logger;
+        public _210011Context _210011Context { get; set; }
         public NarudzbeService(_210011Context context, IMapper mapper, BaseNarudzbaState baseNarudzbaState, ILogger<ProizvodiService> logger) : base(context, mapper)
         {
             BaseNarudzbaState = baseNarudzbaState;
+            _210011Context = context;
             _logger = logger;
         }
 
@@ -99,6 +102,10 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
 
         public override NarudzbeDTO Insert(NarudzbeUpsertRequest request)
         {
+            var lastOrderNumberSplit = (_210011Context.Narudzbes.OrderBy(x=>x.NarudzbaId).Last().BrojNarudzbe).Split('-');
+            var lastNumber = Int32.Parse(lastOrderNumberSplit[1]);
+            request.BrojNarudzbe = $"NAR-{lastNumber + 1}";
+
             var state = BaseNarudzbaState.CreateState("initial");
             return state.Insert(request);
         }
@@ -166,6 +173,33 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
             }
 
             return result;
+        }
+
+        public List<string> CheckOrderValidity(int orderId)
+        {
+            var order = _210011Context.Narudzbes.Where(x=>x.NarudzbaId==orderId).FirstOrDefault();
+            var ordersSets = _210011Context.ProizvodiSets.Include(x => x.Set).Where(x => x.Set.NarudzbaId == orderId && x.Set.IsDeleted==false).ToList();
+            var ordersProductsWithDuplicates = _210011Context.ProizvodiSets.Include(x => x.Proizvod).Where(x => x.Set.NarudzbaId == orderId && x.Set.IsDeleted==false).Select(x=>x.Proizvod).ToList();
+            var ordersProducts = ordersProductsWithDuplicates.Distinct().ToList();
+
+            List<string> listOfErrors = [];
+
+            foreach (var item in ordersSets)
+            {
+                if(ordersProducts.Find(x => x.ProizvodId == item.ProizvodId) != null)
+                    ordersProducts.Find(x => x.ProizvodId == item.ProizvodId).DostupnaKolicina -= item.Kolicina; 
+            }
+
+            foreach (var item in ordersProducts)
+            {
+                if(item.DostupnaKolicina<0)
+                {
+                    listOfErrors.Add($"Naručili ste previše {item.Naziv}, prekoračili ste dostupnu količinu za {int.Abs(item.DostupnaKolicina)}");
+                }
+            }
+
+            return listOfErrors;
+
         }
     }
 }

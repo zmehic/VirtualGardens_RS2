@@ -8,7 +8,7 @@ namespace VirtualGardens.Models.DTOs
     {
         public int NarudzbaId { get; set; }
 
-        public string BrojNarudzbe { get; set; } = null!;
+        public string? BrojNarudzbe { get; set; }
 
         public bool? Otkazana { get; set; }
 
@@ -19,7 +19,7 @@ namespace VirtualGardens.Models.DTOs
         public bool? Status { get; set; }
         public string? StateMachine { get; set; }
 
-        public int UkupnaCijena { get; set; }
+        public float UkupnaCijena { get; set; }
 
         public int KorisnikId { get; set; }
 

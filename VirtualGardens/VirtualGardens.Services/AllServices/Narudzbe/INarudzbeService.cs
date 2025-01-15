@@ -18,5 +18,6 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
         public NarudzbeDTO Finish(int id);
         public List<string> AllowedActions(int id);
         List<int> MonthlyStatistics(int year);
+        public List<string> CheckOrderValidity(int orderId);
     }
 }

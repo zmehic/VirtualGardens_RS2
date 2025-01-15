@@ -15,8 +15,10 @@ namespace VirtualGardens.Services.AllServices.ProizvodiSetovi
 {
     public class ProizvodiSetoviService : BaseCRUDService<Models.DTOs.ProizvodiSetDTO, ProizvodiSetSearchObject, Database.ProizvodiSet, ProizvodiSetoviUpsertRequest, ProizvodiSetoviUpsertRequest>, IProizvodiSetoviService
     {
+        public _210011Context _210011Context { get; set; }
         public ProizvodiSetoviService(_210011Context context, IMapper mapper) : base(context, mapper)
         {
+            _210011Context = context;
         }
 
         public override IQueryable<Database.ProizvodiSet> AddFilter(ProizvodiSetSearchObject search, IQueryable<Database.ProizvodiSet> query)
@@ -48,6 +50,7 @@ namespace VirtualGardens.Services.AllServices.ProizvodiSetovi
 
             return query;
         }
+
 
     }
 }

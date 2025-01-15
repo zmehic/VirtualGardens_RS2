@@ -14,7 +14,7 @@ Narudzba _$NarudzbaFromJson(Map<String, dynamic> json) => Narudzba(
       placeno: json['placeno'] as bool,
       status: json['status'] as bool?,
       stateMachine: json['stateMachine'] as String?,
-      ukupnaCijena: (json['ukupnaCijena'] as num).toInt(),
+      ukupnaCijena: (json['ukupnaCijena'] as num).toDouble(),
       korisnikId: (json['korisnikId'] as num).toInt(),
       nalogId: (json['nalogId'] as num?)?.toInt(),
       korisnik: json['korisnik'] == null

@@ -19,11 +19,18 @@ namespace VirtualGardens.API.Controllers
         {
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Kupac")]
         [HttpPut("{id}/inprogress")]
         public NarudzbeDTO InProgress(int id)
         {
             return (_service as INarudzbeService).InProgress(id);
+        }
+
+        [Authorize(Roles = "Kupac")]
+        [HttpGet("CheckOrderValidity/{orderid}")]
+        public List<string> CheckOrderValidity(int orderid)
+        {
+            return (_service as INarudzbeService).CheckOrderValidity(orderid);
         }
 
         [Authorize(Roles = "Admin")]

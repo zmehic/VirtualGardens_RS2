@@ -1,3 +1,4 @@
+import 'package:virtualgardens_mobile/models/narudzbe.dart';
 import 'package:virtualgardens_mobile/models/ponuda.dart';
 import 'package:virtualgardens_mobile/providers/base_provider.dart';
 import 'dart:convert';
@@ -35,10 +36,27 @@ class PonudeProvider extends BaseProvider<Ponuda> {
     }
   }
 
+  Future<Narudzba> addOfferToOrder({int? ponudaId, int? narudzbaId}) async {
+    var endpoint = "api/Ponude/addOfferToOrder/$ponudaId/$narudzbaId";
+    var baseUrl = const String.fromEnvironment("baseUrl",
+        defaultValue: "https://10.0.2.2:7011/");
+    var url = "$baseUrl$endpoint";
+    var uri = Uri.parse(url);
+    var headers = createHeaders();
+
+    var response = await http.put(uri, headers: headers);
+    if (isValidResponse(response)) {
+      var data = jsonDecode(response.body);
+      return Narudzba.fromJson(data);
+    } else {
+      throw Exception("Unknown error");
+    }
+  }
+
   Future ponudeState({String? action, int? id}) async {
     var endpoint = "api/Ponude/$id/$action";
     var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:7011/");
+        defaultValue: "https://10.0.2.2:7011/");
 
     var url = "$baseUrl$endpoint";
 

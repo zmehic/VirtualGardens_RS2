@@ -8,7 +8,7 @@ namespace VirtualGardens.Models.Requests.ProizvodiSetovi
     {
         public int ProizvodId { get; set; }
 
-        public int SetId { get; set; }
+        public int? SetId { get; set; }
 
         public int Kolicina { get; set; }
     }

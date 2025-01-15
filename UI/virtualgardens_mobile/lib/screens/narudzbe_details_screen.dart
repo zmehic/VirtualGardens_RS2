@@ -1,18 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:flutter_paypal_payment/flutter_paypal_payment.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/narudzbe.dart';
+import 'package:virtualgardens_mobile/models/ponuda.dart';
 import 'package:virtualgardens_mobile/models/search_result.dart';
 import 'package:virtualgardens_mobile/models/set.dart';
+import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
+import 'package:virtualgardens_mobile/providers/ponude_provider.dart';
 import 'package:virtualgardens_mobile/providers/setovi_provider.dart';
 import 'package:virtualgardens_mobile/providers/utils.dart';
+import 'package:virtualgardens_mobile/screens/add_product_set_screen.dart';
 import 'package:virtualgardens_mobile/screens/pitanja_list_screen.dart';
+import 'package:virtualgardens_mobile/screens/ponude_details_screen.dart';
 
-// ignore: must_be_immutable
 class NarudzbaUserDetailsScreen extends StatefulWidget {
-  final Narudzba? narudzba;
-  NarudzbaUserDetailsScreen({super.key, this.narudzba});
+  Narudzba? narudzba;
+  String? secretKeyValue;
+  String? clientIdValue;
+  NarudzbaUserDetailsScreen({super.key, this.narudzba}) {
+    secretKeyValue =
+        const String.fromEnvironment("SECRETKEY", defaultValue: "");
+    clientIdValue = const String.fromEnvironment("CLIENTID", defaultValue: "");
+  }
 
   @override
   State<NarudzbaUserDetailsScreen> createState() =>
@@ -21,8 +35,13 @@ class NarudzbaUserDetailsScreen extends StatefulWidget {
 
 class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
   late SetoviProvider _setoviProvider;
+  late NarudzbaProvider _narudzbaProvider;
+  late PonudeProvider _ponudeProvider;
+
+  List<String> listaValidity = [];
 
   SearchResult<Set>? setoviResult;
+  SearchResult<Ponuda>? offersResult;
 
   bool isLoading = true;
 
@@ -30,12 +49,27 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
   void initState() {
     super.initState();
     _setoviProvider = context.read<SetoviProvider>();
+    _narudzbaProvider = context.read<NarudzbaProvider>();
+    _ponudeProvider = context.read<PonudeProvider>();
 
-    // Initialize the form values and fetch sets
     initForm();
+    fetchOffers();
+  }
+
+  Future<bool> checkValidity() async {
+    listaValidity = await _narudzbaProvider.CheckOrderValidity(
+        orderid: widget.narudzba!.narudzbaId);
+    if (listaValidity.isEmpty == true) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future initForm() async {
+    widget.narudzba =
+        await _narudzbaProvider.getById(widget.narudzba!.narudzbaId);
+
     var filter = {
       'NarudzbaId': widget.narudzba?.narudzbaId,
       'isDeleted': false,
@@ -47,23 +81,46 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
     });
   }
 
+  Future fetchOffers() async {
+    var filter = {'isDeleted': false, 'stateMachine': 'active'};
+    offersResult = await _ponudeProvider.get(filter: filter);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    return MasterScreen(
-      FullScreenLoader(
-        isLoading: isLoading,
-        child: Container(
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
-            children: [
-              _buildBanner(),
-              _buildOrderDetails(),
-              _buildSetsList(),
-            ],
+    return DefaultTabController(
+      length: 2,
+      child: MasterScreen(
+        FullScreenLoader(
+          isLoading: isLoading,
+          child: Container(
+            color: const Color.fromRGBO(235, 241, 224, 1),
+            child: Column(
+              children: [
+                _buildBanner(),
+                const TabBar(
+                  labelColor: Colors.black,
+                  indicatorColor: Colors.green,
+                  tabs: [
+                    Tab(text: "Detalji narudžbe"),
+                    Tab(text: "Ponude"),
+                  ],
+                ),
+                Expanded(
+                  child: TabBarView(
+                    children: [
+                      _buildOrderDetailsTab(),
+                      _buildOffersTab(),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
+        "Detalji narudžbe",
       ),
-      "Detalji narudžbe",
     );
   }
 
@@ -75,9 +132,9 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
         padding: const EdgeInsets.all(15.0),
         child: Stack(
           children: [
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(size: 45, color: Colors.white, Icons.shopping_basket),
                 SizedBox(width: 10),
                 Text(
@@ -93,31 +150,33 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
             ),
             Align(
               alignment: Alignment.centerRight,
-              child: GestureDetector(
-                onTap: () {
-                  // Replace 'QuestionsScreen' with your actual screen/widget
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => PitanjaOdgovoriListScreen(
+              child: widget.narudzba!.stateMachine != 'created'
+                  ? GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PitanjaOdgovoriListScreen(
                               narudzba: widget.narudzba,
-                            )),
-                  );
-                },
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    color: Colors.blue, // Set your desired color here
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.question_answer,
-                    size: 20, // Adjust the size as needed
-                    color: Colors.white, // Icon color
-                  ),
-                ),
-              ),
+                            ),
+                          ),
+                        );
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: const BoxDecoration(
+                          color: Colors.blue,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.question_answer,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                    )
+                  : Container(),
             ),
           ],
         ),
@@ -125,52 +184,13 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
     );
   }
 
-  Widget _buildOrderDetails() {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: const Color.fromRGBO(32, 76, 56, 1),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildDetailRow(
-                "Broj narudžbe:", widget.narudzba?.brojNarudzbe ?? "N/A"),
-            _buildDetailRow("Datum narudžbe:",
-                formatDateString(widget.narudzba?.datum.toIso8601String())),
-            _buildDetailRow("Status:",
-                widget.narudzba?.status == true ? "Aktivna" : "Neaktivna"),
-            _buildDetailRow(
-                "Otkazana:", widget.narudzba?.otkazana == true ? "Da" : "Ne"),
-            _buildDetailRow(
-                "Plaćena:", widget.narudzba?.placeno == true ? "Da" : "Ne"),
-            _buildDetailRow(
-                "Ukupna cijena:", "${widget.narudzba?.ukupnaCijena} KM"),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-          const Spacer(),
-          Text(
-            value,
-            style: const TextStyle(fontSize: 16, color: Colors.white),
-          ),
-        ],
-      ),
+  Widget _buildOrderDetailsTab() {
+    return Column(
+      children: [
+        _buildOrderDetails(),
+        if (widget.narudzba?.stateMachine == 'created') _buildButtonsRow(),
+        Expanded(child: _buildSetsList()),
+      ],
     );
   }
 
@@ -183,44 +203,357 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                       ? setoviResult?.result[index].proizvodiSets.length
                       : -1)! >
                   0
-              ? _buildExpansionTile(index)
+              ? _buildCard(index)
               : Container();
         },
       ),
     );
   }
 
-  Widget _buildExpansionTile(int index) {
+  Widget _buildCard(int index) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      color: Colors.white,
-      elevation: 5,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
       ),
+      elevation: 4,
       child: ExpansionTile(
         iconColor: Colors.black,
         collapsedIconColor: Colors.black,
-        title: Text(
-          "Set ${index + 1} - ${setoviResult?.result[index].cijenaSaPopustom} KM",
-          style: TextStyle(color: Colors.black),
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              "Set ${index + 1} - ${setoviResult?.result[index].cijenaSaPopustom} KM",
+              style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black),
+            ),
+            // Add a delete button
+            widget.narudzba?.stateMachine == 'created'
+                ? IconButton(
+                    onPressed: () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      await _setoviProvider
+                          .delete(setoviResult!.result[index].setId);
+                      setState(() {
+                        initForm();
+                      });
+                    },
+                    icon: const Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                    tooltip: "Obriši Set",
+                  )
+                : Container(),
+          ],
         ),
         children: [
           ListView.builder(
             shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: setoviResult?.result[index].proizvodiSets.length ?? 0,
             itemBuilder: (context, subIndex) {
               var product = setoviResult?.result[index].proizvodiSets[subIndex];
               return ListTile(
+                leading: const Icon(Icons.local_offer, color: Colors.green),
                 title: Text(
-                  "${product?.proizvod?.naziv ?? ""} x ${product?.kolicina ?? ""} ${product?.proizvod?.jedinicaMjere?.skracenica ?? ""} = ${(product?.kolicina ?? 0) * (product?.proizvod?.cijena ?? 0.0)} KM",
-                  style: TextStyle(color: Colors.black),
+                  "${product?.proizvod?.naziv ?? ""} - ${product?.proizvod?.cijena} KM x ${product?.kolicina ?? ""} ${product?.proizvod?.jedinicaMjere?.skracenica ?? ""} = ${(product?.kolicina ?? 0) * (product?.proizvod?.cijena ?? 0.0)} KM",
+                  style: const TextStyle(fontSize: 14, color: Colors.black),
                 ),
               );
             },
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildButtonsRow() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 15.0),
+      child: Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // PayPal Button
+            widget.narudzba?.ukupnaCijena != null &&
+                    widget.narudzba!.ukupnaCijena > 0
+                ? ElevatedButton.icon(
+                    onPressed: () async {
+                      var response = await checkValidity();
+                      String errorText = listaValidity.join("\n");
+                      if (response == false) {
+                        QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.error,
+                            title: "Vaša narudžba nije validna",
+                            confirmBtnText: "U redu",
+                            text: errorText);
+                        return;
+                      } else {
+                        var secret = dotenv.env['SECRETKEY'] ?? "";
+                        var clientId = dotenv.env['CLIENTID'] ?? "";
+
+                        var secretValue = (widget.secretKeyValue == "" ||
+                                widget.secretKeyValue == null)
+                            ? secret
+                            : widget.secretKeyValue;
+
+                        var clientValue = (widget.clientIdValue == "" ||
+                                widget.clientIdValue == null)
+                            ? clientId
+                            : widget.clientIdValue;
+
+                        if ((secretValue?.isEmpty ?? true) ||
+                            (clientValue?.isEmpty ?? true)) {
+                          QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.error,
+                              title: "Greška",
+                              text: "Greška sa plaćanjem");
+                          return;
+                        }
+
+                        List<Map<String, dynamic>> transactions = [];
+                        setoviResult?.result.forEach((set) {
+                          set.proizvodiSets.forEach((proizvodSet) {
+                            transactions.add({
+                              "name": proizvodSet.proizvod?.naziv ?? "",
+                              "quantity": proizvodSet.kolicina,
+                              "price": ((proizvodSet.proizvod?.cijena ?? 0.0) *
+                                      (1 - (set.popust! / 100)))
+                                  .toStringAsFixed(2),
+                              "currency": "EUR",
+                            });
+                          });
+                        });
+
+                        Navigator.of(context)
+                            .push(MaterialPageRoute(
+                          builder: (context) => PaypalCheckoutView(
+                            sandboxMode: true,
+                            clientId: clientValue,
+                            secretKey: secretValue,
+                            transactions: [
+                              {
+                                "amount": {
+                                  "total": widget.narudzba!.ukupnaCijena,
+                                  "currency": "EUR",
+                                  "details": {
+                                    "subtotal": widget.narudzba!.ukupnaCijena,
+                                    "shipping": '0',
+                                    "shipping_discount": 0
+                                  }
+                                },
+                                "description": "Plaćanje narudžbe",
+                                "item_list": {
+                                  "items": transactions,
+                                }
+                              }
+                            ],
+                            note: "Hvala Vam na plaćanju",
+                            onSuccess: (Map params) async {
+                              var request = {
+                                "brojNarudzbe": widget.narudzba!.brojNarudzbe,
+                                "ukupnaCijena": widget.narudzba!.ukupnaCijena,
+                                "korisnikId": widget.narudzba!.korisnikId,
+                                "nalogId": null,
+                                "placeno": true
+                              };
+                              var response = await _narudzbaProvider.update(
+                                  widget.narudzba!.narudzbaId, request);
+                              if (response.narudzbaId ==
+                                  widget.narudzba!.narudzbaId) {
+                                await _narudzbaProvider.narudzbeState(
+                                    action: "inprogress",
+                                    id: widget.narudzba?.narudzbaId);
+                              }
+                              print("onSuccess: $params");
+
+                              Navigator.of(context).pop(true);
+                            },
+                            onError: (error) {
+                              print("onError: $error");
+                              Navigator.pop(context);
+                            },
+                            onCancel: () {
+                              print('cancelled:');
+                            },
+                          ),
+                        ))
+                            .then((result) async {
+                          if (result == true) {
+                            widget.narudzba = await _narudzbaProvider
+                                .getById(widget.narudzba!.narudzbaId);
+                            setState(() {});
+                            QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.success,
+                                title: "Plaćanje",
+                                text:
+                                    "Uspješno ste izvršili uplatu, vaša narudžba se sada nalazi u procesu.",
+                                confirmBtnText: "U redu");
+                          }
+                        });
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 15, horizontal: 25),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                    ),
+                    icon: const Icon(Icons.payment, color: Colors.white),
+                    label: const Text("Plaćanje",
+                        style: TextStyle(color: Colors.white, fontSize: 16)),
+                  )
+                : Container(),
+            const SizedBox(width: 20), // Space between buttons
+
+            // Add New Set Button
+            ElevatedButton.icon(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => AddProductSetScreen(
+                      narudzba: widget.narudzba,
+                    ),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                padding:
+                    const EdgeInsets.symmetric(vertical: 15, horizontal: 25),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              icon: const Icon(Icons.add, color: Colors.white),
+              label: const Text("Dodaj Set",
+                  style: TextStyle(color: Colors.white, fontSize: 16)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOrderDetails() {
+    return Container(
+      margin: const EdgeInsets.all(15),
+      padding: const EdgeInsets.all(15),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.shade300,
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Detalji narudžbe",
+            style: const TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          const Divider(color: Colors.grey),
+          _buildDetailRow(
+              "Broj narudžbe:", widget.narudzba?.brojNarudzbe ?? "N/A"),
+          _buildDetailRow("Datum narudžbe:",
+              formatDateString(widget.narudzba?.datum.toIso8601String())),
+          _buildDetailRow("Status:",
+              widget.narudzba?.status == true ? "Aktivna" : "Neaktivna"),
+          _buildDetailRow(
+              "Otkazana:", widget.narudzba?.otkazana == true ? "Da" : "Ne"),
+          _buildDetailRow(
+              "Plaćena:", widget.narudzba?.placeno == true ? "Da" : "Ne"),
+          _buildDetailRow(
+              "Ukupna cijena:", "${widget.narudzba?.ukupnaCijena} KM"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 5.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: Colors.grey,
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOffersTab() {
+    return ListView.builder(
+      itemCount: offersResult?.result.length ?? 0,
+      itemBuilder: (context, index) {
+        final offer = offersResult?.result[index];
+        return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) =>
+                          PonudeDetailsScreen(ponuda: offer)));
+            },
+            child: Card(
+              color: Colors.green.shade100,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+                side: BorderSide(color: Colors.green.shade700, width: 2),
+              ),
+              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+              child: ListTile(
+                title: Text("Ponuda ${index + 1}: ${offer?.naziv}"),
+                subtitle: Text("Popust ${offer?.popust} %"),
+                trailing: ElevatedButton(
+                  onPressed: () async {
+                    setState(() {
+                      isLoading = true;
+                    });
+                    var response = await _ponudeProvider.addOfferToOrder(
+                        ponudaId: offer?.ponudaId,
+                        narudzbaId: widget.narudzba?.narudzbaId);
+                    fetchOffers();
+                    initForm();
+                  },
+                  child: const Text("Odaberi"),
+                ),
+              ),
+            ));
+      },
     );
   }
 }

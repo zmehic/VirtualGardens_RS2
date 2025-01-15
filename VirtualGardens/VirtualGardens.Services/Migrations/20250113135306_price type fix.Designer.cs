@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VirtualGardens.Services.Database;
 
@@ -11,9 +12,11 @@ using VirtualGardens.Services.Database;
 namespace VirtualGardens.Services.Migrations
 {
     [DbContext(typeof(_210011Context))]
-    partial class _210011ContextModelSnapshot : ModelSnapshot
+    [Migration("20250113135306_price type fix")]
+    partial class pricetypefix
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -260,8 +263,8 @@ namespace VirtualGardens.Services.Migrations
                     b.Property<bool?>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<float>("UkupnaCijena")
-                        .HasColumnType("real");
+                    b.Property<int>("UkupnaCijena")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("VrijemeBrisanja")
                         .HasColumnType("datetime2");

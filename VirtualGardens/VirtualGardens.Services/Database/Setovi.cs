@@ -8,13 +8,13 @@ public partial class Setovi : ISoftDeletable
 {
     public int SetId { get; set; }
 
-    public int Cijena { get; set; }
+    public float Cijena { get; set; }
 
     public int? Popust { get; set; }
 
     public int? NarudzbaId { get; set; }
 
-    public int? CijenaSaPopustom { get; set; }
+    public float? CijenaSaPopustom { get; set; }
 
     public virtual Narudzbe Narudzba { get; set; } = null!;
 

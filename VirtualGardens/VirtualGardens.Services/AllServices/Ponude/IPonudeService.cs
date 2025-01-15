@@ -15,6 +15,7 @@ namespace VirtualGardens.Services.AllServices.Ponude
 {
     public interface IPonudeService : ICRUDService<Models.DTOs.PonudeDTO, PonudeSearchObject, PonudeUpsertRequest, PonudeUpsertRequest>
     {
+        public NarudzbeDTO AddPonudaToOrder(int ponudaId, int narudzbaId);
         public PonudeDTO Activate(int id);
         public PonudeDTO Edit(int id);
         public PonudeDTO Finish(int id);

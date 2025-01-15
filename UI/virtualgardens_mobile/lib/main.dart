@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/providers/auth_provider.dart';
@@ -33,26 +35,38 @@ class MyHttpOverrides extends HttpOverrides {
 
 void main() {
   HttpOverrides.global = MyHttpOverrides();
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(create: (_) => ProductProvider()),
-      ChangeNotifierProvider(create: (_) => JediniceMjereProvider()),
-      ChangeNotifierProvider(create: (_) => VrsteProizvodaProvider()),
-      ChangeNotifierProvider(create: (_) => KorisnikProvider()),
-      ChangeNotifierProvider(create: (_) => NarudzbaProvider()),
-      ChangeNotifierProvider(create: (_) => UlaziProvider()),
-      ChangeNotifierProvider(create: (_) => UlaziProizvodiProvider()),
-      ChangeNotifierProvider(create: (_) => ZaposlenikProvider()),
-      ChangeNotifierProvider(create: (_) => NaloziProvider()),
-      ChangeNotifierProvider(create: (_) => SetoviProvider()),
-      ChangeNotifierProvider(create: (_) => SetoviPonudeProvider()),
-      ChangeNotifierProvider(create: (_) => PonudeProvider()),
-      ChangeNotifierProvider(create: (_) => SetProizvodProvider()),
-      ChangeNotifierProvider(create: (_) => PitanjaOdgovoriProvider()),
-      ChangeNotifierProvider(create: (_) => RecenzijeProvider())
-    ],
-    child: const MyApp(),
-  ));
+  runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
+    FlutterError.onError = (FlutterErrorDetails errorDetails) {
+      print("ON error error: ${errorDetails.exception.toString()}");
+    };
+    await dotenv.load(fileName: ".env");
+    runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => JediniceMjereProvider()),
+        ChangeNotifierProvider(create: (_) => VrsteProizvodaProvider()),
+        ChangeNotifierProvider(create: (_) => KorisnikProvider()),
+        ChangeNotifierProvider(create: (_) => NarudzbaProvider()),
+        ChangeNotifierProvider(create: (_) => UlaziProvider()),
+        ChangeNotifierProvider(create: (_) => UlaziProizvodiProvider()),
+        ChangeNotifierProvider(create: (_) => ZaposlenikProvider()),
+        ChangeNotifierProvider(create: (_) => NaloziProvider()),
+        ChangeNotifierProvider(create: (_) => SetoviProvider()),
+        ChangeNotifierProvider(create: (_) => SetoviPonudeProvider()),
+        ChangeNotifierProvider(create: (_) => PonudeProvider()),
+        ChangeNotifierProvider(create: (_) => SetProizvodProvider()),
+        ChangeNotifierProvider(create: (_) => PitanjaOdgovoriProvider()),
+        ChangeNotifierProvider(create: (_) => RecenzijeProvider())
+      ],
+      child: const MyApp(),
+    ));
+  }, (error, stack) {
+    print("Error from OUT_SUDE Framerwork");
+    print("--------------------------------");
+    print("Error : $error");
+    // print("StackTrace : $stack");
+  });
 }
 
 class MyApp extends StatelessWidget {

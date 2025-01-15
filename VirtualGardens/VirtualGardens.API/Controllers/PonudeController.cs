@@ -26,6 +26,14 @@ namespace VirtualGardens.API.Controllers
         {
             return base.Insert(request);
         }
+
+        [Authorize(Roles ="Kupac")]
+        [HttpPut("addOfferToOrder/{ponudaId}/{narudzbaId}")]
+        public NarudzbeDTO AddPonudaToOrder(int ponudaId, int narudzbaId)
+        {
+            return (_service as IPonudeService).AddPonudaToOrder(ponudaId,narudzbaId);
+        }
+
         [Authorize(Roles = "Admin")]
         public override PonudeDTO Update(int id, PonudeUpsertRequest request)
         {

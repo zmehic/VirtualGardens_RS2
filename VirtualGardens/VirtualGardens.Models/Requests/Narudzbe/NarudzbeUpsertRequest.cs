@@ -6,13 +6,14 @@ namespace VirtualGardens.Models.Requests.Narudzbe
 {
     public class NarudzbeUpsertRequest
     {
-        public string BrojNarudzbe { get; set; } = null!;
+        public string? BrojNarudzbe { get; set; }
 
-        public int UkupnaCijena { get; set; }
+        public float? UkupnaCijena { get; set; }
 
-        public int KorisnikId { get; set; }
+        public int? KorisnikId { get; set; }
 
         public int? NalogId { get; set; }
+        public bool? Placeno { get; set; }
 
         // Optional: Include related entities if needed
         // For example, you might include DTOs or related IDs

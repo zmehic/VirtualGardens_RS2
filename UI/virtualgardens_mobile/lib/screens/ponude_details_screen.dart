@@ -7,10 +7,9 @@ import 'package:virtualgardens_mobile/models/search_result.dart';
 import 'package:virtualgardens_mobile/models/setovi_ponude.dart';
 import 'package:virtualgardens_mobile/providers/setovi_ponude_provider.dart';
 
-// ignore: must_be_immutable
 class PonudeDetailsScreen extends StatefulWidget {
-  Ponuda? ponuda;
-  PonudeDetailsScreen({super.key, this.ponuda});
+  final Ponuda? ponuda;
+  const PonudeDetailsScreen({super.key, this.ponuda});
 
   @override
   State<PonudeDetailsScreen> createState() => _PonudeDetailsScreenState();
@@ -18,35 +17,25 @@ class PonudeDetailsScreen extends StatefulWidget {
 
 class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
   late SetoviPonudeProvider _setoviPonudeProvider;
-
   bool isLoading = true;
   SearchResult<SetoviPonude>? setoviPonudeResult;
-
-  final TextEditingController _offerNameController = TextEditingController();
-  final TextEditingController _discountController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _setoviPonudeProvider = context.read<SetoviPonudeProvider>();
-
-    _offerNameController.text = widget.ponuda?.naziv ?? "Unnamed Offer";
-    _discountController.text = widget.ponuda?.popust?.toString() ?? "0";
     initForm();
   }
 
-  Future initForm() async {
-    var isDeleted = false;
+  Future<void> initForm() async {
     var filter = {
       'PonudaId': widget.ponuda?.ponudaId,
-      'isDeleted': isDeleted,
+      'isDeleted': false,
       'IncludeTables': "Set"
     };
 
-    if (widget.ponuda != null) {
-      setoviPonudeResult = await _setoviPonudeProvider.get(filter: filter);
-      if (setoviPonudeResult != null) {}
-    }
+    setoviPonudeResult = await _setoviPonudeProvider.get(filter: filter);
+
     setState(() {
       isLoading = false;
     });
@@ -67,7 +56,7 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
           ),
         ),
       ),
-      "Detalji",
+      "Detalji o ponudi",
     );
   }
 
@@ -77,21 +66,13 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: const Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
-            SizedBox(width: 10),
-            Text(
-              "Detalji o ponudi",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Arial",
-                color: Colors.white,
-              ),
-            ),
-          ],
+        child: Text(
+          "Detalji o ponudi",
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -104,47 +85,56 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildTextField(
-              controller: _offerNameController,
-              label: "Offer Name",
-              hintText: "Enter the offer name",
-            ),
+            _buildDetailsCard(),
             const SizedBox(height: 20),
-            _buildTextField(
-              controller: _discountController,
-              label: "Discount (%)",
-              hintText: "Enter the discount",
-              keyboardType: TextInputType.number,
-            ),
-            const SizedBox(height: 30),
-            _buildResultsSection(),
+            _buildSetsSection(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    String? hintText,
-    TextInputType keyboardType = TextInputType.text,
-  }) {
-    return TextField(
-      enabled: false,
-      controller: controller,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hintText,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-        filled: true,
-        fillColor: Colors.white,
+  Widget _buildDetailsCard() {
+    return Card(
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildDetailRow("Naziv ponude:", widget.ponuda?.naziv ?? "N/A"),
+            const SizedBox(height: 10),
+            _buildDetailRow(
+                "Popust (%):", "${widget.ponuda?.popust?.toString() ?? '0'}%"),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildResultsSection() {
+  Widget _buildDetailRow(String label, String value) {
+    return Row(
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSetsSection() {
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -155,7 +145,7 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Sets in Offer",
+            "Setovi u ponudi",
             style: TextStyle(
               color: Colors.white,
               fontSize: 18,
@@ -164,10 +154,10 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
           ),
           const SizedBox(height: 10),
           widget.ponuda != null
-              ? _buildResultView()
+              ? _buildSetsList()
               : const Center(
                   child: Text(
-                    "No sets available.",
+                    "Nema dostupnih setova.",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -176,52 +166,49 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
     );
   }
 
-  Widget _buildResultView() {
+  Widget _buildSetsList() {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: setoviPonudeResult != null
-          ? setoviPonudeResult?.result.length
-          : 0, // Replace with actual count of sets
+      itemCount: setoviPonudeResult?.result.length ?? 0,
       itemBuilder: (context, index) {
-        return setoviPonudeResult != null &&
-                setoviPonudeResult?.result[index] != null &&
-                setoviPonudeResult!.result[index].set!.proizvodiSets.length <= 3
-            ? _buildExpansionTile(index)
-            : Container();
+        final setovi = setoviPonudeResult!.result[index];
+        return _buildSetCard(setovi, index);
       },
     );
   }
 
-  Widget _buildExpansionTile(int index) {
+  Widget _buildSetCard(SetoviPonude setovi, int index) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-      color: Colors.white,
-      elevation: 5,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(15),
-      ),
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      elevation: 3,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
       child: ExpansionTile(
         iconColor: Colors.black,
         collapsedIconColor: Colors.black,
         title: Text(
           "Set ${index + 1}",
-          style: const TextStyle(color: Colors.black),
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
-        textColor: Colors.white,
         children: [
-          ListTile(
-            title: Text(
-                "${setoviPonudeResult?.result[index].set?.proizvodiSets[0].proizvod?.naziv}"),
-          ),
-          ListTile(
-            title: Text(
-                "${setoviPonudeResult?.result[index].set?.proizvodiSets[1].proizvod?.naziv}"),
-          ),
-          ListTile(
-            title: Text(
-                "${setoviPonudeResult?.result[index].set?.proizvodiSets[2].proizvod?.naziv}"),
-          ),
+          ...setovi.set!.proizvodiSets.map((proizvodSet) {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    proizvodSet.proizvod?.naziv ?? "Nepoznato",
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  Text(
+                    "${proizvodSet.kolicina ?? 0} ${proizvodSet.proizvod?.jedinicaMjere?.skracenica ?? ''}",
+                    style: const TextStyle(fontSize: 14, color: Colors.grey),
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
         ],
       ),
     );

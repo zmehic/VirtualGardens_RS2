@@ -8,10 +8,10 @@ part of 'set.dart';
 
 Set _$SetFromJson(Map<String, dynamic> json) => Set(
       setId: (json['setId'] as num).toInt(),
-      cijena: (json['cijena'] as num).toInt(),
+      cijena: (json['cijena'] as num).toDouble(),
       popust: (json['popust'] as num?)?.toInt(),
       narudzbaId: (json['narudzbaId'] as num?)?.toInt(),
-      cijenaSaPopustom: (json['cijenaSaPopustom'] as num?)?.toInt(),
+      cijenaSaPopustom: (json['cijenaSaPopustom'] as num?)?.toDouble(),
       narudzba: json['narudzba'] == null
           ? null
           : Narudzba.fromJson(json['narudzba'] as Map<String, dynamic>),

@@ -13,7 +13,7 @@ class Narudzba {
   bool placeno;
   bool? status;
   String? stateMachine;
-  int ukupnaCijena;
+  double ukupnaCijena;
   int korisnikId;
   int? nalogId;
   Korisnik? korisnik;

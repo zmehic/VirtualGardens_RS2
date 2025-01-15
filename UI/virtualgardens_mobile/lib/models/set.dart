@@ -7,10 +7,10 @@ part 'set.g.dart';
 @JsonSerializable()
 class Set {
   int setId;
-  int cijena;
+  double cijena;
   int? popust;
   int? narudzbaId;
-  int? cijenaSaPopustom;
+  double? cijenaSaPopustom;
   Narudzba? narudzba;
   List<ProizvodiSet> proizvodiSets;
 

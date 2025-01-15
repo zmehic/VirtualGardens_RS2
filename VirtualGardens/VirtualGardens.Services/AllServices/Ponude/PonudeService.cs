@@ -11,6 +11,7 @@ using VirtualGardens.Models.DTOs;
 using VirtualGardens.Models.HelperClasses;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Ponude;
+using VirtualGardens.Models.Requests.Setovi;
 using VirtualGardens.Models.Requests.SetoviPonude;
 using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.BaseServices;
@@ -136,6 +137,30 @@ namespace VirtualGardens.Services.AllServices.Ponude
                 var state = BasePonudaState.CreateState(entity.StateMachine);
                 return state.AllowedActions(entity);
             }
+        }
+
+        public NarudzbeDTO AddPonudaToOrder(int ponudaId, int narudzbaId)
+        {
+            var setovi = Context.SetoviPonudes.Include(x => x.Set).ThenInclude(x => x.ProizvodiSets).Where(x => x.PonudaId == ponudaId).Select(x=> Mapper.Map<SetoviUpsertRequest>(x.Set)).ToList();
+            var suma = 0.0f;
+            foreach (var item in setovi)
+            {
+                Database.Setovi entity = Mapper.Map<Database.Setovi>(item);
+                entity.NarudzbaId = narudzbaId;
+                Context.Add(entity);
+
+                suma += (float)entity.CijenaSaPopustom!;
+
+            }
+            var narudzba = Context.Narudzbes.Where(x => x.NarudzbaId == narudzbaId).FirstOrDefault();
+            if(narudzba!=null)
+                narudzba.UkupnaCijena += suma;
+
+            Context.Update(narudzba);
+            Context.SaveChanges();
+            return Mapper.Map<NarudzbeDTO>(narudzba);
+
+
         }
     }
 }
