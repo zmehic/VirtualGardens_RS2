@@ -17,6 +17,26 @@ import 'package:virtualgardens_admin/providers/setovi_provider.dart';
 import 'package:virtualgardens_admin/providers/utils.dart';
 import 'package:virtualgardens_admin/screens/ponude_list_screen.dart';
 
+class ProizvodiSetDTO {
+  int? proizvodId;
+  int? setId;
+  int? kolicina;
+
+  ProizvodiSetDTO({
+    this.proizvodId,
+    this.setId,
+    this.kolicina,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'proizvodId': proizvodId,
+      'setId': setId,
+      'kolicina': kolicina,
+    };
+  }
+}
+
 // ignore: must_be_immutable
 class PonudeDetailsScreen extends StatefulWidget {
   Ponuda? ponuda;
@@ -44,6 +64,8 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
   late ProductProvider _proizvodiProvider;
   late SetoviProvider _setoviProvider;
   late SetProizvodProvider _proizvodiSet;
+
+  List<ProizvodiSetDTO> productList = [];
 
   SearchResult<SetoviPonude>? setoviPonudeResult;
   SearchResult<Proizvod>? proizvodiResult;
@@ -249,6 +271,7 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                     child: FormBuilderTextField(
                         decoration: const InputDecoration(labelText: "Popust"),
                         name: "popust",
+                        enabled: widget.ponuda != null ? false : true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Please enter some text';
@@ -589,18 +612,24 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
         ),
         textColor: Colors.white,
         children: [
-          ListTile(
-            title: Text(
-                "${setoviPonudeResult?.result[index].set?.proizvodiSets[0].proizvod?.naziv}"),
-          ),
-          ListTile(
-            title: Text(
-                "${setoviPonudeResult?.result[index].set?.proizvodiSets[1].proizvod?.naziv}"),
-          ),
-          ListTile(
-            title: Text(
-                "${setoviPonudeResult?.result[index].set?.proizvodiSets[2].proizvod?.naziv}"),
-          ),
+          setoviPonudeResult?.result[index].set?.proizvodiSets.isEmpty == false
+              ? ListTile(
+                  title: Text(
+                      "${setoviPonudeResult?.result[index].set?.proizvodiSets[0].proizvod?.naziv}"),
+                )
+              : Container(),
+          setoviPonudeResult?.result[index].set?.proizvodiSets.isEmpty == false
+              ? ListTile(
+                  title: Text(
+                      "${setoviPonudeResult?.result[index].set?.proizvodiSets[1].proizvod?.naziv}"),
+                )
+              : Container(),
+          setoviPonudeResult?.result[index].set?.proizvodiSets.isEmpty == false
+              ? ListTile(
+                  title: Text(
+                      "${setoviPonudeResult?.result[index].set?.proizvodiSets[2].proizvod?.naziv}"),
+                )
+              : Container(),
         ],
       ),
     );
@@ -615,76 +644,112 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
         child: Row(
           children: [
             Expanded(
-                child: FormBuilderTextField(
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              decoration: const InputDecoration(labelText: "Popust"),
-              name: "popust",
-            )),
-            const SizedBox(
-              width: 10,
-            ),
-            Expanded(
-              child: FormBuilderDropdown(
-                name: "proizvodId1",
-                decoration: const InputDecoration(labelText: "Tlo"),
-                items: tlo
-                    .map((item) => DropdownMenuItem(
-                          value: item.proizvodId.toString(),
-                          child: Text(
-                              "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
-                        ))
-                    .toList(),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please choose some value';
-                  }
-                  return null;
-                },
+              child: FormBuilderTextField(
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(labelText: "Popust"),
+                initialValue: widget.ponuda?.popust.toString(),
+                enabled: false,
+                name: "popust",
               ),
             ),
             const SizedBox(
               width: 10,
             ),
             Expanded(
-              child: FormBuilderDropdown(
-                name: "proizvodId2",
-                decoration: const InputDecoration(labelText: "Sjeme"),
-                items: sjeme
-                    .map((item) => DropdownMenuItem(
-                          value: item.proizvodId.toString(),
-                          child: Text(
-                              "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
-                        ))
-                    .toList(),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please choose some value';
-                  }
-                  return null;
-                },
+              child: Column(
+                children: [
+                  FormBuilderDropdown(
+                    name: "proizvodId1",
+                    decoration: const InputDecoration(labelText: "Tlo"),
+                    items: tlo
+                        .map((item) => DropdownMenuItem(
+                              value: item.proizvodId.toString(),
+                              child: Text(
+                                  "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
+                            ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please choose some value';
+                      }
+                      return null;
+                    },
+                  ),
+                  FormBuilderTextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration:
+                        const InputDecoration(labelText: "Količina Tlo"),
+                    name: "kolicinaTlo",
+                  ),
+                ],
               ),
             ),
             const SizedBox(
               width: 10,
             ),
             Expanded(
-              child: FormBuilderDropdown(
-                name: "proizvodId3",
-                decoration: const InputDecoration(labelText: "Prihrana"),
-                items: prihrana
-                    .map((item) => DropdownMenuItem(
-                          value: item.proizvodId.toString(),
-                          child: Text(
-                              "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
-                        ))
-                    .toList(),
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please choose some value';
-                  }
-                  return null;
-                },
+              child: Column(
+                children: [
+                  FormBuilderDropdown(
+                    name: "proizvodId2",
+                    decoration: const InputDecoration(labelText: "Sjeme"),
+                    items: sjeme
+                        .map((item) => DropdownMenuItem(
+                              value: item.proizvodId.toString(),
+                              child: Text(
+                                  "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
+                            ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please choose some value';
+                      }
+                      return null;
+                    },
+                  ),
+                  FormBuilderTextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration:
+                        const InputDecoration(labelText: "Količina Sjeme"),
+                    name: "kolicinaSjeme",
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(
+              width: 10,
+            ),
+            Expanded(
+              child: Column(
+                children: [
+                  FormBuilderDropdown(
+                    name: "proizvodId3",
+                    decoration: const InputDecoration(labelText: "Prihrana"),
+                    items: prihrana
+                        .map((item) => DropdownMenuItem(
+                              value: item.proizvodId.toString(),
+                              child: Text(
+                                  "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
+                            ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please choose some value';
+                      }
+                      return null;
+                    },
+                  ),
+                  FormBuilderTextField(
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration:
+                        const InputDecoration(labelText: "Količina Prihrana"),
+                    name: "kolicinaPrihrana",
+                  ),
+                ],
               ),
             ),
             const SizedBox(
@@ -700,10 +765,27 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                           debugPrint(_formKey.currentState?.value.toString());
 
                           var request = Map.from(_formKey2.currentState!.value);
+                          productList.add(ProizvodiSetDTO(
+                              proizvodId: int.tryParse(request['proizvodId1']),
+                              setId: set?.setId,
+                              kolicina: int.tryParse(request['kolicinaTlo'])));
+                          productList.add(ProizvodiSetDTO(
+                            proizvodId: int.tryParse(request['proizvodId2']),
+                            setId: set?.setId,
+                            kolicina: int.tryParse(request['kolicinaSjeme']),
+                          ));
+                          productList.add(ProizvodiSetDTO(
+                            proizvodId: int.tryParse(request['proizvodId3']),
+                            setId: set?.setId,
+                            kolicina: int.tryParse(request['kolicinaPrihrana']),
+                          ));
+
                           Map<dynamic, dynamic> requestOne = {
                             'popust': request['popust'] ?? 0,
                             'cijena': 0,
-                            'cijenaSaPopustom': 0
+                            'cijenaSaPopustom': null,
+                            'proizvodiSets':
+                                productList?.map((e) => e.toJson()).toList()
                           };
                           request['popust'] = request['popust'] ?? 0;
                           request['cijena'] = 0;
@@ -722,26 +804,6 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                                 };
                                 setPonuda = await _setoviPonudeProvider
                                     .insert(requestTwo);
-                                if (setPonuda != null) {
-                                  Map<dynamic, dynamic> requestThree = {
-                                    'proizvodId': request['proizvodId1'],
-                                    'setId': set!.setId,
-                                    'kolicina': 0
-                                  };
-                                  Map<dynamic, dynamic> requestFour = {
-                                    'proizvodId': request['proizvodId2'],
-                                    'setId': set!.setId,
-                                    'kolicina': 0
-                                  };
-                                  Map<dynamic, dynamic> requestFive = {
-                                    'proizvodId': request['proizvodId3'],
-                                    'setId': set!.setId,
-                                    'kolicina': 0
-                                  };
-                                  await _proizvodiSet.insert(requestThree);
-                                  await _proizvodiSet.insert(requestFour);
-                                  await _proizvodiSet.insert(requestFive);
-                                }
                               }
                             }
 
@@ -760,7 +822,6 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                         padding: const EdgeInsets.all(
                             8), // Adjust padding for icon size // Background color
                       ),
-
                       child: isLoadingSave
                           ? const CircularProgressIndicator()
                           : const Icon(

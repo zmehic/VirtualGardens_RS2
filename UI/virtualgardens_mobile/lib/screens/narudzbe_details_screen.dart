@@ -342,10 +342,12 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                             transactions: [
                               {
                                 "amount": {
-                                  "total": widget.narudzba!.ukupnaCijena,
+                                  "total": widget.narudzba!.ukupnaCijena
+                                      .toStringAsFixed(2),
                                   "currency": "EUR",
                                   "details": {
-                                    "subtotal": widget.narudzba!.ukupnaCijena,
+                                    "subtotal": widget.narudzba!.ukupnaCijena
+                                        .toStringAsFixed(2),
                                     "shipping": '0',
                                     "shipping_discount": 0
                                   }

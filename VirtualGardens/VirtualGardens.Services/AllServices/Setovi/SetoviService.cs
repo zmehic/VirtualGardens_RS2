@@ -84,16 +84,20 @@ namespace VirtualGardens.Services.AllServices.Setovi
             {
                 foreach (var item in request.ProizvodiSets)
                 {
-                    var cijena = _210011Context.Proizvodis.Where(x => x.ProizvodId == item.ProizvodId).FirstOrDefault()?.Cijena;
-                    if (cijena != null && item != null)
+                    float cijena = _210011Context.Proizvodis.Where(x => x.ProizvodId == item.ProizvodId).FirstOrDefault()?.Cijena ?? 0.0f;
+                    if (cijena != 0.0f && item != null)
                     {
-                        var ukupnacijena = item.Kolicina * cijena;
-                        var ukupnacijenaPopust = item.Kolicina * (cijena * (1 - (request.Popust / 100)));
-                        suma += ukupnacijena != null ? (float)ukupnacijena : 0.0f;
-                        sumaPopust += ukupnacijenaPopust != null ? (float)ukupnacijenaPopust : 0.0f;
+                        float ukupnacijena = item.Kolicina * cijena;
+                        float ukupnacijenaPopust = (float)item.Kolicina * (float)Math.Round((cijena * (1 - (float)((float)request.Popust! / 100))),2);
+                        suma += ukupnacijena;
+                        sumaPopust += ukupnacijenaPopust;
                     }
                 }
             }
+
+            suma = (float)Math.Round(suma, 2);
+            sumaPopust = (float)Math.Round(sumaPopust, 2);
+
             request.Cijena = suma;
 
             if (request.Popust == null || request.Popust == 0)
@@ -122,10 +126,12 @@ namespace VirtualGardens.Services.AllServices.Setovi
             {
                 ukupnacijena += x.CijenaSaPopustom ?? 0;
             }
-
-            narudzba.UkupnaCijena = ukupnacijena;
-            _210011Context.Update(narudzba);
-            _210011Context.SaveChanges();
+            if (narudzba != null)
+            {
+                narudzba.UkupnaCijena = ukupnacijena;
+                _210011Context.Update(narudzba);
+            }
+                _210011Context.SaveChanges();
 
             base.AfterInsert(request, entity);
         }

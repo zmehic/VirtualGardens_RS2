@@ -21,7 +21,7 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
             _210011Context = context;
         }
 
-        void BeforeUpdate(Narudzbe entity, NarudzbeUpsertRequest request)
+        void BeforeUpdate(Narudzbe entity)
         {
             var orderProducts = _210011Context.ProizvodiSets.Include(x => x.Set).Where(x => x.Set.NarudzbaId == entity.NarudzbaId && x.Set.IsDeleted==false).ToList();
             foreach (var item in orderProducts)
@@ -40,7 +40,6 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
         {
             var set = Context.Set<Narudzbe>();
             var entity = set.Find(id);
-            BeforeUpdate(entity,request);
             Mapper.Map(request, entity);
             Context.SaveChanges();
 
@@ -78,6 +77,7 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
             var set = Context.Set<Narudzbe>();
             var entity = set.Find(id);
             entity.StateMachine = "inprogress";
+            BeforeUpdate(entity);
             Context.SaveChanges();
 
             return Mapper.Map<NarudzbeDTO>(entity);

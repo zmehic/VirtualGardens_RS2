@@ -59,7 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
       'SortDirection': "ASC",
       'VrstaProizvodaId': value ?? selectedVrstaProizvoda,
       'PageSize': 3,
-      'IncludeTables': "JedinicaMjere"
+      'IncludeTables': "JedinicaMjere",
+      'isDeleted': false
     };
 
     proizvodiResult = await productProvider.get(filter: filterProizvodi);

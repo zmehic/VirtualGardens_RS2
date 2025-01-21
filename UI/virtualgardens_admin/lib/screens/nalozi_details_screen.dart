@@ -90,7 +90,7 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
         'NalogId': 0,
         'Otkazana': false,
         'Placeno': true,
-        'StateMachine': "created",
+        'StateMachine': "inprogress",
       };
 
       narudzbaResult = await _narudzbaProvider.get(filter: filter2);
@@ -515,6 +515,7 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
                     request['brojNarudzbe'] = narudzba?.brojNarudzbe;
                     request['ukupnaCijena'] = narudzba?.ukupnaCijena;
                     request['korisnikId'] = narudzba?.korisnikId;
+                    request['placeno'] = narudzba?.placeno;
                     request['nalogId'] = widget.nalog?.nalogId;
                     isLoadingSave = true;
                     setState(() {});

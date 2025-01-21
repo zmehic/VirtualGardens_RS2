@@ -170,7 +170,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                     color:
                                         const Color.fromRGBO(235, 241, 224, 1),
                                     width: 5)),
-                            child: widget.product?.slika != null
+                            child: _base64Image != null
                                 ? imageFromString(_base64Image!)
                                 : const Text(""),
                           ),
@@ -324,10 +324,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   Expanded(
                       child: FormBuilderTextField(
-                          keyboardType: TextInputType.number,
+                          keyboardType:
+                              TextInputType.numberWithOptions(decimal: true),
                           inputFormatters: <TextInputFormatter>[
-                            FilteringTextInputFormatter
-                                .digitsOnly, // Allows only digits
+                            FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d*\.?\d*')), // Allows only digits
                           ],
                           decoration: InputDecoration(
                               labelText:
@@ -358,7 +359,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             leading: const Icon(Icons.image),
                             title: const Text("Select an image"),
                             trailing: const Icon(Icons.file_upload),
-                            onTap: getImage,
+                            onTap: () {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              getImage();
+                              setState(() {
+                                isLoading = false;
+                              });
+                            },
                           ),
                         );
                       },

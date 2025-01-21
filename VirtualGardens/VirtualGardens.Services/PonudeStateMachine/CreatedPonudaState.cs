@@ -12,6 +12,7 @@ using VirtualGardens.Models.Messages;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Models.Requests.Ponude;
 using VirtualGardens.Models.Requests.SetoviPonude;
+using VirtualGardens.Services.BaseInterfaces;
 using VirtualGardens.Services.Database;
 
 namespace VirtualGardens.Services.PonudeStateMachine
@@ -41,7 +42,18 @@ namespace VirtualGardens.Services.PonudeStateMachine
                 throw new Exception("Nemoguće pronaći objekat sa poslanim id-om!");
             }
 
-            Context.Remove(entity);
+            if (entity is ISoftDeletable softDeletableEntity)
+            {
+                softDeletableEntity.IsDeleted = true;
+                softDeletableEntity.VrijemeBrisanja = DateTime.Now;
+
+                Context.Update(entity);
+            }
+            else
+            {
+                Context.Remove(entity);
+            }
+
             Context.SaveChanges();
         }
 

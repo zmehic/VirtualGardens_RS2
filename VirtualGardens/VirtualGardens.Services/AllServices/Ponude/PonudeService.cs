@@ -141,7 +141,7 @@ namespace VirtualGardens.Services.AllServices.Ponude
 
         public NarudzbeDTO AddPonudaToOrder(int ponudaId, int narudzbaId)
         {
-            var setovi = Context.SetoviPonudes.Include(x => x.Set).ThenInclude(x => x.ProizvodiSets).Where(x => x.PonudaId == ponudaId).Select(x=> Mapper.Map<SetoviUpsertRequest>(x.Set)).ToList();
+            var setovi = Context.SetoviPonudes.Include(x => x.Set).ThenInclude(x => x.ProizvodiSets).Where(x => x.PonudaId == ponudaId && x.IsDeleted==false && x.Set.IsDeleted==false).Select(x=> Mapper.Map<SetoviUpsertRequest>(x.Set)).ToList();
             var suma = 0.0f;
             foreach (var item in setovi)
             {
