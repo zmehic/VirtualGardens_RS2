@@ -20,6 +20,8 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
   bool isLoading = true;
   SearchResult<SetoviPonude>? setoviPonudeResult;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -46,35 +48,29 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
     return MasterScreen(
       FullScreenLoader(
         isLoading: isLoading,
-        child: Container(
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
-            children: [
-              _buildBanner(),
-              Expanded(child: _buildMainContent()),
-            ],
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            actions: <Widget>[Container()],
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: const Text(
+              "Detalji o ponudi",
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+          ),
+          body: Column(
+            children: [_buildMainContent()],
           ),
         ),
       ),
       "Detalji o ponudi",
-    );
-  }
-
-  Widget _buildBanner() {
-    return Container(
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: const Center(
-        child: Text(
-          "Detalji o ponudi",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: Colors.white,
-          ),
-        ),
-      ),
     );
   }
 
@@ -202,13 +198,13 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                     style: const TextStyle(fontSize: 14),
                   ),
                   Text(
-                    "${proizvodSet.kolicina ?? 0} ${proizvodSet.proizvod?.jedinicaMjere?.skracenica ?? ''}",
+                    "${proizvodSet.kolicina} ${proizvodSet.proizvod?.jedinicaMjere?.skracenica ?? ''}",
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
               ),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

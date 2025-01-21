@@ -193,32 +193,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
         "Proizvodi");
   }
 
-  Widget _buildBanner() {
-    return Container(
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: const Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(size: 45, color: Colors.white, Icons.shopping_cart),
-            SizedBox(width: 10),
-            Text(
-              "Proizvodi",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Arial",
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(8.0),

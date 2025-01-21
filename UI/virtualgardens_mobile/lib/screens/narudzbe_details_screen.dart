@@ -45,6 +45,8 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
 
   bool isLoading = true;
 
+  final _scaffoldKeyOrderDetails = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -94,28 +96,45 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
       child: MasterScreen(
         FullScreenLoader(
           isLoading: isLoading,
-          child: Container(
-            color: const Color.fromRGBO(235, 241, 224, 1),
-            child: Column(
-              children: [
-                _buildBanner(),
-                const TabBar(
-                  labelColor: Colors.black,
-                  indicatorColor: Colors.green,
-                  tabs: [
-                    Tab(text: "Detalji narudžbe"),
-                    Tab(text: "Ponude"),
-                  ],
-                ),
-                Expanded(
-                  child: TabBarView(
-                    children: [
-                      _buildOrderDetailsTab(),
-                      _buildOffersTab(),
+          child: Scaffold(
+            key: _scaffoldKeyOrderDetails,
+            appBar: AppBar(
+              leading: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Colors.white),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+              actions: <Widget>[Container()],
+              iconTheme: const IconThemeData(color: Colors.white),
+              title: const Text(
+                "Detalji narudžbe",
+                style: TextStyle(color: Colors.white),
+              ),
+              backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+            ),
+            body: Container(
+              color: const Color.fromRGBO(235, 241, 224, 1),
+              child: Column(
+                children: [
+                  const TabBar(
+                    labelColor: Colors.black,
+                    indicatorColor: Colors.green,
+                    tabs: [
+                      Tab(text: "Detalji narudžbe"),
+                      Tab(text: "Ponude"),
                     ],
                   ),
-                ),
-              ],
+                  Expanded(
+                    child: TabBarView(
+                      children: [
+                        _buildOrderDetailsTab(),
+                        _buildOffersTab(),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

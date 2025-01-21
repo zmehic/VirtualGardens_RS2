@@ -28,6 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   bool isLoading = true;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     korisnikProvider = context.read<KorisnikProvider>();
@@ -60,50 +62,50 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return MasterScreen(
       FullScreenLoader(
-        isLoading: isLoading,
-        child: Container(
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
-            children: [
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      _greeting(screenWidth),
-                      const SizedBox(height: 20),
-                      _basicInfo(screenWidth),
-                    ],
+          isLoading: isLoading,
+          child: Scaffold(
+            key: _scaffoldKey,
+            body: Column(
+              children: [
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        _greeting(screenWidth),
+                        const SizedBox(height: 20),
+                        _basicInfo(screenWidth),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                margin: const EdgeInsets.only(bottom: 30, left: 20, right: 20),
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(
-                      const Color.fromRGBO(32, 76, 56, 1),
-                    ),
-                    foregroundColor: MaterialStateProperty.all(
-                      const Color.fromRGBO(235, 241, 224, 1),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UserOrdersScreen(),
+                Container(
+                  margin:
+                      const EdgeInsets.only(bottom: 30, left: 20, right: 20),
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.all(
+                        const Color.fromRGBO(32, 76, 56, 1),
                       ),
-                    );
-                  },
-                  child: const Text('Kreiraj narudžbu'),
+                      foregroundColor: MaterialStateProperty.all(
+                        const Color.fromRGBO(235, 241, 224, 1),
+                      ),
+                    ),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const UserOrdersScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text('Kreiraj narudžbu'),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-      ),
+              ],
+            ),
+          )),
       "Home Screen",
     );
   }
@@ -142,8 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
         _sectionContainer(
           "Ponude",
           Icons.local_offer,
-          SingleChildScrollView(
-              child: ponude()), // Replace with appropriate content for orders
+          SingleChildScrollView(child: ponude()),
           onSearch: () {},
         ),
       ],

@@ -27,57 +27,115 @@ class _MasterScreenState extends State<MasterScreen> {
           height: 60,
           width: 60,
         ),
-        actions: [
-          IconButton(
-              onPressed: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
-                AuthProvider.korisnikId = 0;
-                AuthProvider.username = "";
-                AuthProvider.password = "";
-              },
-              icon: Icon(
-                Icons.logout,
-                size: 36,
-                color: Colors.red.shade900,
-              ))
-        ],
       ),
       drawer: Drawer(
-        child: ListView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ListTile(
-              title: const Text("Home"),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const HomeScreen()));
-              },
+            UserAccountsDrawerHeader(
+              decoration: BoxDecoration(
+                color: const Color.fromRGBO(32, 76, 56, 1),
+              ),
+              accountName: Text(
+                AuthProvider.username ?? "Guest User",
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+              accountEmail: Text(
+                "Kupac",
+              ),
             ),
-            ListTile(
-              title: const Text("Profil"),
-              onTap: () {
-                Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => ProfileScreen()));
-              },
+            // Menu Options
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildDrawerItem(
+                    icon: Icons.home,
+                    label: "Početna stranica",
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => const HomeScreen()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.person,
+                    label: "Profil",
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => ProfileScreen()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.shopping_bag,
+                    label: "Proizvodi",
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => const ProductListScreen()),
+                      );
+                    },
+                  ),
+                  _buildDrawerItem(
+                    icon: Icons.shopping_cart,
+                    label: "Narudžbe",
+                    onTap: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                            builder: (context) => const UserOrdersScreen()),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
-            ListTile(
-              title: const Text("Proizvodi"),
-              onTap: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const ProductListScreen()));
-              },
-            ),
-            ListTile(
-              title: const Text("Narudžbe"),
-              onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => const UserOrdersScreen()));
-              },
-            ),
+            // Logout Button at Bottom
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade900,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                ),
+                onPressed: () {
+                  Navigator.of(context).popUntil((route) => route.isFirst);
+                  AuthProvider.korisnikId = 0;
+                  AuthProvider.username = "";
+                  AuthProvider.password = "";
+                },
+                icon: const Icon(Icons.logout, color: Colors.white),
+                label: const Text(
+                  "Odjavi se",
+                  style: TextStyle(color: Colors.white, fontSize: 16),
+                ),
+              ),
+            )
           ],
         ),
       ),
       body: widget.child,
       backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
+    );
+  }
+
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon, color: Colors.brown.shade700),
+      title: Text(
+        label,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      ),
+      onTap: onTap,
     );
   }
 }

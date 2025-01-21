@@ -22,6 +22,7 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
   SearchResult<Narudzba>? result;
   bool isLoading = true;
 
+  final _scaffoldKeyOrdersList = GlobalKey<ScaffoldState>();
   @override
   void initState() {
     super.initState();
@@ -55,31 +56,49 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
     return MasterScreen(
       FullScreenLoader(
         isLoading: isLoading,
-        child: Column(
-          children: [
-            _buildBanner(),
-            TabBar(
-              controller: _tabController,
-              labelColor: Colors.white,
-              unselectedLabelColor: Colors.white70,
-              indicatorColor: Colors.white,
-              tabs: const [
-                Tab(text: "Kreirane"),
-                Tab(text: "U procesu"),
-                Tab(text: "Završene"),
-              ],
+        child: Scaffold(
+          key: _scaffoldKeyOrdersList,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
             ),
-            Expanded(
-              child: TabBarView(
+            actions: <Widget>[Container()],
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: const Text(
+              "Moje narudžbe",
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+          ),
+          body: Column(
+            children: [
+              TabBar(
                 controller: _tabController,
-                children: [
-                  _buildOrdersView("created"),
-                  _buildOrdersView("inprogress"),
-                  _buildOrdersView("finished"),
+                labelColor: Colors.green.shade900,
+                unselectedLabelColor: Colors.green.shade100,
+                indicatorColor: Colors.green.shade900,
+                tabs: const [
+                  Tab(text: "Kreirane"),
+                  Tab(text: "U procesu"),
+                  Tab(text: "Završene"),
                 ],
               ),
-            ),
-          ],
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildOrdersView("created"),
+                    _buildOrdersView("inprogress"),
+                    _buildOrdersView("finished"),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
       "Moje Narudžbe",
