@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -50,15 +51,21 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
   late ProductProvider _productProvider;
   late VrsteProizvodaProvider _vrsteProizvodaProvider;
   late SetoviProvider _setoviProvider;
+
   SearchResult<Proizvod>? result;
   SearchResult<VrstaProizvoda>? vrsteProizvodaResult;
+
   List<ProizvodiSetDTO>? productList = [];
   bool isLoading = true;
   int brojac = 2;
   int? selectedProductIndex;
   Proizvod? selectedProduct;
+
+  List<Proizvod>? recommendedProducts = [];
+
   TextEditingController quantityController =
       TextEditingController(); // Controller for the quantity field
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -100,6 +107,20 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
     };
 
     result = await _productProvider.get(filter: filter);
+    if (result != null && result!.result.isNotEmpty) {
+      Proizvod? desiredElement = null;
+      for (int i = 0; i < result!.result.length; i++) {
+        if (recommendedProducts!
+            .any((e) => e.proizvodId == result!.result[i].proizvodId)) {
+          desiredElement = result!.result[i];
+          break;
+        }
+      }
+      if (desiredElement != null && result != null) {
+        result!.result.remove(desiredElement);
+        result!.result.insert(0, desiredElement);
+      }
+    }
   }
 
   @override
@@ -107,11 +128,26 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
     return MasterScreen(
       FullScreenLoader(
         isLoading: isLoading,
-        child: Container(
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).pop(); // Go back to the previous screen
+                Navigator.of(context).pop();
+              },
+            ),
+            actions: <Widget>[Container()],
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: const Text(
+              "Novi set",
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+          ),
+          body: Column(
             children: [
-              _buildBanner(),
               _buildResultView(),
               _buildCreateOrderButton(),
             ],
@@ -119,32 +155,6 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
         ),
       ),
       "Novi set",
-    );
-  }
-
-  Widget _buildBanner() {
-    return Container(
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: const Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
-            SizedBox(width: 10),
-            Text(
-              "Novi set",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Arial",
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -158,43 +168,103 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
           // Determine if the card is selected
           bool isSelected = selectedProductIndex == index;
 
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                selectedProductIndex = isSelected ? null : index;
-                selectedProduct = isSelected ? null : product;
-              });
-            },
-            child: Card(
-              color: isSelected
-                  ? Colors.green.shade300
-                  : Colors.green.shade100, // Highlight the selected card
-              margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-              elevation: 5,
-              child: ListTile(
-                contentPadding: const EdgeInsets.all(10),
-                leading: ClipRRect(
-                    borderRadius: BorderRadius.circular(8),
-                    child: product.slika != null
-                        ? imageFromString(product.slika!)
-                        : Image.asset('assets/images/user.png')),
-                title: Text(
-                  product.naziv ?? "N/A",
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
+          return Padding(
+            padding: index + 1 == result!.result.length
+                ? const EdgeInsets.only(top: 8.0, bottom: 100.0)
+                : const EdgeInsets.symmetric(vertical: 8),
+            child: GestureDetector(
+              onTap: () {
+                setState(() {
+                  selectedProductIndex = isSelected ? null : index;
+                  selectedProduct = isSelected ? null : product;
+                });
+              },
+              child: Card(
+                color: isSelected
+                    ? Colors.green.shade300
+                    : recommendedProducts!.any((element) =>
+                                element.proizvodId == product.proizvodId) ==
+                            true
+                        ? Colors.yellow.shade300
+                        : Colors.white,
+                margin:
+                    const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15),
                 ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text("Cijena: ${product.cijena ?? 0} KM"),
-                    Text(
-                        "Količina: ${product.dostupnaKolicina ?? 0} ${product.jedinicaMjere?.skracenica ?? ""}"),
-                  ],
+                elevation: 5,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8.0),
+                        child: product.slika != null
+                            ? Image.memory(
+                                base64Decode(product.slika!),
+                                width: 150,
+                                height: 150,
+                                fit: BoxFit.cover,
+                              )
+                            : Container(
+                                width: 150,
+                                height: 150,
+                                color: Colors.grey.shade200,
+                                child: const Icon(
+                                  Icons.image,
+                                  size: 60,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                      ),
+                      const SizedBox(width: 16),
+                      // Product Details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              product.naziv ?? "",
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              "${product.cijena} KM / ${product.jedinicaMjere?.skracenica ?? ''}",
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Na stanju: ${product.dostupnaKolicina} ${product.jedinicaMjere?.skracenica ?? ''}",
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            const SizedBox(height: 8),
+                            recommendedProducts!.any((element) =>
+                                        element.proizvodId ==
+                                        product.proizvodId) ==
+                                    true
+                                ? Row(
+                                    children: [
+                                      Text("Preporučen proizvod"),
+                                      const SizedBox(width: 8),
+                                      Icon(
+                                        Icons.check,
+                                        color: Colors.green,
+                                      )
+                                    ],
+                                  )
+                                : Container()
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -211,7 +281,6 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
           ? Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Quantity Field (only visible when a product is selected)
                 Padding(
                   padding: const EdgeInsets.only(right: 20.0),
                   child: SizedBox(
@@ -222,7 +291,7 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
                       decoration: InputDecoration(
                         labelText:
                             "Kol - ${selectedProduct != null ? selectedProduct!.jedinicaMjere?.skracenica! : ""}",
-                        border: OutlineInputBorder(),
+                        border: const OutlineInputBorder(),
                       ),
                       onChanged: (value) {
                         var vrijednost = int.tryParse(value.toString());
@@ -236,7 +305,6 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
                     ),
                   ),
                 ),
-                // "Dalje" Button
                 brojac > 0
                     ? ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -249,7 +317,6 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
                         ),
                         onPressed: () async {
                           if (quantityController.text.isEmpty) {
-                            // Show an error if the field is empty
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content:
@@ -265,12 +332,17 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
                               proizvodId: selectedProduct!.proizvodId,
                               kolicina: int.tryParse(quantityController.text),
                               setId: null));
+                          if (brojac == 2 && selectedProduct != null) {
+                            recommendedProducts = await _productProvider
+                                .recommend(selectedProduct!.proizvodId!);
+                          }
                           selectedProduct = null;
                           selectedProductIndex = null;
                           quantityController.clear();
                           brojac--;
                           await fetchProducts(vrsteProizvodaResult!
                               .result[brojac].vrstaProizvodaId!);
+
                           setState(() {
                             isLoading = false;
                           });

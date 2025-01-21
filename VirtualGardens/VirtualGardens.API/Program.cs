@@ -26,6 +26,7 @@ using VirtualGardens.Services.Auth;
 using VirtualGardens.Services.Database;
 using VirtualGardens.Services.NarudzbeStateMachine;
 using VirtualGardens.Services.PonudeStateMachine;
+using VirtualGardens.Services.Recommender;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,6 +62,8 @@ builder.Services.AddTransient<InitialPonudaState>();
 builder.Services.AddTransient<CreatedPonudaState>();
 builder.Services.AddTransient<ActivePonudaState>();
 builder.Services.AddTransient<FinishedPonudaState>();
+
+builder.Services.AddTransient<IRecommenderService, RecommenderService>();
 
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 

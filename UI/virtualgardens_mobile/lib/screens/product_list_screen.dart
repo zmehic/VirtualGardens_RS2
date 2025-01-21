@@ -117,11 +117,27 @@ class _ProductListScreenState extends State<ProductListScreen> {
               key: _scaffoldKey,
               endDrawer: _buildDrawerSort("Sort"),
               drawer: _buildDrawerFilter("Filter"),
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(); // Go back to the previous screen
+                    Navigator.of(context).pop();
+                  },
+                ),
+                actions: <Widget>[Container()],
+                iconTheme: const IconThemeData(color: Colors.white),
+                title: const Text(
+                  "Proizvodi",
+                  style: TextStyle(color: Colors.white),
+                ),
+                backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+              ),
               body: Stack(
                 children: [
                   Column(
                     children: [
-                      _buildBanner(),
                       _buildSearchBar(),
                       Expanded(
                         child: _buildProductList(),
@@ -150,7 +166,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                           ),
                           backgroundColor: Colors.green.shade700,
                         ),
-                        SizedBox(
+                        const SizedBox(
                           width: 5,
                         ),
                         FloatingActionButton.extended(

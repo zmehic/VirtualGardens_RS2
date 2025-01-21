@@ -62,7 +62,7 @@ class _MasterScreenState extends State<MasterScreen> {
             ListTile(
               title: const Text("Proizvodi"),
               onTap: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const ProductListScreen()));
               },
             ),

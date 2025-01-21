@@ -49,5 +49,19 @@ namespace VirtualGardens.API.Controllers
             }
             else { return BadRequest(); }
         }
+
+        [Authorize(Roles="Kupac")]
+        [HttpGet("{id}/recommend")]
+        public List<ProizvodiDTO> Recommend(int id)
+        {
+            return (_service as IProizvodiService).Recommend(id);
+        }
+
+        [HttpGet("trainmodel")]
+        [Authorize(Roles ="Admin")]
+        public void TrainModel()
+        {
+            (_service as IProizvodiService).TrainModel();
+        }
     }
 }

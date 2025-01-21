@@ -1,9 +1,15 @@
 ﻿using MapsterMapper;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Identity.Client;
+using Microsoft.ML;
+using Microsoft.ML.Data;
+using Microsoft.ML.Trainers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
@@ -13,6 +19,7 @@ using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.AllServices;
 using VirtualGardens.Services.BaseServices;
 using VirtualGardens.Services.Database;
+using VirtualGardens.Services.Recommender;
 
 namespace VirtualGardens.Services
 {
@@ -20,10 +27,12 @@ namespace VirtualGardens.Services
     {
         public _210011Context Context { get; set; }
         public IMapper Mapper { get; set; }
-        public ProizvodiService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public IRecommenderService _recommenderService;
+        public ProizvodiService(_210011Context context, IMapper mapper, IRecommenderService recommenderService) : base(context, mapper)
         {
             Context = context;
             Mapper = mapper;
+            _recommenderService= recommenderService;
         }
 
         public override IQueryable<Services.Database.Proizvodi> AddFilter(ProizvodiSearchObject search, IQueryable<Services.Database.Proizvodi> query)
@@ -97,5 +106,30 @@ namespace VirtualGardens.Services
             Context.SaveChanges();
             return true;
         }
+
+        public List<ProizvodiDTO> Recommend(int id)
+        {
+            return _recommenderService.Recommend(id);
+        }
+
+        public void TrainModel()
+        {
+            _recommenderService.TrainModel();
+        }
+    }
+
+    public class Copurchase_prediction
+    {
+        public float Score { get; set; }
+    }
+
+    public class ProductEntry
+    {
+        [KeyType(count:262111)]
+        public uint ProductID { get; set; }
+        [KeyType(count: 262111)]
+        public uint CoPurchaseProductID { get; set; }
+
+        public float Label { get; set; }
     }
 }
