@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/main.dart';
@@ -131,57 +132,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildPasswordFields() {
-    return Column(
-      children: [
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: FormBuilderTextField(
-            obscureText: true,
-            name: "lozinka",
-            decoration: const InputDecoration(labelText: "Nova lozinka"),
-            validator: FormBuilderValidators.compose([
-              FormBuilderValidators.required(
-                  errorText: "Nova lozinka je obavezna."),
-              FormBuilderValidators.minLength(8,
-                  errorText: "Lozinka mora imati najmanje 8 znakova."),
-              FormBuilderValidators.match(
-                  r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
-                  errorText:
-                      "Lozinka mora sadržavati velika slova, mala slova, brojeve \n i specijalne znakove.")
-            ]),
+    return Visibility(
+      visible: changePassword,
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: FormBuilderTextField(
+              obscureText: true,
+              name: "lozinka",
+              decoration: const InputDecoration(labelText: "Nova lozinka"),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(
+                    errorText: "Nova lozinka je obavezna."),
+                FormBuilderValidators.minLength(8,
+                    errorText: "Lozinka mora imati najmanje 8 znakova."),
+                FormBuilderValidators.match(
+                    r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+                    errorText:
+                        "Lozinka mora sadržavati velika slova, mala slova, brojeve \n i specijalne znakove.")
+              ]),
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: FormBuilderTextField(
-            obscureText: true,
-            name: "lozinkaPotvrda",
-            decoration: const InputDecoration(labelText: "Potvrdite lozinku"),
-            validator: FormBuilderValidators.compose([
-              FormBuilderValidators.required(
-                  errorText: "Potvrda lozinke je obavezna."),
-              (value) {
-                if (value != _formKey.currentState?.fields['lozinka']?.value) {
-                  return "Potvrda lozinke se ne poklapa s novom lozinkom.";
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: FormBuilderTextField(
+              obscureText: true,
+              name: "lozinkaPotvrda",
+              decoration: const InputDecoration(labelText: "Potvrdite lozinku"),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(
+                    errorText: "Potvrda lozinke je obavezna."),
+                (value) {
+                  if (value !=
+                      _formKey.currentState?.fields['lozinka']?.value) {
+                    return "Potvrda lozinke se ne poklapa s novom lozinkom.";
+                  }
+                  return null;
                 }
-                return null;
-              }
-            ]),
+              ]),
+            ),
           ),
-        ),
-        Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0),
-          child: FormBuilderTextField(
-            obscureText: true,
-            name: "staraLozinka",
-            decoration: const InputDecoration(labelText: "Stara lozinka"),
-            validator: FormBuilderValidators.compose([
-              FormBuilderValidators.required(
-                  errorText: "Stara lozinka je obavezna."),
-            ]),
-          ),
-        )
-      ],
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: FormBuilderTextField(
+              obscureText: true,
+              name: "staraLozinka",
+              decoration: const InputDecoration(labelText: "Stara lozinka"),
+              validator: FormBuilderValidators.compose([
+                FormBuilderValidators.required(
+                    errorText: "Stara lozinka je obavezna."),
+              ]),
+            ),
+          )
+        ],
+      ),
     );
   }
 
@@ -347,10 +352,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: FormBuilderTextField(
                       name: "adresa",
                       decoration: const InputDecoration(labelText: "Adresa"),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.minLength(5,
-                            errorText: "Adresa mora imati najmanje 5 slova.")
-                      ]),
                     ),
                   ),
                   Padding(
@@ -395,7 +396,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ],
                     ),
                   ),
-                  changePassword ? _buildPasswordFields() : Container(),
+                  _buildPasswordFields(),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
@@ -409,64 +410,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         setState(() {});
 
                         try {
-                          if (request['lozinka'].toString().isEmpty ||
-                              (request['lozinka'].toString().isEmpty == false &&
-                                  request['staraLozinka'].toString().isEmpty ==
-                                      false &&
-                                  request['lozinkaPotvrda']
-                                          .toString()
-                                          .isEmpty ==
-                                      false &&
-                                  request['lozinka'].toString().isEmpty ==
-                                      request['lozinkaPotvrda']
-                                          .toString()
-                                          .isEmpty)) {
-                            await _korisnikProvider.update(
-                                AuthProvider.korisnikId!, request);
+                          if (request.containsKey('lozinka') == false ||
+                              (request.containsKey('lozinka') == true &&
+                                  request.containsKey('staraLozinka') == true &&
+                                  request.containsKey('lozinkaPotvrda') ==
+                                      true &&
+                                  request.containsKey('lozinka') ==
+                                      request.containsKey('lozinkaPotvrda'))) {
+                            try {
+                              await _korisnikProvider.update(
+                                  AuthProvider.korisnikId!, request);
 
-                            if (request['lozinka'].toString().isEmpty) {
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const HomeScreen()));
-                            } else {
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) => LoginPage()));
+                              QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.success,
+                                title:
+                                    "Uspješno ste ažurirali podatke o vašem profilu",
+                                confirmBtnText: "U redu",
+                                text:
+                                    "Ukoliko ste mijenjali lozinku, potrebno je da se ponovo prijavite na sistem!",
+                                onConfirmBtnTap: () {
+                                  if (request.containsKey('lozinka') == false) {
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const HomeScreen()));
+                                  } else {
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) => LoginPage()));
+                                  }
+                                },
+                              );
+                            } on Exception {
+                              QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  title: "Greška prilikom ažuriranja profila",
+                                  confirmBtnText: "U redu",
+                                  text:
+                                      "Molimo Vas kontaktirajte korisničku podršku");
                             }
                           } else {
-                            showDialog(
-                                // ignore: use_build_context_synchronously
+                            QuickAlert.show(
                                 context: context,
-                                builder: (context) => AlertDialog(
-                                      title: const Text("Error"),
-                                      content:
-                                          const Text("Molimo provjerite unos"),
-                                      actions: [
-                                        TextButton(
-                                            onPressed: () =>
-                                                Navigator.pop(context),
-                                            child: const Text("Ok"))
-                                      ],
-                                    ));
+                                type: QuickAlertType.error,
+                                title: "Greška prilikom ažuriranja profila",
+                                confirmBtnText: "U redu",
+                                text:
+                                    "Molimo Vas kontaktirajte korisničku podršku");
                             setState(() {});
                           }
                         } on Exception catch (e) {
-                          showDialog(
-                              // ignore: use_build_context_synchronously
+                          QuickAlert.show(
                               context: context,
-                              builder: (context) => AlertDialog(
-                                    title: const Text("Error"),
-                                    content: Text(e.toString()),
-                                    actions: [
-                                      TextButton(
-                                          onPressed: () =>
-                                              Navigator.pop(context),
-                                          child: const Text("Ok"))
-                                    ],
-                                  ));
+                              type: QuickAlertType.error,
+                              title: "Greška prilikom ažuriranja",
+                              text: (e.toString().split(': '))[1],
+                              confirmBtnText: "U redu");
+
                           setState(() {});
                         }
                       }

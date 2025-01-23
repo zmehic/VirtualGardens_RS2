@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
@@ -22,6 +23,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
   late ProductProvider provider;
   late VrsteProizvodaProvider vrsteProizvodaProvider;
 
+  Map<String, dynamic> _initialValue = {};
+  final ScrollController _scrollController = ScrollController();
+
   final TextEditingController _cijenaOdEditingController =
       TextEditingController();
   final TextEditingController _cijenaDoEditingController =
@@ -33,54 +37,68 @@ class _ProductListScreenState extends State<ProductListScreen> {
   double _cijenaOd = 0;
   double _cijenaDo = 1000;
 
-  String? sortBy = null;
+  String? sortBy;
   bool isAscending = true;
 
   bool isLoading = true;
+  bool isLoadingMore = false;
+  bool hasMoreData = true;
+  int currentPage = 1;
+  final int productsPerPage = 4;
   int? selectedVrstaProizvoda;
 
   final TextEditingController _searchController = TextEditingController();
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormBuilderState> _productListFormKey =
+      GlobalKey<FormBuilderState>();
 
   @override
   void initState() {
     super.initState();
     provider = context.read<ProductProvider>();
+    initForm();
     vrsteProizvodaProvider = context.read<VrsteProizvodaProvider>();
     selectedVrstaProizvoda = 0;
-    _fetchProducts(vrstaProizvodaId: selectedVrstaProizvoda);
+    _fetchProducts(vrstaProizvodaId: selectedVrstaProizvoda, reset: true);
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+              _scrollController.position.maxScrollExtent &&
+          !isLoadingMore &&
+          hasMoreData) {
+        _loadMoreProducts();
+      }
+    });
   }
 
-  Future<void> _fetchProducts(
-      {String searchQuery = "", int? vrstaProizvodaId}) async {
-    setState(() {
-      isLoading = true;
-    });
-    var filter = {
-      'NazivGTE': _searchController.text,
-      'CijenaFrom': _cijenaOd,
-      'CijenaTo': _cijenaDo,
-      'OrderBy': sortBy,
-      'SortDirection': isAscending ? "ASC" : "DESC",
-      'VrstaProizvodaId':
-          selectedVrstaProizvoda == 0 ? "" : selectedVrstaProizvoda,
-      'IncludeTables': "JedinicaMjere",
-      'isDeleted': false,
+  Future initForm() async {
+    _initialValue = {
+      'naziv': "",
     };
 
-    vrsteProizvodaResult = await vrsteProizvodaProvider.get();
-    vrsteProizvodaResult?.result
-        .insert(0, VrstaProizvoda(vrstaProizvodaId: 0, naziv: "Svi"));
-
-    result = await provider.get(filter: filter);
     setState(() {
       isLoading = false;
     });
   }
 
-  Future initScreen(int? vrstaProizvodaId) async {
+  Future<void> _fetchProducts(
+      {String searchQuery = "",
+      int? vrstaProizvodaId,
+      bool reset = false}) async {
+    if (reset) {
+      currentPage = 1;
+      hasMoreData = true;
+      result = null;
+      isLoading = true;
+    }
+
+    setState(() {
+      isLoadingMore = !reset;
+    });
     var filter = {
-      'NazivGTE': _searchController.text,
+      'NazivGTE':
+          _productListFormKey.currentState?.fields['naziv']?.value.toString() ??
+              "",
       'CijenaFrom': _cijenaOd,
       'CijenaTo': _cijenaDo,
       'OrderBy': sortBy,
@@ -89,16 +107,47 @@ class _ProductListScreenState extends State<ProductListScreen> {
           selectedVrstaProizvoda == 0 ? "" : selectedVrstaProizvoda,
       'IncludeTables': "JedinicaMjere",
       'isDeleted': false,
+      'Page': currentPage,
+      'PageSize': productsPerPage,
     };
+
+    if (reset) {
+      vrsteProizvodaResult = await vrsteProizvodaProvider.get();
+      vrsteProizvodaResult?.result
+          .insert(0, VrstaProizvoda(vrstaProizvodaId: 0, naziv: "Svi"));
+    }
+
+    var newResult = await provider.get(filter: filter);
+
+    setState(() {
+      if (newResult == null || newResult.result.isEmpty) {
+        hasMoreData = false;
+      } else {
+        if (reset) {
+          result = newResult;
+        } else {
+          result?.result.addAll(newResult.result);
+        }
+      }
+      if (reset) isLoading = false;
+      isLoadingMore = false;
+    });
+  }
+
+  Future<void> _loadMoreProducts() async {
+    if (!hasMoreData || isLoading || isLoadingMore) return;
+
+    currentPage++;
+    await _fetchProducts(reset: false);
+  }
+
+  Future initScreen(int? vrstaProizvodaId) async {
     vrsteProizvodaResult = await vrsteProizvodaProvider.get();
     vrsteProizvodaResult?.result
         .insert(0, VrstaProizvoda(vrstaProizvodaId: 0, naziv: "Svi"));
 
-    if (vrstaProizvodaId != 0) {
-      result = await provider.get(filter: filter);
-    } else {
-      result = await provider.get(filter: filter);
-    }
+    _fetchProducts(vrstaProizvodaId: vrstaProizvodaId);
+
     selectedVrstaProizvoda ??= vrsteProizvodaResult?.result[0].vrstaProizvodaId;
     _cijenaDoEditingController.text = "";
     _searchController.text = "";
@@ -196,31 +245,38 @@ class _ProductListScreenState extends State<ProductListScreen> {
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _searchController,
-              decoration: const InputDecoration(
-                labelText: "Pretraži proizvode",
-                prefixIcon: Icon(Icons.search),
-                border: OutlineInputBorder(),
-                filled: true,
-                fillColor: Color.fromRGBO(235, 241, 224, 1),
+      child: FormBuilder(
+        key: _productListFormKey,
+        initialValue: _initialValue,
+        child: Row(
+          children: [
+            Expanded(
+              child: FormBuilderTextField(
+                name: 'naziv',
+                decoration: const InputDecoration(
+                  labelText: "Pretraži proizvode",
+                  prefixIcon: Icon(Icons.search),
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Color.fromRGBO(235, 241, 224, 1),
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () {
-              _fetchProducts(
-                searchQuery: _searchController.text,
-                vrstaProizvodaId: selectedVrstaProizvoda,
-              );
-            },
-            child: const Text("Pretraga"),
-          ),
-        ],
+            const SizedBox(width: 8),
+            ElevatedButton(
+              onPressed: () {
+                _fetchProducts(
+                    searchQuery: _productListFormKey
+                            .currentState?.fields['naziv']?.value
+                            .toString() ??
+                        "",
+                    vrstaProizvodaId: selectedVrstaProizvoda,
+                    reset: true);
+              },
+              child: const Text("Pretraga"),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -252,28 +308,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 const SizedBox(height: 16),
                 ElevatedButton(
                   onPressed: () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    // Apply filter action here, for example:
-                    var filter = {
-                      'NazivGTE': _searchController.text,
-                      'CijenaFrom': _cijenaOd,
-                      'CijenaTo': _cijenaDo,
-                      'OrderBy': sortBy,
-                      'SortDirection': isAscending ? "ASC" : "DESC",
-                      'VrstaProizvodaId': selectedVrstaProizvoda == 0
-                          ? ""
-                          : selectedVrstaProizvoda,
-                      'IncludeTables': "JedinicaMjere",
-                      'isDeleted': false,
-                    };
-                    // Apply the filter using your provider
-                    result = await provider.get(filter: filter);
+                    _fetchProducts(reset: true);
                     _scaffoldKey.currentState?.closeDrawer();
-                    setState(() {
-                      isLoading = false;
-                    });
                   },
                   child: const Text("Apply Filters"),
                 ),
@@ -396,8 +432,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   title: const Text("Po nazivu"),
                   onTap: () {
                     setState(() {
-                      sortBy = "Naziv"; // Set sorting by name
-                      isAscending = !isAscending; // Toggle ascending/descending
+                      sortBy = "Naziv";
+                      isAscending = !isAscending;
                     });
                   },
                 ),
@@ -411,12 +447,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   title: const Text("Po cijeni"),
                   onTap: () {
                     setState(() {
-                      sortBy = "Cijena"; // Set sorting by price
-                      isAscending = !isAscending; // Toggle ascending/descending
+                      sortBy = "Cijena";
+                      isAscending = !isAscending;
                     });
                   },
                 ),
-                // Add more sorting options if necessary, such as sorting in reverse order,
                 ListTile(
                   leading: const Icon(Icons.sort),
                   trailing: sortBy != null && sortBy == "DostupnaKolicina"
@@ -427,8 +462,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   title: const Text("Po količini"),
                   onTap: () {
                     setState(() {
-                      sortBy = "DostupnaKolicina"; // Set sorting by price
-                      isAscending = !isAscending; // Toggle ascending/descending
+                      sortBy = "DostupnaKolicina";
+                      isAscending = !isAscending;
                     });
                   },
                 ),
@@ -437,28 +472,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   children: [
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          isLoading = true;
-                        });
-                        // Apply filter action here, for example:
-                        var filter = {
-                          'NazivGTE': _searchController.text,
-                          'CijenaFrom': _cijenaOd,
-                          'CijenaTo': _cijenaDo,
-                          'OrderBy': sortBy,
-                          'SortDirection': isAscending ? "ASC" : "DESC",
-                          'VrstaProizvodaId': selectedVrstaProizvoda == 0
-                              ? ""
-                              : selectedVrstaProizvoda,
-                          'IncludeTables': "JedinicaMjere",
-                          'isDeleted': false,
-                        };
-                        // Apply the filter using your provider
-                        result = await provider.get(filter: filter);
+                        _fetchProducts(reset: true);
                         _scaffoldKey.currentState?.closeEndDrawer();
-                        setState(() {
-                          isLoading = false;
-                        });
                       },
                       child: const Text("Sortiraj"),
                     ),
@@ -492,13 +507,26 @@ class _ProductListScreenState extends State<ProductListScreen> {
     }
 
     return ListView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.all(8.0),
-      itemCount: result!.result.length,
+      itemCount: result!.result.length + (isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index == result!.result.length) {
+          return const Column(
+            children: [
+              Center(
+                child: CircularProgressIndicator(),
+              ),
+              SizedBox(
+                height: 80,
+              ),
+            ],
+          );
+        }
         final product = result!.result[index];
         return Padding(
           padding: index + 1 == result!.result.length
-              ? const EdgeInsets.only(top: 8.0, bottom: 100.0)
+              ? const EdgeInsets.only(top: 8.0, bottom: 70.0)
               : const EdgeInsets.symmetric(vertical: 8.0),
           child: GestureDetector(
             onTap: () {
@@ -519,7 +547,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Product Image
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8.0),
                       child: product.slika != null
@@ -541,7 +568,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
                             ),
                     ),
                     const SizedBox(width: 16),
-                    // Product Details
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

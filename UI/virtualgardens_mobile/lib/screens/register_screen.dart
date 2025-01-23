@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/main.dart';
 import 'package:virtualgardens_mobile/models/korisnici.dart';
@@ -162,7 +163,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Please select an image up to 2 MB in size"),
+            content: Text("Molimo vas odaberite fotografiju veličine do 2 MB"),
             backgroundColor: Colors.red,
           ),
         );
@@ -190,12 +191,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         decoration:
                             const InputDecoration(labelText: "Korisničko ime"),
                         name: "korisnickoIme",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        }),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                              errorText: "Korisničko ime je obavezno."),
+                          FormBuilderValidators.minLength(3,
+                              errorText:
+                                  "Korisničko ime mora imati najmanje 3 slova."),
+                          FormBuilderValidators.match(r'^\S+$',
+                              errorText:
+                                  "Korisničko ime ne smije sadržavati razmake.")
+                        ])),
                   ),
                 ],
               ),
@@ -207,12 +212,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: FormBuilderTextField(
                         decoration: const InputDecoration(labelText: "Email"),
                         name: "email",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        }),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                              errorText: "Email je obavezan."),
+                          FormBuilderValidators.email(
+                              errorText: "Unesite ispravnu email adresu.")
+                        ])),
                   )
                 ],
               ),
@@ -224,32 +229,31 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: FormBuilderTextField(
                         decoration: const InputDecoration(labelText: "Ime"),
                         name: "ime",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        }),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: FormBuilderTextField(
-                        decoration: const InputDecoration(labelText: "Prezime"),
-                        name: "prezime",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        }),
-                  ),
-                  const SizedBox(
-                    width: 10,
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                              errorText: "Ime je obavezno."),
+                          FormBuilderValidators.match(r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
+                              errorText: "Ime može sadržavati samo slova.")
+                        ])),
                   ),
                 ],
               ),
+              const SizedBox(
+                height: 15,
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Expanded(
+                  child: FormBuilderTextField(
+                      decoration: const InputDecoration(labelText: "Prezime"),
+                      name: "prezime",
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(
+                            errorText: "Prezime je obavezno."),
+                        FormBuilderValidators.match(r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
+                            errorText: "Prezime može sadržavati samo slova.")
+                      ])),
+                ),
+              ]),
               const SizedBox(height: 15),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -261,12 +265,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           const InputDecoration(labelText: "Datum rođenja"),
                       name: "datumRodjenja",
                       readOnly: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please choose some value';
-                        }
-                        return null;
-                      },
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(
+                            errorText: "Datum rođenja je obavezan."),
+                      ]),
                       onTap: () async {
                         DateTime? pickedDate = await showDatePicker(
                             context: context,
@@ -281,14 +283,23 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       },
                     ),
                   ),
-                  const SizedBox(
-                    width: 10,
-                  ),
+                ],
+              ),
+              const SizedBox(height: 15),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Expanded(
                     child: FormBuilderTextField(
                       decoration:
                           const InputDecoration(labelText: "Broj telefona"),
                       name: "brojTelefona",
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.match(
+                            r'^(?:\+387[0-9]{2}[0-9]{6}|06[0-9]{7})$',
+                            errorText:
+                                "Unesite ispravan broj mobitela (npr. +38761234567).")
+                      ]),
                     ),
                   ),
                 ],
@@ -311,21 +322,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   Expanded(
                     child: FormBuilderTextField(
-                      decoration: const InputDecoration(labelText: "Grad"),
-                      name: "grad",
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: FormBuilderTextField(
-                      decoration: const InputDecoration(labelText: "Država"),
-                      name: "drzava",
-                    ),
+                        decoration: const InputDecoration(labelText: "Grad"),
+                        name: "grad",
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.match(r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
+                              errorText: "Grad može sadržavati samo slova.")
+                        ])),
                   ),
                 ],
               ),
+              const SizedBox(
+                height: 15,
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Expanded(
+                  child: FormBuilderTextField(
+                      decoration: const InputDecoration(labelText: "Država"),
+                      name: "drzava",
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.match(r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
+                            errorText: "Država može sadržavati samo slova.")
+                      ])),
+                ),
+              ]),
               const SizedBox(
                 height: 15,
               ),
@@ -334,24 +353,47 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 children: [
                   Expanded(
                     child: FormBuilderTextField(
-                      decoration:
-                          const InputDecoration(labelText: "Nova lozinka"),
-                      obscureText: true,
-                      name: "lozinka",
-                    ),
-                  ),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Expanded(
-                    child: FormBuilderTextField(
-                        decoration: const InputDecoration(
-                            labelText: "Potvrdite lozinku"),
+                        decoration:
+                            const InputDecoration(labelText: "Nova lozinka"),
                         obscureText: true,
-                        name: "lozinkaPotvrda"),
+                        name: "lozinka",
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                              errorText: "Nova lozinka je obavezna."),
+                          FormBuilderValidators.minLength(8,
+                              errorText:
+                                  "Lozinka mora imati najmanje 8 znakova."),
+                          FormBuilderValidators.match(
+                              r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+                              errorText:
+                                  "Lozinka mora sadržavati velika slova, mala slova, brojeve \n i specijalne znakove.")
+                        ])),
                   ),
                 ],
               ),
+              const SizedBox(
+                height: 15,
+              ),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Expanded(
+                  child: FormBuilderTextField(
+                      decoration:
+                          const InputDecoration(labelText: "Potvrdite lozinku"),
+                      obscureText: true,
+                      name: "lozinkaPotvrda",
+                      validator: FormBuilderValidators.compose([
+                        FormBuilderValidators.required(
+                            errorText: "Potvrda lozinke je obavezna."),
+                        (value) {
+                          if (value !=
+                              _formKey.currentState?.fields['lozinka']?.value) {
+                            return "Potvrda lozinke se ne poklapa s novom lozinkom.";
+                          }
+                          return null;
+                        }
+                      ])),
+                ),
+              ]),
               const SizedBox(height: 15),
               Row(
                 children: [
@@ -425,7 +467,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 var request =
                                     Map.from(_formKey.currentState!.value);
                                 request['slika'] = _base64Image;
-                                request['uloge'] = [2];
                                 var key = request.entries.elementAt(4).key;
                                 request[key] = _initialValue['datumRodjenja'];
                                 isLoadingSave = true;

@@ -28,6 +28,6 @@ namespace VirtualGardens.Models.Requests
 
         public DateTime? DatumRodjenja { get; set; }
         public byte[]? Slika { get; set; }
-        public List<int> Uloge { get; set; }
+        public List<int>? Uloge { get; set; }
     }
 }

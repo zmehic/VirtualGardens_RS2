@@ -1,6 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
 import 'package:virtualgardens_mobile/models/korisnici.dart';
-import 'package:virtualgardens_mobile/models/nalozi.dart';
 
 part 'narudzbe.g.dart';
 
@@ -17,7 +16,6 @@ class Narudzba {
   int korisnikId;
   int? nalogId;
   Korisnik? korisnik;
-  Nalog? nalog;
 
   Narudzba({
     required this.narudzbaId,
@@ -31,7 +29,6 @@ class Narudzba {
     required this.korisnikId,
     this.nalogId,
     this.korisnik,
-    this.nalog,
   });
 
   factory Narudzba.fromJson(Map<String, dynamic> json) =>

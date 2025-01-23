@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
@@ -22,10 +25,15 @@ class ProductDetailsScreen extends StatefulWidget {
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   late RecenzijeProvider _recenzijeProvider;
+
+  Map<String, dynamic> _initialValue = {};
+
   SearchResult<Recenzija>? recenzijeResult;
   bool isLoading = true;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormBuilderState> _productRatingFormKey =
+      GlobalKey<FormBuilderState>();
 
   @override
   void initState() {
@@ -35,6 +43,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   Future initForm() async {
+    _initialValue = {'komenatar': ""};
+
     var filter = {
       'ProizvodId': widget.product?.proizvodId,
       'isDeleted': false,
@@ -55,6 +65,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             child: Scaffold(
               key: _scaffoldKey,
               endDrawer: _buildEndDrawer("Recenzija"),
+              resizeToAvoidBottomInset: false,
               appBar: AppBar(
                 actions: <Widget>[Container()],
                 iconTheme: const IconThemeData(color: Colors.white),
@@ -122,9 +133,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       const SizedBox(height: 24),
 
                       // Reviews Section Header
-                      Text(
+                      const Text(
                         "Recenzije",
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
@@ -132,51 +143,67 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       const SizedBox(height: 8),
 
                       // Reviews List
-                      recenzijeResult?.result.isNotEmpty ?? false
-                          ? ListView.builder(
-                              physics: const NeverScrollableScrollPhysics(),
-                              shrinkWrap: true,
-                              itemCount: recenzijeResult?.result.length ?? 0,
-                              itemBuilder: (context, index) {
-                                final recenzija =
-                                    recenzijeResult!.result[index];
-                                return Card(
-                                  margin: const EdgeInsets.symmetric(
-                                      vertical: 8.0, horizontal: 0.0),
-                                  child: ListTile(
-                                    title: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          recenzija.korisnik?.ime ??
-                                              "Nepoznati korisnik",
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
+                      Container(
+                        height: 250,
+                        child: SingleChildScrollView(
+                          child: Column(
+                            children: [
+                              recenzijeResult?.result.isNotEmpty ?? false
+                                  ? ListView.builder(
+                                      physics:
+                                          const NeverScrollableScrollPhysics(),
+                                      shrinkWrap: true,
+                                      itemCount:
+                                          recenzijeResult?.result.length ?? 0,
+                                      itemBuilder: (context, index) {
+                                        final recenzija =
+                                            recenzijeResult!.result[index];
+                                        return Card(
+                                          margin: const EdgeInsets.symmetric(
+                                              vertical: 8.0, horizontal: 0.0),
+                                          child: ListTile(
+                                            title: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  recenzija.korisnik?.ime ??
+                                                      "Nepoznati korisnik",
+                                                  style: const TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
+                                                ),
+                                                RatingBarIndicator(
+                                                  rating: recenzija.ocjena
+                                                      .toDouble(),
+                                                  itemBuilder:
+                                                      (context, index) =>
+                                                          const Icon(
+                                                    Icons.star,
+                                                    color: Colors.amber,
+                                                  ),
+                                                  itemSize: 20,
+                                                ),
+                                              ],
+                                            ),
+                                            subtitle: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  top: 8.0),
+                                              child: Text(
+                                                recenzija.komentar ??
+                                                    "Bez komentara",
+                                              ),
+                                            ),
                                           ),
-                                        ),
-                                        RatingBarIndicator(
-                                          rating: recenzija.ocjena.toDouble(),
-                                          itemBuilder: (context, index) =>
-                                              const Icon(
-                                            Icons.star,
-                                            color: Colors.amber,
-                                          ),
-                                          itemSize: 20,
-                                        ),
-                                      ],
-                                    ),
-                                    subtitle: Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        recenzija.komentar ?? "Bez komentara",
-                                      ),
-                                    ),
-                                  ),
-                                );
-                              },
-                            )
-                          : const Text("Nema dostupnih recenzija."),
+                                        );
+                                      },
+                                    )
+                                  : const Text("Nema dostupnih recenzija."),
+                            ],
+                          ),
+                        ),
+                      ),
                       const SizedBox(height: 16),
 
                       // Write Review Button
@@ -208,155 +235,165 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   }
 
   _buildEndDrawer(String title) {
-    double userRating = 0; // To store the user's selected rating
+    double userRating = 1; // To store the user's selected rating
     TextEditingController _commentController = TextEditingController();
 
     return Drawer(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          DrawerHeader(
-            decoration: BoxDecoration(color: Colors.green.shade700),
-            child: Center(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
+      child: FormBuilder(
+        key: _productRatingFormKey,
+        initialValue: _initialValue,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            DrawerHeader(
+              decoration: BoxDecoration(color: Colors.green.shade700),
+              child: Center(
+                child: Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Ocijenite proizvod",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Rating Bar
-                  RatingBar(
-                    ignoreGestures: false,
-                    allowHalfRating: false,
-                    minRating: 1,
-                    maxRating: 5,
-                    ratingWidget: RatingWidget(
-                        full: const Icon(
-                          Icons.star,
-                          color: Colors.amber,
-                        ),
-                        empty: const Icon(Icons.star, color: Colors.grey),
-                        half: const Icon(Icons.star_half)),
-                    onRatingUpdate: (double value) {
-                      userRating = value;
-                    },
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Comment Field
-                  const Text(
-                    "Vaš komentar",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _commentController,
-                    maxLines: 5,
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      hintText: "Napišite svoj komentar ovdje...",
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Buttons
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      ElevatedButton(
-                        onPressed: () async {
-                          if (userRating == 0) {
-                            // Show an error if the user hasn't given a rating
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Molimo odaberite ocjenu."),
-                              ),
-                            );
-                            return;
-                          }
-
-                          if (_commentController.text.isEmpty) {
-                            // Show an error if the comment is empty
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text("Molimo unesite komentar."),
-                              ),
-                            );
-                            return;
-                          }
-                          setState(() {
-                            isLoading = true;
-                          });
-                          // Handle review submission here
-                          final newReview = {
-                            'ocjena': userRating.toInt(),
-                            'komentar': _commentController.text,
-                            'korisnikId': AuthProvider.korisnikId,
-                            'proizvodId': widget.product!.proizvodId,
-                          };
-
-                          await _recenzijeProvider.insert(newReview);
-
-                          QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.success,
-                            text: "Vaša recenzija je uspješno poslana!",
-                          );
-
-                          // Clear inputs after submission
-                          userRating = 0;
-                          _commentController.clear();
-
-                          // Close the drawer
-                          _scaffoldKey.currentState?.closeEndDrawer();
-
-                          await initForm();
-                        },
-                        child: const Text("Pošalji recenziju"),
-                      ),
-                      ElevatedButton(
-                        onPressed: () {
-                          // Clear inputs when cancel is pressed
-                          userRating = 0;
-                          _commentController.clear();
-                          _scaffoldKey.currentState?.closeEndDrawer();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey,
+                      const Text(
+                        "Ocijenite proizvod",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
-                        child: const Text("Otkaži"),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Rating Bar
+                      RatingBar(
+                        ignoreGestures: false,
+                        allowHalfRating: false,
+                        initialRating: 1,
+                        minRating: 1,
+                        maxRating: 5,
+                        ratingWidget: RatingWidget(
+                            full: const Icon(
+                              Icons.star,
+                              color: Colors.amber,
+                            ),
+                            empty: const Icon(Icons.star, color: Colors.grey),
+                            half: const Icon(Icons.star_half)),
+                        onRatingUpdate: (double value) {
+                          userRating = value;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Comment Field
+                      const Text(
+                        "Vaš komentar",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      FormBuilderTextField(
+                        name: "komentar",
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          hintText: "Napišite svoj komentar ovdje...",
+                        ),
+                        validator: FormBuilderValidators.compose(
+                            [FormBuilderValidators.maxLength(100)]),
+                      ),
+                      const SizedBox(height: 16),
+
+                      // Buttons
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          ElevatedButton(
+                            onPressed: () async {
+                              if (_productRatingFormKey.currentState
+                                      ?.saveAndValidate() ==
+                                  true) {
+                                if (userRating == 0) {
+                                  // Show an error if the user hasn't given a rating
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text("Molimo odaberite ocjenu."),
+                                    ),
+                                  );
+                                  return;
+                                }
+                                setState(() {
+                                  isLoading = true;
+                                });
+                                // Handle review submission here
+                                final newReview = {
+                                  'ocjena': userRating.toInt(),
+                                  'komentar': _productRatingFormKey
+                                          .currentState!
+                                          .fields['komentar']
+                                          ?.value ??
+                                      "",
+                                  'korisnikId': AuthProvider.korisnikId,
+                                  'proizvodId': widget.product!.proizvodId,
+                                };
+
+                                var result =
+                                    await _recenzijeProvider.insert(newReview);
+                                recenzijeResult!.result.add(result);
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.success,
+                                  text: "Vaša recenzija je uspješno poslana!",
+                                );
+
+                                // Clear inputs after submission
+                                userRating = 0;
+                                _commentController.clear();
+
+                                // Close the drawer
+                                _scaffoldKey.currentState?.closeEndDrawer();
+
+                                setState(() {
+                                  isLoading = false;
+                                });
+                              }
+                            },
+                            child: const Text("Pošalji recenziju"),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              userRating = 0;
+                              _productRatingFormKey.currentState!
+                                  .setInternalFieldValue('komentar', "");
+                              _scaffoldKey.currentState?.closeEndDrawer();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.grey,
+                            ),
+                            child: const Text("Otkaži"),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ],
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -33,10 +33,8 @@ class ProductProvider extends BaseProvider<Proizvod> {
 
   Future<List<Proizvod>> recommend(int id) async {
     var endpoint = "Proizvodi/$id/recommend";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://10.0.2.2:7011/");
 
-    var url = "$baseUrl$endpoint";
+    var url = "${BaseProvider.baseUrl}$endpoint";
 
     var uri = Uri.parse(url);
     var headers = createHeaders();

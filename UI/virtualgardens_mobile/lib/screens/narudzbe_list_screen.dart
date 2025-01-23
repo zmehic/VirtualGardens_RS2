@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/narudzbe.dart';
@@ -105,32 +106,6 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
     );
   }
 
-  Widget _buildBanner() {
-    return Container(
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 20),
-      child: const Center(
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
-            SizedBox(width: 10),
-            Text(
-              "Moje narudžbe",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                fontFamily: "Arial",
-                color: Colors.white,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildOrdersView(String state) {
     final orders =
         result?.result.where((order) => order.stateMachine == state).toList() ??
@@ -172,39 +147,25 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () async {
-                          final confirm = await showDialog<bool>(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text("Brisanje narudžbe"),
-                                content: const Text(
-                                    "Jeste li sigurni da želite obrisati ovu narudžbu?"),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(false),
-                                    child: const Text("Ne"),
-                                  ),
-                                  TextButton(
-                                    onPressed: () =>
-                                        Navigator.of(context).pop(true),
-                                    child: const Text("Da"),
-                                  ),
-                                ],
-                              );
-                            },
-                          );
-
-                          if (confirm == true) {
-                            setState(() {
-                              isLoading = true;
-                            });
-                            await _narudzbaProvider.delete(order.narudzbaId);
-                            await fetchUserOrders();
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
+                          QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.confirm,
+                              title: "Brisanje narudžbe",
+                              text:
+                                  "Jeste li sigurni da želite obrisati ovu narudžbu?",
+                              confirmBtnText: "Da",
+                              showCancelBtn: true,
+                              cancelBtnText: "Ne",
+                              onConfirmBtnTap: () async {
+                                await _narudzbaProvider
+                                    .delete(order.narudzbaId);
+                                result!.result.remove(order);
+                                if (context.mounted) {
+                                  Navigator.of(context).pop(true);
+                                }
+                                setState(() {});
+                                return;
+                              });
                         },
                       ),
                     IconButton(
@@ -249,11 +210,20 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
                   'korisnikId': AuthProvider.korisnikId,
                   'nalogId': null
                 };
-                await _narudzbaProvider.insert(request);
-                await fetchUserOrders();
+                var order = await _narudzbaProvider.insert(request);
+                result!.result.add(order);
+
                 setState(() {
                   isLoading = false;
                 });
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.success,
+                  title: "Narudžba je uspješno kreirana!",
+                  text:
+                      "Kliknite na narudžbu da biste vidjeli detalje i dodali proizvode.",
+                  confirmBtnText: "U redu",
+                );
               },
               child: const Text(
                 "Kreiraj novu narudžbu",

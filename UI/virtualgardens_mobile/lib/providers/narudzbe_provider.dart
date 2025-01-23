@@ -14,10 +14,8 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
 
   Future AllowedActions({int? id}) async {
     var endpoint = "api/Narudzbe/$id/allowedActions";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://10.0.2.2:7011/");
 
-    var url = "$baseUrl$endpoint";
+    var url = "${BaseProvider.baseUrl}$endpoint";
 
     var uri = Uri.parse(url);
     var headers = createHeaders();
@@ -38,10 +36,8 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
 
   Future<List<String>> CheckOrderValidity({int? orderid}) async {
     var endpoint = "api/Narudzbe/CheckOrderValidity/$orderid";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://10.0.2.2:7011/");
 
-    var url = "$baseUrl$endpoint";
+    var url = "${BaseProvider.baseUrl}$endpoint";
 
     var uri = Uri.parse(url);
     var headers = createHeaders();
@@ -61,10 +57,8 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
 
   Future MonthlyStatistics({int year = 2024}) async {
     var endpoint = "api/Narudzbe/MonthlyStatistics?year=${year}";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:7011/");
 
-    var url = "$baseUrl$endpoint";
+    var url = "${BaseProvider.baseUrl}$endpoint";
 
     var uri = Uri.parse(url);
     var headers = createHeaders();
@@ -85,10 +79,8 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
 
   Future narudzbeState({String? action, int? id}) async {
     var endpoint = "api/Narudzbe/$id/$action";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://10.0.2.2:7011/");
 
-    var url = "$baseUrl$endpoint";
+    var url = "${BaseProvider.baseUrl}$endpoint";
 
     var uri = Uri.parse(url);
     var headers = createHeaders();

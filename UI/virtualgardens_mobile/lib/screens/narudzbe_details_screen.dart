@@ -15,9 +15,10 @@ import 'package:virtualgardens_mobile/providers/ponude_provider.dart';
 import 'package:virtualgardens_mobile/providers/setovi_provider.dart';
 import 'package:virtualgardens_mobile/providers/utils.dart';
 import 'package:virtualgardens_mobile/screens/add_product_set_screen.dart';
-import 'package:virtualgardens_mobile/screens/pitanja_list_screen.dart';
+import 'package:virtualgardens_mobile/screens/narudzbe_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/ponude_details_screen.dart';
 
+// ignore: must_be_immutable
 class NarudzbaUserDetailsScreen extends StatefulWidget {
   Narudzba? narudzba;
   String? secretKeyValue;
@@ -92,7 +93,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: widget.narudzba?.stateMachine == "created" ? 2 : 1,
       child: MasterScreen(
         FullScreenLoader(
           isLoading: isLoading,
@@ -102,7 +103,10 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => const UserOrdersScreen()),
+                  );
                 },
               ),
               actions: <Widget>[Container()],
@@ -117,21 +121,36 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
               color: const Color.fromRGBO(235, 241, 224, 1),
               child: Column(
                 children: [
-                  const TabBar(
-                    labelColor: Colors.black,
-                    indicatorColor: Colors.green,
-                    tabs: [
-                      Tab(text: "Detalji narudžbe"),
-                      Tab(text: "Ponude"),
-                    ],
-                  ),
+                  widget.narudzba?.stateMachine == "created"
+                      ? const TabBar(
+                          labelColor: Colors.black,
+                          indicatorColor: Colors.green,
+                          tabs: [
+                            Tab(text: "Detalji narudžbe"),
+                            Tab(text: "Ponude"),
+                          ],
+                        )
+                      : const TabBar(
+                          labelColor: Colors.black,
+                          indicatorColor: Colors.green,
+                          tabs: [
+                            Tab(text: "Detalji narudžbe"),
+                          ],
+                        ),
                   Expanded(
-                    child: TabBarView(
-                      children: [
-                        _buildOrderDetailsTab(),
-                        _buildOffersTab(),
-                      ],
-                    ),
+                    // Ensure TabBarView has proper constraints
+                    child: widget.narudzba?.stateMachine == "created"
+                        ? TabBarView(
+                            children: [
+                              _buildOrderDetailsTab(),
+                              _buildOffersTab()
+                            ],
+                          )
+                        : TabBarView(
+                            children: [
+                              _buildOrderDetailsTab(),
+                            ],
+                          ),
                   ),
                 ],
               ),
@@ -143,72 +162,12 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
     );
   }
 
-  Widget _buildBanner() {
-    return Container(
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Stack(
-          children: [
-            const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(size: 45, color: Colors.white, Icons.shopping_basket),
-                SizedBox(width: 10),
-                Text(
-                  "Detalji narudžbe",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "arial",
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-            Align(
-              alignment: Alignment.centerRight,
-              child: widget.narudzba!.stateMachine != 'created'
-                  ? GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => PitanjaOdgovoriListScreen(
-                              narudzba: widget.narudzba,
-                            ),
-                          ),
-                        );
-                      },
-                      child: Container(
-                        width: 40,
-                        height: 40,
-                        decoration: const BoxDecoration(
-                          color: Colors.blue,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.question_answer,
-                          size: 20,
-                          color: Colors.white,
-                        ),
-                      ),
-                    )
-                  : Container(),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildOrderDetailsTab() {
     return Column(
       children: [
         _buildOrderDetails(),
         if (widget.narudzba?.stateMachine == 'created') _buildButtonsRow(),
-        Expanded(child: _buildSetsList()),
+        _buildSetsList()
       ],
     );
   }
@@ -308,6 +267,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                       String errorText = listaValidity.join("\n");
                       if (response == false) {
                         QuickAlert.show(
+                            // ignore: use_build_context_synchronously
                             context: context,
                             type: QuickAlertType.error,
                             title: "Vaša narudžba nije validna",
@@ -331,6 +291,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                         if ((secretValue?.isEmpty ?? true) ||
                             (clientValue?.isEmpty ?? true)) {
                           QuickAlert.show(
+                              // ignore: use_build_context_synchronously
                               context: context,
                               type: QuickAlertType.error,
                               title: "Greška",
@@ -340,7 +301,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
 
                         List<Map<String, dynamic>> transactions = [];
                         setoviResult?.result.forEach((set) {
-                          set.proizvodiSets.forEach((proizvodSet) {
+                          for (var proizvodSet in set.proizvodiSets) {
                             transactions.add({
                               "name": proizvodSet.proizvod?.naziv ?? "",
                               "quantity": proizvodSet.kolicina,
@@ -349,9 +310,10 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                                   .toStringAsFixed(2),
                               "currency": "EUR",
                             });
-                          });
+                          }
                         });
 
+                        // ignore: use_build_context_synchronously
                         Navigator.of(context)
                             .push(MaterialPageRoute(
                           builder: (context) => PaypalCheckoutView(
@@ -394,17 +356,14 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                                     action: "inprogress",
                                     id: widget.narudzba?.narudzbaId);
                               }
-                              print("onSuccess: $params");
 
+                              // ignore: use_build_context_synchronously
                               Navigator.of(context).pop(true);
                             },
                             onError: (error) {
-                              print("onError: $error");
                               Navigator.pop(context);
                             },
-                            onCancel: () {
-                              print('cancelled:');
-                            },
+                            onCancel: () {},
                           ),
                         ))
                             .then((result) async {
@@ -413,6 +372,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                                 .getById(widget.narudzba!.narudzbaId);
                             setState(() {});
                             QuickAlert.show(
+                                // ignore: use_build_context_synchronously
                                 context: context,
                                 type: QuickAlertType.success,
                                 title: "Plaćanje",
@@ -483,9 +443,9 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
+          const Text(
             "Detalji narudžbe",
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
               color: Colors.black,
@@ -561,13 +521,16 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                 subtitle: Text("Popust ${offer?.popust} %"),
                 trailing: ElevatedButton(
                   onPressed: () async {
-                    setState(() {
-                      isLoading = true;
-                    });
-                    var response = await _ponudeProvider.addOfferToOrder(
+                    await _ponudeProvider.addOfferToOrder(
                         ponudaId: offer?.ponudaId,
                         narudzbaId: widget.narudzba?.narudzbaId);
-                    fetchOffers();
+
+                    QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.success,
+                        title: "Uspješno dodano!",
+                        text: "Ponuda je dodana u narudzbu.",
+                        confirmBtnText: "U redu");
                     initForm();
                   },
                   child: const Text("Odaberi"),

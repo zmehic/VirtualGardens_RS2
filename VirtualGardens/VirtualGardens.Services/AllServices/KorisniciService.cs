@@ -21,11 +21,13 @@ namespace VirtualGardens.Services.AllServices
     {
         private readonly ILogger<KorisniciService> _logger;
         private readonly IPasswordService _passwordService;
+        _210011Context _context;
 
         public KorisniciService(_210011Context context, IMapper mapper, ILogger<KorisniciService> logger, IPasswordService passwordService) : base(context,mapper)
         {
             _logger = logger;
             this._passwordService = passwordService;
+            _context = context;
         }
 
         public override IQueryable<Korisnici> AddFilter(KorisniciSearchObject search, IQueryable<Korisnici> query)
@@ -77,6 +79,7 @@ namespace VirtualGardens.Services.AllServices
             entity.LozinkaSalt = _passwordService.GenerateSalt();
             entity.LozinkaHash = _passwordService.GenerateHash(entity.LozinkaSalt, request.Lozinka);
             entity.DatumRegistracije = DateTime.Now;
+
         }
 
         public override void AfterInsert(KorisniciInsertRequest request, Korisnici entity)
@@ -92,6 +95,19 @@ namespace VirtualGardens.Services.AllServices
                     });
                 }
                 Context.SaveChanges();
+            }
+            else if(request.Uloge==null)
+            {
+                var uloga = _context.Uloges.Where(x => x.Naziv == "Kupac").FirstOrDefault();
+                if(uloga!=null)
+                {
+                    _context.KorisniciUloges.Add(new Database.KorisniciUloge
+                    {
+                        KorisnikId = entity.KorisnikId,
+                        UlogaId = uloga.UlogaId
+                    });
+                }
+
             }
 
         }

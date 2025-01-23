@@ -442,3 +442,5 @@ app.*.map.json
 /android/app/release
 
 *.env
+
+set-model.zip

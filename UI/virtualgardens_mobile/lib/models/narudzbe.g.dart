@@ -20,9 +20,6 @@ Narudzba _$NarudzbaFromJson(Map<String, dynamic> json) => Narudzba(
       korisnik: json['korisnik'] == null
           ? null
           : Korisnik.fromJson(json['korisnik'] as Map<String, dynamic>),
-      nalog: json['nalog'] == null
-          ? null
-          : Nalog.fromJson(json['nalog'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$NarudzbaToJson(Narudzba instance) => <String, dynamic>{
@@ -37,5 +34,4 @@ Map<String, dynamic> _$NarudzbaToJson(Narudzba instance) => <String, dynamic>{
       'korisnikId': instance.korisnikId,
       'nalogId': instance.nalogId,
       'korisnik': instance.korisnik,
-      'nalog': instance.nalog,
     };

@@ -1,20 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/narudzbe.dart';
 import 'package:virtualgardens_mobile/models/proizvod.dart';
-import 'package:virtualgardens_mobile/models/proizvodi_setovi.dart';
 import 'package:virtualgardens_mobile/models/search_result.dart';
 import 'package:virtualgardens_mobile/models/vrsta_proizvoda.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
-import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_mobile/providers/product_provider.dart';
 import 'package:virtualgardens_mobile/providers/setovi_provider.dart';
-import 'package:virtualgardens_mobile/providers/utils.dart';
 import 'package:virtualgardens_mobile/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_mobile/screens/narudzbe_details_screen.dart';
 
@@ -52,6 +50,8 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
   late VrsteProizvodaProvider _vrsteProizvodaProvider;
   late SetoviProvider _setoviProvider;
 
+  Map<String, dynamic> _initialValue = {};
+
   SearchResult<Proizvod>? result;
   SearchResult<VrstaProizvoda>? vrsteProizvodaResult;
 
@@ -66,6 +66,9 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
   TextEditingController quantityController =
       TextEditingController(); // Controller for the quantity field
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+  final GlobalKey<FormBuilderState> _addProductFormKey =
+      GlobalKey<FormBuilderState>();
+  final ScrollController _scrollControllerAddProduct = ScrollController();
 
   @override
   void initState() {
@@ -73,7 +76,14 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
     _vrsteProizvodaProvider = context.read<VrsteProizvodaProvider>();
     _setoviProvider = context.read<SetoviProvider>();
     super.initState();
+    initForm();
     setupPage();
+  }
+
+  Future initForm() async {
+    _initialValue = {
+      'kolicina': "0",
+    };
   }
 
   Future setupPage() async {
@@ -98,8 +108,6 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
   }
 
   Future fetchProducts(int vrstaProizvodaId) async {
-    final currentUserId = AuthProvider.korisnikId;
-
     var filter = {
       'vrstaProizvodaId': vrstaProizvodaId,
       'isDeleted': false,
@@ -108,7 +116,7 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
 
     result = await _productProvider.get(filter: filter);
     if (result != null && result!.result.isNotEmpty) {
-      Proizvod? desiredElement = null;
+      Proizvod? desiredElement;
       for (int i = 0; i < result!.result.length; i++) {
         if (recommendedProducts!
             .any((e) => e.proizvodId == result!.result[i].proizvodId)) {
@@ -134,7 +142,6 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
             leading: IconButton(
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () {
-                Navigator.of(context).pop(); // Go back to the previous screen
                 Navigator.of(context).pop();
               },
             ),
@@ -249,10 +256,10 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
                                         element.proizvodId ==
                                         product.proizvodId) ==
                                     true
-                                ? Row(
+                                ? const Row(
                                     children: [
                                       Text("Preporučen proizvod"),
-                                      const SizedBox(width: 8),
+                                      SizedBox(width: 8),
                                       Icon(
                                         Icons.check,
                                         color: Colors.green,
@@ -275,138 +282,145 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
   }
 
   Widget _buildCreateOrderButton() {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: selectedProductIndex != null
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: SizedBox(
-                    width: 100,
-                    child: TextField(
-                      controller: quantityController,
-                      keyboardType: TextInputType.number,
-                      decoration: InputDecoration(
-                        labelText:
-                            "Kol - ${selectedProduct != null ? selectedProduct!.jedinicaMjere?.skracenica! : ""}",
-                        border: const OutlineInputBorder(),
+    return FormBuilder(
+      key: _addProductFormKey,
+      initialValue: _initialValue,
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: selectedProductIndex != null
+            ? Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(right: 20.0),
+                    child: SizedBox(
+                      width: 100,
+                      child: FormBuilderTextField(
+                        name: "kolicina",
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
+                        decoration: InputDecoration(
+                          labelText:
+                              "Kol - ${selectedProduct != null ? selectedProduct!.jedinicaMjere?.skracenica! : ""}",
+                          border: const OutlineInputBorder(),
+                        ),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.min(1,
+                              errorText:
+                                  "Morate odabrati količinu veću ili jednaku 1"),
+                          FormBuilderValidators.required(
+                              errorText: "Količina je obavezna!"),
+                          FormBuilderValidators.max(
+                              int.tryParse(selectedProduct?.dostupnaKolicina
+                                      ?.toString() ??
+                                  "0")!,
+                              errorText:
+                                  "Količina ne može biti veća od dostupne količine")
+                        ]),
                       ),
-                      onChanged: (value) {
-                        var vrijednost = int.tryParse(value.toString());
-                        if (vrijednost != null) {
-                          if (vrijednost > selectedProduct!.dostupnaKolicina!) {
-                            quantityController.text =
-                                selectedProduct!.dostupnaKolicina.toString();
-                          }
-                        }
-                      },
                     ),
                   ),
-                ),
-                brojac > 0
-                    ? ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 30),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () async {
-                          if (quantityController.text.isEmpty) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('Polje Količina mora biti popunjeno!'),
-                              ),
-                            );
-                            return;
-                          }
-                          setState(() {
-                            isLoading = true;
-                          });
-                          productList!.add(ProizvodiSetDTO(
-                              proizvodId: selectedProduct!.proizvodId,
-                              kolicina: int.tryParse(quantityController.text),
-                              setId: null));
-                          if (brojac == 2 && selectedProduct != null) {
-                            recommendedProducts = await _productProvider
-                                .recommend(selectedProduct!.proizvodId!);
-                          }
-                          selectedProduct = null;
-                          selectedProductIndex = null;
-                          quantityController.clear();
-                          brojac--;
-                          await fetchProducts(vrsteProizvodaResult!
-                              .result[brojac].vrstaProizvodaId!);
-
-                          setState(() {
-                            isLoading = false;
-                          });
-                        },
-                        child: const Text(
-                          "Dalje",
-                          style: TextStyle(color: Colors.white, fontSize: 18),
-                        ),
-                      )
-                    : ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 30),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        onPressed: () async {
-                          if (quantityController.text.isEmpty) {
-                            // Show an error if the field is empty
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content:
-                                    Text('Polje Količina mora biti popunjeno!'),
-                              ),
-                            );
-                            return;
-                          }
-                          setState(() {
-                            isLoading = true;
-                          });
-                          productList!.add(ProizvodiSetDTO(
-                              proizvodId: selectedProduct!.proizvodId,
-                              kolicina: int.tryParse(quantityController.text),
-                              setId: null));
-                          selectedProduct = null;
-                          selectedProductIndex = null;
-                          quantityController.clear();
-                          var request = {
-                            "cijena": 0,
-                            "popust": 0,
-                            "narudzbaId": widget.narudzba!.narudzbaId,
-                            "cijenaSaPopustom": null,
-                            "proizvodiSets":
-                                productList?.map((e) => e.toJson()).toList()
-                          };
-                          await _setoviProvider.insert(request);
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => NarudzbaUserDetailsScreen(
-                                narudzba: widget.narudzba,
-                              ),
+                  brojac > 0
+                      ? ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromRGBO(32, 76, 56, 1),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 30),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                          );
-                        },
-                        child: const Text(
-                          "Završi",
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                          onPressed: () async {
+                            if (_addProductFormKey.currentState
+                                    ?.saveAndValidate() ==
+                                true) {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              productList!.add(ProizvodiSetDTO(
+                                  proizvodId: selectedProduct!.proizvodId,
+                                  kolicina: int.tryParse(int.tryParse(
+                                          _addProductFormKey.currentState
+                                              ?.fields['kolicina']?.value)
+                                      .toString()),
+                                  setId: null));
+                              if (brojac == 2 && selectedProduct != null) {
+                                recommendedProducts = await _productProvider
+                                    .recommend(selectedProduct!.proizvodId!);
+                              }
+                              selectedProduct = null;
+                              selectedProductIndex = null;
+                              brojac--;
+                              await fetchProducts(vrsteProizvodaResult!
+                                  .result[brojac].vrstaProizvodaId!);
+
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          },
+                          child: const Text(
+                            "Dalje",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
+                        )
+                      : ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                const Color.fromRGBO(32, 76, 56, 1),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 30),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () async {
+                            if (_addProductFormKey.currentState
+                                    ?.saveAndValidate() ==
+                                true) {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              productList!.add(ProizvodiSetDTO(
+                                  proizvodId: selectedProduct!.proizvodId,
+                                  kolicina: int.tryParse(int.tryParse(
+                                          _addProductFormKey.currentState
+                                              ?.fields['kolicina']?.value)
+                                      .toString()),
+                                  setId: null));
+                              selectedProduct = null;
+                              selectedProductIndex = null;
+
+                              var request = {
+                                "cijena": 0,
+                                "popust": 0,
+                                "narudzbaId": widget.narudzba!.narudzbaId,
+                                "cijenaSaPopustom": null,
+                                "proizvodiSets":
+                                    productList?.map((e) => e.toJson()).toList()
+                              };
+                              await _setoviProvider.insert(request);
+                              Navigator.of(context).pushReplacement(
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      NarudzbaUserDetailsScreen(
+                                    narudzba: widget.narudzba,
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            "Završi",
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          ),
                         ),
-                      ),
-              ],
-            )
-          : Container(),
+                ],
+              )
+            : Container(),
+      ),
     );
   }
 }
