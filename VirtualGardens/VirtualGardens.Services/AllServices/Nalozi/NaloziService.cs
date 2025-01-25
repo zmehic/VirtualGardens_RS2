@@ -13,7 +13,7 @@ namespace VirtualGardens.Services.AllServices.Nalozi
 {
     public class NaloziService : BaseCRUDService<Models.DTOs.NaloziDTO, NaloziSearchObject, Database.Nalozi, NaloziInsertRequest, NaloziUpdateRequest>, INaloziService
     {
-        public NaloziService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public NaloziService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 

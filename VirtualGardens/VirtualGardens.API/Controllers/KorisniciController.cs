@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Mvc;
 using VirtualGardens.API.Controllers.BaseControllers;
 using VirtualGardens.Models.DTOs;
 using VirtualGardens.Models.HelperClasses;
-using VirtualGardens.Models.Requests;
+using VirtualGardens.Models.Requests.Korisnici;
 using VirtualGardens.Models.SearchObjects;
-using VirtualGardens.Services.AllServices;
+using VirtualGardens.Services.AllServices.Korisnici;
 
 namespace VirtualGardens.API.Controllers
 {
@@ -22,7 +22,7 @@ namespace VirtualGardens.API.Controllers
         [HttpPost("login")]
         public Models.DTOs.KorisniciDTO Login(string username, string password)
         {
-            return (_service as IKorisniciService).Login(username, password);
+            return (_service as IKorisniciService)!.Login(username, password);
         }
 
         [AllowAnonymous]

@@ -15,20 +15,19 @@ namespace VirtualGardens.Services.BaseServices
 {
     public abstract class BaseService<TModel, TSearch, TDbEntity> : IService<TModel, TSearch> where TSearch : BaseSearchObject where TDbEntity : class where TModel : class
     {
-        public _210011Context Context { get; set; }
-        public IMapper Mapper { get; set; }
+        public _210011Context context { get; set; }
+        public IMapper mapper { get; set; }
 
-        public BaseService(_210011Context context, IMapper mapper)
+        public BaseService(_210011Context _context, IMapper _mapper)
         {
-            Context = context;
-            Mapper = mapper;
+            context = _context;
+            mapper = _mapper;
         }
 
         public PagedResult<TModel> GetPaged(TSearch search)
         {
             List<TModel> result = new List<TModel>();
-
-            var query = Context.Set<TDbEntity>().AsQueryable();
+            var query = context.Set<TDbEntity>().AsQueryable();
 
             if(!string.IsNullOrEmpty(search?.IncludeTables) )
             {
@@ -50,8 +49,7 @@ namespace VirtualGardens.Services.BaseServices
             }
 
             var list = query.ToList();
-
-            result = Mapper.Map(list, result);
+            result = mapper.Map(list, result);
 
             PagedResult<TModel> pagedResult = new PagedResult<TModel>();
             pagedResult.ResultList = result;
@@ -62,11 +60,11 @@ namespace VirtualGardens.Services.BaseServices
 
         public TModel GetById(int id)
         {
-            var entity = Context.Set<TDbEntity>().Find(id);
+            var entity = context.Set<TDbEntity>().Find(id);
 
             if (entity != null)
             {
-                return Mapper.Map<TModel>(entity);
+                return mapper.Map<TModel>(entity);
             }
             else
                 return null;

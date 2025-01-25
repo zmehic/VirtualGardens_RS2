@@ -14,7 +14,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
     baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "http://10.0.2.2:5203/");
+        defaultValue: "http://localhost:5203/");
   }
 
 //https://10.0.2.2:7011/
@@ -125,7 +125,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     } else if (response.statusCode == 401) {
       throw new Exception("Unauthorized");
     } else {
-      final Map<String, dynamic> decodedResponse = jsonDecode(response.body);
+      var decodedResponse = jsonDecode(response.body);
 
       if (decodedResponse['errors'] != null &&
           decodedResponse['errors']['userError'] != null) {

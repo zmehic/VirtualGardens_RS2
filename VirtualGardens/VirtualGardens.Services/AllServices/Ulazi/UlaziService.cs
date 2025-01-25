@@ -14,7 +14,7 @@ namespace VirtualGardens.Services.AllServices.Ulazi
 {
     public class UlaziService : BaseCRUDService<Models.DTOs.UlaziDTO, UlaziSearchObject, Database.Ulazi, UlaziUpsertRequest, UlaziUpsertRequest>, IUlaziService
     {
-        public UlaziService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public UlaziService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 
@@ -22,25 +22,21 @@ namespace VirtualGardens.Services.AllServices.Ulazi
         {
             if (!string.IsNullOrEmpty(search.BrojUlazaGTE))
             {
-                // Filter by entry number where it starts with the provided string
                 query = query.Where(x => x.BrojUlaza.ToLower().StartsWith(search.BrojUlazaGTE.ToLower()));
             }
 
             if (search.DatumUlazaFrom.HasValue)
             {
-                // Filter by entry date starting from the provided date
                 query = query.Where(x => x.DatumUlaza >= search.DatumUlazaFrom.Value);
             }
 
             if (search.DatumUlazaTo.HasValue)
             {
-                // Filter by entry date up to the provided date
                 query = query.Where(x => x.DatumUlaza <= search.DatumUlazaTo.Value);
             }
 
             if (search.KorisnikId.HasValue)
             {
-                // Filter by user ID
                 query = query.Where(x => x.KorisnikId == search.KorisnikId.Value);
             }
 
@@ -54,19 +50,19 @@ namespace VirtualGardens.Services.AllServices.Ulazi
 
         public override void AfterDelete(int id, Database.Ulazi entity)
         {
-            var ulaziProizvodi = Context.Set<VirtualGardens.Services.Database.UlaziProizvodi>().Where(x => x.UlazId == id && x.IsDeleted==false).ToList();
+            var ulaziProizvodi = context.Set<VirtualGardens.Services.Database.UlaziProizvodi>().Where(x => x.UlazId == id && x.IsDeleted==false).ToList();
 
             foreach (var item in ulaziProizvodi)
             {
-                var proizvod = Context.Set<Proizvodi>().Find(item.ProizvodId);
+                var proizvod = context.Set<Database.Proizvodi>().Find(item.ProizvodId);
                 if(proizvod!=null)
                 {
                     proizvod.DostupnaKolicina -= item.Kolicina;
-                    Context.Update<Proizvodi>(proizvod);
+                    context.Update<Database.Proizvodi>(proizvod);
                 }
 
             }
-            Context.SaveChanges();
+            context.SaveChanges();
         }
     }
 }

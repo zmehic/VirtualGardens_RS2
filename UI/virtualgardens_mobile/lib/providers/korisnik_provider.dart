@@ -22,10 +22,8 @@ class KorisnikProvider extends BaseProvider<Korisnik> {
     }
 
     var uri = Uri.parse(url);
-    var headers = createHeaders();
 
-    var response = await http.post(uri, headers: headers);
-
+    var response = await http.post(uri);
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
 
@@ -37,12 +35,12 @@ class KorisnikProvider extends BaseProvider<Korisnik> {
         if (item.uloga.naziv == "Kupac") {
           break;
         } else {
-          throw Exception("Not authorized");
+          throw Exception(
+              "Ne možete pristupiti administratorskom interfejsu putem mobilne aplikacije");
         }
       }
-    } else {
-      throw Exception("Unknown error");
     }
+
     // print("response: ${response.request} ${response.statusCode}, ${response.body}");
   }
 }

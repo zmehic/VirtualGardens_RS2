@@ -11,8 +11,8 @@ namespace VirtualGardens.Services.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.InsertData(
-            table: "JediniceMjere", // Table name
-            columns: new[] { "JedinicaMjereID", "Naziv","Skracenica", "Opis" }, // Column names
+            table: "JediniceMjere", 
+            columns: new[] { "JedinicaMjereID", "Naziv","Skracenica", "Opis" }, 
             values: new object[,]
             {
                 { 1, "Kilogram","kg", null },
@@ -61,9 +61,9 @@ namespace VirtualGardens.Services.Migrations
             columns: new[] { "KorisniciUlogeID", "KorisnikID", "UlogaID" },
             values: new object[,]
             {
-                { 1, 2, 1 }, // User with ID 2 as Admin
-                { 2, 2, 2 }, // User with ID 2 as Kupac
-                { 3, 3, 2 }  // User with ID 3 as Kupac (third user)
+                { 1, 1, 1 }, 
+                { 2, 2, 2 }, 
+                { 3, 3, 2 }  
             });
 
             migrationBuilder.InsertData(
@@ -71,9 +71,9 @@ namespace VirtualGardens.Services.Migrations
             columns: new[] { "VrstaProizvodaID", "Naziv" },
             values: new object[,]
             {
-                { 1, "Tlo" },       // Fruit
-                { 2, "Prihrana" },     // Vegetable
-                { 3, "Sjeme" }        // Meat
+                { 1, "Tlo" },      
+                { 2, "Prihrana" }, 
+                { 3, "Sjeme" }     
             });
 
             migrationBuilder.InsertData(
@@ -81,38 +81,36 @@ namespace VirtualGardens.Services.Migrations
             columns: new[] { "ProizvodID", "Naziv", "Opis", "Cijena", "DostupnaKolicina", "JedinicaMjereID", "VrstaProizvodaID" },
             values: new object[,]
             {
-                // Soil Products
-                { 1, "Kvalitetna Zemlja", "Svježa kvalitetna zemlja za biljke", 2.50f, 100, 1, 1 }, // Soil
-                { 2, "Tlo za Cvijeće", "Idealno tlo za cvjetne biljke", 3.00f, 75, 1, 1 }, // Soil
-                { 3, "Zemlja za Raste", "Posebno mješavina tla za rastuće biljke", 2.75f, 50, 1, 1 }, // Soil
-                { 4, "Zemlja za cvijeće 2", "Svježa kvalitetna zemlja za cvijeće", 2.50f, 100, 1, 1 }, // Soil
-                { 5, "Tlo za Paradajz", "Idealno tlo za paradajz", 3.00f, 75, 1, 1 }, // Soil
-                { 6, "Zemlja za Kukuruz", "Posebno mješavina tla za kukuruz", 2.75f, 50, 1, 1 },
-                { 7, "Kvalitetna Zemlja za Paprike", "Svježa kvalitetna zemlja za paprike", 2.50f, 100, 1, 1 }, // Soil
-                { 8, "Tlo za Cvijeće 2", "Idealno tlo za cvjetne biljke", 3.00f, 75, 1, 1 }, // Soil
-                { 9, "Zemlja za Raste 2", "Posebno mješavina tla za rastuće biljke", 2.75f, 50, 1, 1 }, 
-                
-                // Fertilizer Products
-                { 10, "Organski Đubrivo", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 60, 2, 2 }, // Fertilizer
-                { 11, "Mineralno Đubrivo", "Đubrivo bogato mineralima", 6.00f, 40, 2, 2 }, // Fertilizer
-                { 12, "NPK Đubrivo", "NPK đubrivo za optimalan rast biljaka", 4.50f, 80, 2, 2 }, // Fertilizer
-                { 13, "Organski Đubrivo 2", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 60, 2, 2 }, // Fertilizer
-                { 14, "Mineralno Đubrivo 2", "Đubrivo bogato mineralima", 6.00f, 40, 2, 2 }, // Fertilizer
-                { 15, "NPK Đubrivo 2", "NPK đubrivo za optimalan rast biljaka", 4.50f, 80, 2, 2 }, // Fertilizer
-                { 16, "Organski Đubrivo 3", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 60, 2, 2 }, // Fertilizer
-                { 17, "Mineralno Đubrivo 3", "Đubrivo bogato mineralima", 6.00f, 40, 2, 2 }, // Fertilizer
-                { 18, "NPK Đubrivo 3", "NPK đubrivo za optimalan rast biljaka", 4.50f, 80, 2, 2 }, // Fertilizer
 
-                // Seed Products
-                { 19, "Sjemenke Rajčice", "Sjemenke za uzgoj rajčice", 1.50f, 200, 1, 3 }, // Seeds
-                { 20, "Sjemenke Paprike", "Sjemenke za uzgoj paprike", 1.80f, 180, 1, 3 }, // Seeds
-                { 21, "Sjemenke Krastavca", "Sjemenke za uzgoj krastavca", 1.60f, 150, 1, 3 } , // Seeds
-                { 22, "Sjemenke Kukuruza", "Sjemenke za uzgoj rajčice", 1.50f, 200, 1, 3 }, // Seeds
-                { 23, "Sjemenke Mahune", "Sjemenke za uzgoj paprike", 1.80f, 180, 1, 3 }, // Seeds
-                { 24, "Sjemenke Graška", "Sjemenke za uzgoj krastavca", 1.60f, 150, 1, 3 } , // Seeds
-                { 25, "Sjemenke Mrkve", "Sjemenke za uzgoj rajčice", 1.50f, 200, 1, 3 }, // Seeds
-                { 26, "Sjemenke Špinata", "Sjemenke za uzgoj paprike", 1.80f, 180, 1, 3 }, // Seeds
-                { 27, "Sjemenke Blitve", "Sjemenke za uzgoj krastavca", 1.60f, 150, 1, 3 }  // Seeds
+                { 1, "Kvalitetna Zemlja", "Svježa kvalitetna zemlja za biljke", 2.50f, 1000, 1, 1 },
+                { 2, "Tlo za Cvijeće", "Idealno tlo za cvjetne biljke", 3.00f, 750, 1, 1 },
+                { 3, "Zemlja za Raste", "Posebno mješavina tla za rastuće biljke", 2.75f, 500, 1, 1 }, 
+                { 4, "Zemlja za cvijeće 2", "Svježa kvalitetna zemlja za cvijeće", 2.50f, 1000, 1, 1 },
+                { 5, "Tlo za Paradajz", "Idealno tlo za paradajz", 3.00f, 750, 1, 1 }, 
+                { 6, "Zemlja za Kukuruz", "Posebno mješavina tla za kukuruz", 2.75f, 500, 1, 1 },
+                { 7, "Kvalitetna Zemlja za Paprike", "Svježa kvalitetna zemlja za paprike", 2.50f, 1000, 1, 1 },
+                { 8, "Tlo za Cvijeće 2", "Idealno tlo za cvjetne biljke", 3.00f, 750, 1, 1 }, 
+                { 9, "Zemlja za Raste 2", "Posebno mješavina tla za rastuće biljke", 2.75f, 500, 1, 1 }, 
+                
+                { 10, "Organski Đubrivo", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 600, 2, 2 },  
+                { 11, "Mineralno Đubrivo", "Đubrivo bogato mineralima", 6.00f, 400, 2, 2 }, 
+                { 12, "NPK Đubrivo", "NPK đubrivo za optimalan rast biljaka", 4.50f, 800, 2, 2 },
+                { 13, "Organski Đubrivo 2", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 600, 2, 2 }, 
+                { 14, "Mineralno Đubrivo 2", "Đubrivo bogato mineralima", 6.00f, 400, 2, 2 }, 
+                { 15, "NPK Đubrivo 2", "NPK đubrivo za optimalan rast biljaka", 4.50f, 800, 2, 2 }, 
+                { 16, "Organski Đubrivo 3", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 600, 2, 2 }, 
+                { 17, "Mineralno Đubrivo 3", "Đubrivo bogato mineralima", 6.00f, 400, 2, 2 }, 
+                { 18, "NPK Đubrivo 3", "NPK đubrivo za optimalan rast biljaka", 4.50f, 800, 2, 2 }, 
+
+                { 19, "Sjemenke Rajčice", "Sjemenke za uzgoj rajčice", 1.50f, 2000, 1, 3 }, 
+                { 20, "Sjemenke Paprike", "Sjemenke za uzgoj paprike", 1.80f, 1800, 1, 3 }, 
+                { 21, "Sjemenke Krastavca", "Sjemenke za uzgoj krastavca", 1.60f, 1500, 1, 3 } , 
+                { 22, "Sjemenke Kukuruza", "Sjemenke za uzgoj rajčice", 1.50f, 2000, 1, 3 }, 
+                { 23, "Sjemenke Mahune", "Sjemenke za uzgoj paprike", 1.80f, 1800, 1, 3 }, 
+                { 24, "Sjemenke Graška", "Sjemenke za uzgoj krastavca", 1.60f, 1500, 1, 3 } ,
+                { 25, "Sjemenke Mrkve", "Sjemenke za uzgoj rajčice", 1.50f, 2000, 1, 3 },
+                { 26, "Sjemenke Špinata", "Sjemenke za uzgoj paprike", 1.80f, 1800, 1, 3 },
+                { 27, "Sjemenke Blitve", "Sjemenke za uzgoj krastavca", 1.60f, 1500, 1, 3 }  
             });
 
             migrationBuilder.InsertData(
@@ -130,9 +128,9 @@ namespace VirtualGardens.Services.Migrations
                 columns: new[] { "UlazID", "BrojUlaza", "DatumUlaza", "KorisnikID" },
                 values: new object[,]
                 {
-                    { 1, "Batch-1", DateTime.Now, 1 }, // Admin User with KorisnikId 1
-                    { 2, "Batch-2", DateTime.Now.AddDays(-1), 1 }, // Admin User with KorisnikId 1
-                    { 3, "Batch-3", DateTime.Now.AddDays(-2), 1 }  // Admin User with KorisnikId 1
+                    { 1, "Batch-1", DateTime.Now, 1 }, 
+                    { 2, "Batch-2", DateTime.Now.AddDays(-1), 1 }, 
+                    { 3, "Batch-3", DateTime.Now.AddDays(-2), 1 }  
                 });
 
             migrationBuilder.InsertData(
@@ -140,33 +138,33 @@ namespace VirtualGardens.Services.Migrations
                columns: new[] { "UlaziProizvodiID", "UlazID", "ProizvodID", "Kolicina" },
                values: new object[,]
                {
-                    { 1, 1, 1, 100 }, // ProizvodId 1 (Soil)
-                    { 2, 1, 2, 75 },  // ProizvodId 2 (Fertilizer)
-                    { 3, 1, 3, 50 },  // ProizvodId 3 (Seeds)
-                    { 4, 1, 4, 100 }, // ProizvodId 4 (Soil)
-                    { 5, 1, 5, 75 }, // ProizvodId 5 (Fertilizer)
-                    { 6, 1, 6, 50 }, // ProizvodId 6 (Seeds)
-                    { 7, 1, 7, 100 },  // ProizvodId 7 (Soil)
-                    { 8, 1, 8, 75 }, // ProizvodId 8 (Fertilizer)
-                    { 9, 1, 9, 50 },  // ProizvodId 9 (Seeds)
-                    { 10, 2, 10, 60 }, // ProizvodId 1 (Soil)
-                    { 11, 2, 11, 40 },  // ProizvodId 2 (Fertilizer)
-                    { 12, 2, 12, 80 },  // ProizvodId 3 (Seeds)
-                    { 13, 2, 13, 60 }, // ProizvodId 4 (Soil)
-                    { 14, 2, 14, 40 }, // ProizvodId 5 (Fertilizer)
-                    { 15, 2, 15, 80 }, // ProizvodId 6 (Seeds)
-                    { 16, 2, 16, 60 },  // ProizvodId 7 (Soil)
-                    { 17, 2, 17, 40 }, // ProizvodId 8 (Fertilizer)
-                    { 18, 2, 18, 80 },  // ProizvodId 9 (Seeds)
-                    { 19, 3, 19, 200 }, // ProizvodId 1 (Soil)
-                    { 20, 3, 20, 180 },  // ProizvodId 2 (Fertilizer)
-                    { 21, 3, 21, 150 },  // ProizvodId 3 (Seeds)
-                    { 22, 3, 22, 200 }, // ProizvodId 4 (Soil)
-                    { 23, 3, 23, 180 }, // ProizvodId 5 (Fertilizer)
-                    { 24, 3, 24, 150 }, // ProizvodId 6 (Seeds)
-                    { 25, 3, 25, 200 },  // ProizvodId 7 (Soil)
-                    { 26, 3, 26, 180 }, // ProizvodId 8 (Fertilizer)
-                    { 27, 3, 27, 150 },  // ProizvodId 9 (Seeds)
+                    { 1, 1, 1, 1000 }, 
+                    { 2, 1, 2, 750 },  
+                    { 3, 1, 3, 500 },  
+                    { 4, 1, 4, 1000 },
+                    { 5, 1, 5, 750 }, 
+                    { 6, 1, 6, 500 }, 
+                    { 7, 1, 7, 1000 },  
+                    { 8, 1, 8, 750 }, 
+                    { 9, 1, 9, 500 },  
+                    { 10, 2, 10, 600 }, 
+                    { 11, 2, 11, 400 }, 
+                    { 12, 2, 12, 800 }, 
+                    { 13, 2, 13, 600 }, 
+                    { 14, 2, 14, 400 }, 
+                    { 15, 2, 15, 800 }, 
+                    { 16, 2, 16, 600},  
+                    { 17, 2, 17, 400 }, 
+                    { 18, 2, 18, 800 }, 
+                    { 19, 3, 19, 2000 },
+                    { 20, 3, 20, 1800 },
+                    { 21, 3, 21, 1500 },
+                    { 22, 3, 22, 2000 },
+                    { 23, 3, 23, 1800 },
+                    { 24, 3, 24, 1500 },
+                    { 25, 3, 25, 2000 },
+                    { 26, 3, 26, 1800 },
+                    { 27, 3, 27, 1500 },
                });
 
             migrationBuilder.InsertData(
@@ -174,96 +172,217 @@ namespace VirtualGardens.Services.Migrations
             columns: new[] { "NalogID", "BrojNaloga", "DatumKreiranja", "ZaposlenikID", "Zavrsen" },
             values: new object[,]
             {
-                { 1, "NAL-1", DateTime.Now, 1, false }, // Assuming ZaposlenikId 1 exists
-                { 2, "NAL-2", DateTime.Now, 2, false }, // Assuming ZaposlenikId 2 exists
-                { 3, "NAL-3", DateTime.Now, 3, false }  // Assuming ZaposlenikId 3 exists
+                { 1, "NAL-1", DateTime.Now, 1, false },
+                { 2, "NAL-2", DateTime.Now, 2, false },
+                { 3, "NAL-3", DateTime.Now, 3, false } 
             });
 
-            //migrationBuilder.InsertData(
-            //table: "Narudzbe",
-            //columns: new[] { "NarudzbaID", "BrojNarudzbe", "Otkazana", "Datum", "Placeno", "StateMachine", "Status", "UkupnaCijena", "KorisnikID", "NalogID" },
-            //values: new object[,]
-            //{
-            //    { 1, "NAR-001", false, DateTime.Now, false, "created", null, 150, 1, 1 }, // Assuming KorisnikId 1 and NalogId 1 exist
-            //    { 2, "NAR-002", false, DateTime.Now, false, "created", null, 300, 2, 2 }, // Assuming KorisnikId 2 and NalogId 2 exist
-            //    { 3, "NAR-003", false, DateTime.Now, true, "finished", null, 200, 3, 1 },  // Assuming KorisnikId 3 exists, no NalogId
-            //    { 4, "NAR-004", false, DateTime.Now, true, "finished", null, 400, 1, null }, // Assuming KorisnikId 1 and NalogId 1 exist
-            //    { 5, "NAR-005", false, DateTime.Now, false, "created", null, 250, 2, 1 } // Assuming KorisnikId 2 exists, no NalogId
-            //});
+            migrationBuilder.InsertData(
+            table: "Narudzbe",
+            columns: new[] { "NarudzbaID", "BrojNarudzbe", "Otkazana", "Datum", "Placeno", "StateMachine", "Status", "UkupnaCijena", "KorisnikID", "NalogID" },
+            values: new object[,]
+            {
+                { 1, "NAR-1", false, DateTime.Now, true, "finished", null, 1669.6, 3, 2 },
+                { 2, "NAR-2", false, DateTime.Now, true, "inprogress", null, 725.6, 3, 1 },
+                { 3, "NAR-3", false, DateTime.Now, true, "inprogress", null, 576.15, 3, 1 },
+                { 4, "NAR-4", false, DateTime.Now, false, "created", null, 0, 3, null}
+                });
 
-            //migrationBuilder.InsertData(
-            //table: "PitanjaOdgovori",
-            //columns: new[] { "PitanjeID", "Tekst", "Datum", "KorisnikID", "NarudzbaID" },
-            //values: new object[,]
-            //{
-            //    { 1, "When will my order be delivered?", DateTime.Now, 1, 1 }, // Assuming KorisnikId 1 and NarudzbaId 1 exist
-            //    { 2, "Is there a way to track my order?", DateTime.Now, 2, 2 }, // Assuming KorisnikId 2 and NarudzbaId 2 exist
-            //    { 3, "Can I change my delivery address?", DateTime.Now, 3, 3 }, // Assuming KorisnikId 3 and NarudzbaId 3 exist
-            //    { 4, "What is your return policy?", DateTime.Now, 1, 4 }, // Assuming KorisnikId 1 and NarudzbaId 4 exist
-            //    { 5, "Do you offer discounts for bulk purchases?", DateTime.Now, 2, 5 } // Assuming KorisnikId 2 and NarudzbaId 5 exist
-            //});
+            migrationBuilder.InsertData(
+            table: "PitanjaOdgovori",
+            columns: new[] { "PitanjeID", "Tekst", "Datum", "KorisnikID", "NarudzbaID" },
+            values: new object[,]
+            {
+                { 1, "When will my order be delivered?", DateTime.Now, 2, 1 },
+                { 2, "Is there a way to track my order?", DateTime.Now, 2, 2 },
+                { 3, "Can I change my delivery address?", DateTime.Now, 3, 3 },
+                { 4, "What is your return policy?", DateTime.Now, 3, 1 },
+                { 5, "Do you offer discounts for bulk purchases?", DateTime.Now, 2, 2 }
+            });
 
             migrationBuilder.InsertData(
             table: "Ponude",
             columns: new[] { "PonudaID", "Naziv", "Popust", "StateMachine", "DatumKreiranja" },
             values: new object[,]
             {
-                { 1, "Spring Sale", 15, "created", DateTime.Now },
+                { 1, "Proljetna ponuda", 20, "created", DateTime.Now },
+                 { 2, "Proljetna ponuda 2", 30, "active", DateTime.Now },
+                  { 3, "Proljetna ponuda 3", 10, "finished", DateTime.Now },
             });
 
-            //migrationBuilder.InsertData(
-            //table: "Setovi",
-            //columns: new[] { "SetID", "Cijena", "Popust", "NarudzbaID", "CijenaSaPopustom" },
-            //values: new object[,]
-            //{
-            //    { 1, 100, 10, null, 90 },
-            //    { 2, 150, 15, null, 135 },
-            //    { 3, 200, 20, null, 180 },
-            //    { 4, 250, null, null, 250 },
-            //    { 5, 300, 25, null, 275 }
-            //});
+            migrationBuilder.InsertData(
+             table: "Setovi",
+             columns: new[] { "SetID", "Cijena", "Popust", "NarudzbaID", "CijenaSaPopustom" },
+             values: new object[,]
+             {
+                { 1, 90, 20, null, 72 },
+                { 2, 88.5, 30, null, 61.9 },
+                { 3, 100, 10, null, 90 },
+                { 4, 95, 0, 1, 95 },
+                { 5, 207, 0, 1, 207 },
+                { 6, 103.5, 0, 1, 103.5 },
+                { 7, 206, 0, 1, 206 },
+                { 8, 222, 0, 1, 222 },
+                { 9, 118.6, 0, 1, 118.6 },
+                { 10, 111.1, 0, 1, 111.1 },
+                { 11, 182, 0, 1, 182 },
+                { 12, 300.6, 0, 1, 300.6 },
+                { 13, 88.5, 30, 1, 61.9 },
+                { 14, 88.5, 30, 1, 61.9 },
+                { 15, 57, 0, 2, 57 },
+                { 16, 39.8, 0, 2, 39.8 },
+                { 17, 141.1, 0, 2, 141.1 },
+                { 18, 146.5, 0, 2, 146.5 },
+                { 19, 38, 0, 2, 38 },
+                { 20, 27.4, 0, 2, 27.4 },
+                { 21, 49.5, 0, 2, 49.5 },
+                { 22, 47.8, 0, 2, 47.8 },
+                { 23, 116.6, 0, 2, 116.6 },
+                { 24, 88.5, 30, 2, 61.9 },
+                { 25, 35.5, 0, 3, 35.5 },
+                { 26, 130.1, 0, 3, 130.1 },
+                { 27, 9.35, 0, 3, 9.35 },
+                { 28, 19, 0, 3, 19 },
+                { 29, 191.95, 0, 3, 191.95 },
+                { 30, 48.7, 0, 3, 48.7 },
+                { 31, 26, 0, 3, 26 },
+                { 32, 93.95, 0, 3, 93.95 },
+                { 33, 21.6, 0, 3, 21.6 },
+             });
 
-            //migrationBuilder.InsertData(
-            //table: "Proizvodi_Set",
-            //columns: new[] { "ProizvodSetID", "ProizvodID", "SetID", "Kolicina" },
-            //values: new object[,]
-            //{
-            //    { 1, 1, 1, 10 }, // 10 units of product 1 in set 1
-            //    { 2, 2, 1, 5 },  // 5 units of product 2 in set 1
-            //    { 3, 3, 2, 8 },  // 8 units of product 3 in set 2
-            //    { 4, 4, 2, 3 },  // 3 units of product 4 in set 2
-            //    { 5, 5, 3, 7 },  // 7 units of product 5 in set 3
-            //    { 6, 1, 3, 4 },  // 4 units of product 1 in set 3
-            //    { 7, 2, 3, 6 }   // 6 units of product 2 in set 3
-            //});
+
+            migrationBuilder.InsertData(
+                table: "Proizvodi_Set",
+                columns: new[] { "ProizvodSetID", "ProizvodID", "SetID", "Kolicina" },
+                values: new object[,]
+                {
+                    { 1, 1, 1, 10 },
+                    { 2, 19, 1, 10 },
+                    { 3, 10, 1, 10 },
+                    { 4, 3, 2, 10 },
+                    { 5, 21, 2, 10 },
+                    { 6, 12, 2, 10 },
+                    { 7, 4, 3, 10 },
+                    { 8, 22, 3, 10 },
+                    { 9, 14, 3, 10 },
+                    { 10, 19, 4, 10 },
+                    { 11, 10, 4, 10 },
+                    { 12, 2, 4, 10 },
+                    { 13, 21, 5, 20 },
+                    { 14, 11, 5, 20 },
+                    { 15, 3, 5, 20 },
+                    { 16, 23, 6, 10 },
+                    { 17, 18, 6, 11 },
+                    { 18, 2, 6, 12 },
+                    { 19, 20, 7, 20 },
+                    { 20, 17, 7, 20 },
+                    { 21, 7, 7, 20 },
+                    { 22, 22, 8, 10 },
+                    { 23, 10, 8, 15 },
+                    { 24, 5, 8, 44 },
+                    { 25, 23, 9, 12 },
+                    { 26, 15, 9, 13 },
+                    { 27, 9, 9, 14 },
+                    { 28, 24, 10, 11 },
+                    { 29, 11, 10, 11 },
+                    { 30, 4, 10, 11 },
+                    { 31, 25, 11, 54 },
+                    { 32, 10, 11, 13 },
+                    { 33, 2, 11, 12 },
+                    { 34, 27, 12, 11 },
+                    { 35, 13, 12, 44 },
+                    { 36, 2, 12, 21 },
+                    { 37, 3, 13, 10 },
+                    { 38, 21, 13, 10 },
+                    { 39, 12, 13, 10 },
+                    { 40, 3, 14, 10 },
+                    { 41, 21, 14, 10 },
+                    { 42, 12, 14, 10 },
+                    { 43, 19, 15, 5 },
+                    { 44, 14, 15, 7 },
+                    { 45, 1, 15, 3 },
+                    { 46, 20, 16, 11 },
+                    { 47, 12, 16, 2 },
+                    { 48, 9, 16, 4 },
+                    { 49, 21, 17, 11 },
+                    { 50, 18, 17, 3 },
+                    { 51, 1, 17, 44 },
+                    { 52, 22, 18, 1 },
+                    { 53, 14, 18, 4 },
+                    { 54, 9, 18, 44 },
+                    { 55, 23, 19, 5 },
+                    { 56, 10, 19, 4 },
+                    { 57, 5, 19, 3 },
+                    { 58, 24, 20, 4 },
+                    { 59, 14, 20, 3 },
+                    { 60, 2, 20, 1 },
+                    { 61, 25, 21, 22 },
+                    { 62, 18, 21, 2 },
+                    { 63, 1, 21, 3 },
+                    { 64, 26, 22, 11 },
+                    { 65, 14, 22, 3 },
+                    { 66, 1, 22, 4 },
+                    { 67, 27, 23, 11 },
+                    { 68, 17, 23, 11 },
+                    { 69, 5, 23, 11 },
+                    { 70, 3, 24, 10 },
+                    { 71, 21, 24, 10 },
+                    { 72, 12, 24, 10 },
+                    { 73, 19, 25, 11 },
+                    { 74, 10, 25, 2 },
+                    { 75, 2, 25, 3 },
+                    { 76, 20, 26, 2 },
+                    { 77, 12, 26, 22 },
+                    { 78, 4, 26, 11 },
+                    { 79, 21, 27, 1 },
+                    { 80, 16, 27, 1 },
+                    { 81, 9, 27, 1 },
+                    { 82, 22, 28, 4 },
+                    { 83, 13, 28, 2 },
+                    { 84, 2, 28, 1 },
+                    { 85, 23, 29, 44 },
+                    { 86, 13, 29, 22 },
+                    { 87, 9, 29, 1 },
+                    { 88, 24, 30, 22 },
+                    { 89, 17, 30, 1 },
+                    { 90, 1, 30, 3 },
+                    { 91, 25, 31, 11 },
+                    { 92, 15, 31, 1 },
+                    { 93, 1, 31, 2 },
+                    { 94, 26, 32, 44 },
+                    { 95, 14, 32, 2 },
+                    { 96, 9, 32, 1 },
+                    { 97, 27, 33, 1 },
+                    { 98, 16, 33, 2 },
+                    { 99, 1, 33, 4 },
+                            });
+
 
             migrationBuilder.InsertData(
             table: "Recenzije",
             columns: new[] { "RecenzijaID", "Ocjena", "Komentar", "KorisnikID", "Datum", "ProizvodID" },
             values: new object[,]
             {
-                { 1, 5, "Excellent product! Highly recommend.", 2, DateTime.Now, 1 }, // Review for product 1 by user 1
-                { 2, 4, "Very good quality, but a bit pricey.", 2, DateTime.Now, 2 },  // Review for product 2 by user 2
-                { 3, 3, "Average product, nothing special.", 3, DateTime.Now, 2 },   // Review for product 3 by user 3
-                { 4, 2, "Not satisfied with the quality.", 2, DateTime.Now, 4 },      // Review for product 4 by user 1
-                { 5, 5, "Best purchase I've made this year!", 2, DateTime.Now, 5 },  // Review for product 5 by user 2
-                { 6, 1, "Terrible experience, will not buy again.", 3, DateTime.Now, 6 }, // Review for product 1 by user 3
-                { 7, 4, "Good value for the price.", 2, DateTime.Now, 8 },           // Review for product 2 by user 1
-                { 8, 3, "Okay product, works as expected.", 2, DateTime.Now, 8 }     // Review for product 3 by user 2
+                { 1, 5, "Excellent product! Highly recommend.", 2, DateTime.Now, 1 }, 
+                { 2, 4, "Very good quality, but a bit pricey.", 2, DateTime.Now, 2 }, 
+                { 3, 3, "Average product, nothing special.", 3, DateTime.Now, 2 },   
+                { 4, 2, "Not satisfied with the quality.", 2, DateTime.Now, 4 },      
+                { 5, 5, "Best purchase I've made this year!", 2, DateTime.Now, 5 }, 
+                { 6, 1, "Terrible experience, will not buy again.", 3, DateTime.Now, 6 },
+                { 7, 4, "Good value for the price.", 2, DateTime.Now, 8 },           
+                { 8, 3, "Okay product, works as expected.", 2, DateTime.Now, 8 }     
             });
 
-            //migrationBuilder.InsertData(
-            //table: "Setovi_Ponude",
-            //columns: new[] { "SetoviPonudeID", "SetID", "PonudaID" },
-            //values: new object[,]
-            //{
-            //    { 1, 1, 1 }, // Set 1 associated with Offer 1
-            //    { 2, 1, 2 }, // Set 1 associated with Offer 2
-            //    { 3, 2, 1 }, // Set 2 associated with Offer 1
-            //    { 4, 3, 3 }, // Set 3 associated with Offer 3
-            //    { 5, 2, 2 }, // Set 2 associated with Offer 2
-            //    { 6, 3, 1 }  // Set 3 associated with Offer 1
-            //});
+            migrationBuilder.InsertData(
+            table: "Setovi_Ponude",
+            columns: new[] { "SetoviPonudeID", "SetID", "PonudaID" },
+            values: new object[,]
+            {
+                { 1, 1, 1 }, 
+                { 2, 2, 2 },
+                { 3, 3, 3 }, 
+
+            });
         }
 
         /// <inheritdoc />
@@ -297,7 +416,7 @@ namespace VirtualGardens.Services.Migrations
             migrationBuilder.DeleteData(
                 table: "Korisnici_Uloge",
                 keyColumn: "KorisniciUlogeID",
-                keyValue: 3); // Add this line to remove the third user during rollback
+                keyValue: 3);
 
             migrationBuilder.DeleteData(
             table: "VrsteProizvoda",
@@ -629,140 +748,240 @@ namespace VirtualGardens.Services.Migrations
                 keyColumn: "NalogID",
                 keyValue: 3);
 
-            //migrationBuilder.DeleteData(
-            //table: "Narudzbe",
-            //keyColumn: "NarudzbaID",
-            //keyValue: 1);
+            migrationBuilder.DeleteData(
+            table: "Narudzbe",
+            keyColumn: "NarudzbaID",
+            keyValue: 1);
 
-            //migrationBuilder.DeleteData(
-            //    table: "Narudzbe",
-            //    keyColumn: "NarudzbaID",
-            //    keyValue: 2);
+            migrationBuilder.DeleteData(
+                table: "Narudzbe",
+                keyColumn: "NarudzbaID",
+                keyValue: 2);
 
-            //migrationBuilder.DeleteData(
-            //    table: "Narudzbe",
-            //    keyColumn: "NarudzbaID",
-            //    keyValue: 3);
+            migrationBuilder.DeleteData(
+                table: "Narudzbe",
+                keyColumn: "NarudzbaID",
+                keyValue: 3);
 
-            //migrationBuilder.DeleteData(
-            //    table: "Narudzbe",
-            //    keyColumn: "NarudzbaID",
-            //    keyValue: 4);
+            migrationBuilder.DeleteData(
+                table: "Narudzbe",
+                keyColumn: "NarudzbaID",
+                keyValue: 4);
 
-            //migrationBuilder.DeleteData(
-            //    table: "Narudzbe",
-            //    keyColumn: "NarudzbaID",
-            //    keyValue: 5);
 
-            //migrationBuilder.DeleteData(
-            //table: "PitanjaOdgovori",
-            //keyColumn: "PitanjeID",
-            //keyValue: 1);
+            migrationBuilder.DeleteData(
+            table: "PitanjaOdgovori",
+            keyColumn: "PitanjeID",
+            keyValue: 1);
 
-            //migrationBuilder.DeleteData(
-            //    table: "PitanjaOdgovori",
-            //    keyColumn: "PitanjeID",
-            //    keyValue: 2);
+            migrationBuilder.DeleteData(
+                table: "PitanjaOdgovori",
+                keyColumn: "PitanjeID",
+                keyValue: 2);
 
-            //migrationBuilder.DeleteData(
-            //    table: "PitanjaOdgovori",
-            //    keyColumn: "PitanjeID",
-            //    keyValue: 3);
+            migrationBuilder.DeleteData(
+                table: "PitanjaOdgovori",
+                keyColumn: "PitanjeID",
+                keyValue: 3);
 
-            //migrationBuilder.DeleteData(
-            //    table: "PitanjaOdgovori",
-            //    keyColumn: "PitanjeID",
-            //    keyValue: 4);
+            migrationBuilder.DeleteData(
+                table: "PitanjaOdgovori",
+                keyColumn: "PitanjeID",
+                keyValue: 4);
 
-            //migrationBuilder.DeleteData(
-            //    table: "PitanjaOdgovori",
-            //    keyColumn: "PitanjeID",
-            //    keyValue: 5);
+            migrationBuilder.DeleteData(
+                table: "PitanjaOdgovori",
+                keyColumn: "PitanjeID",
+                keyValue: 5);
 
             migrationBuilder.DeleteData(
             table: "Ponude",
             keyColumn: "PonudaID",
             keyValue: 1);
 
-            //migrationBuilder.DeleteData(
-            //    table: "Ponude",
-            //    keyColumn: "PonudaID",
-            //    keyValue: 2);
+            migrationBuilder.DeleteData(
+                table: "Ponude",
+                keyColumn: "PonudaID",
+                keyValue: 2);
 
-            //migrationBuilder.DeleteData(
-            //    table: "Ponude",
-            //    keyColumn: "PonudaID",
-            //    keyValue: 3);
+            migrationBuilder.DeleteData(
+                table: "Ponude",
+                keyColumn: "PonudaID",
+                keyValue: 3);
 
-            //migrationBuilder.DeleteData(
-            //    table: "Ponude",
-            //    keyColumn: "PonudaID",
-            //    keyValue: 4);
 
-            //migrationBuilder.DeleteData(
-            //    table: "Ponude",
-            //    keyColumn: "PonudaID",
-            //    keyValue: 5);
+            migrationBuilder.DeleteData(
+           table: "Setovi",
+           keyColumn: "SetID",
+           keyValue: 1);
 
-           // migrationBuilder.DeleteData(
-           //table: "Setovi",
-           //keyColumn: "SetID",
-           //keyValue: 1);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 2);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Setovi",
-           //     keyColumn: "SetID",
-           //     keyValue: 2);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 3);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Setovi",
-           //     keyColumn: "SetID",
-           //     keyValue: 3);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 4);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Setovi",
-           //     keyColumn: "SetID",
-           //     keyValue: 4);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 5);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Setovi",
-           //     keyColumn: "SetID",
-           //     keyValue: 5);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 6);
 
-           // migrationBuilder.DeleteData(
-           //table: "Proizvodi_Set",
-           //keyColumn: "ProizvodSetID",
-           //keyValue: 1);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 7);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Proizvodi_Set",
-           //     keyColumn: "ProizvodSetID",
-           //     keyValue: 2);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 8);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Proizvodi_Set",
-           //     keyColumn: "ProizvodSetID",
-           //     keyValue: 3);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 9);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Proizvodi_Set",
-           //     keyColumn: "ProizvodSetID",
-           //     keyValue: 4);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 10);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Proizvodi_Set",
-           //     keyColumn: "ProizvodSetID",
-           //     keyValue: 5);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 11);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Proizvodi_Set",
-           //     keyColumn: "ProizvodSetID",
-           //     keyValue: 6);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 12);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Proizvodi_Set",
-           //     keyColumn: "ProizvodSetID",
-           //     keyValue: 7);
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 13);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 14);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 15);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 16);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 17);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 18);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 19);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 20);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 21);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 22);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 23);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 24);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 25);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 26);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 27);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 28);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 29);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 30);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 31);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 32);
+
+            migrationBuilder.DeleteData(
+                table: "Setovi",
+                keyColumn: "SetID",
+                keyValue: 33);
+
+            for (int i = 1; i <= 99; i++)
+            {
+                migrationBuilder.DeleteData(
+                    table: "Proizvodi_Set",
+                    keyColumn: "ProizvodSetID",
+                    keyValue: i);
+            }
 
             migrationBuilder.DeleteData(
             table: "Recenzije",
@@ -804,35 +1023,21 @@ namespace VirtualGardens.Services.Migrations
                 keyColumn: "RecenzijaID",
                 keyValue: 8);
 
-           // migrationBuilder.DeleteData(
-           //table: "Setovi_Ponude",
-           //keyColumn: "SetoviPonudeID",
-           //keyValue: 1);
+            migrationBuilder.DeleteData(
+           table: "Setovi_Ponude",
+           keyColumn: "SetoviPonudeID",
+           keyValue: 1);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Setovi_Ponude",
-           //     keyColumn: "SetoviPonudeID",
-           //     keyValue: 2);
+            migrationBuilder.DeleteData(
+                table: "Setovi_Ponude",
+                keyColumn: "SetoviPonudeID",
+                keyValue: 2);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Setovi_Ponude",
-           //     keyColumn: "SetoviPonudeID",
-           //     keyValue: 3);
+            migrationBuilder.DeleteData(
+                table: "Setovi_Ponude",
+                keyColumn: "SetoviPonudeID",
+                keyValue: 3);
 
-           // migrationBuilder.DeleteData(
-           //     table: "Setovi_Ponude",
-           //     keyColumn: "SetoviPonudeID",
-           //     keyValue: 4);
-
-           // migrationBuilder.DeleteData(
-           //     table: "Setovi_Ponude",
-           //     keyColumn: "SetoviPonudeID",
-           //     keyValue: 5);
-
-           // migrationBuilder.DeleteData(
-           //     table: "Setovi_Ponude",
-           //     keyColumn: "SetoviPonudeID",
-           //     keyValue: 6);
         }
     }
  }

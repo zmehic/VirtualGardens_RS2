@@ -11,7 +11,7 @@ DotNetEnv.Env.Load();
 
 Console.WriteLine("Hello, World!");
 
-await WaitForRabbitMQAsync("rabbitmq", 5672); // Call the health check method
+await WaitForRabbitMQAsync("rabbitmq", 5672);
 
 string smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty;
 int smtpPort = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var port) ? port : 0;
@@ -96,7 +96,6 @@ bus.PubSub.Subscribe<VirtualGardens.Models.Messages.PonudaActivated>(string.Empt
         }
         catch (Exception ex)
         {
-            // Log the exception or handle it accordingly
             Console.WriteLine($"Failed to send email: {ex.Message}");
         }
 
@@ -116,7 +115,7 @@ async Task WaitForRabbitMQAsync(string host, int port, int maxRetries = 10, int 
             {
                 await client.ConnectAsync(host, port);
                 Console.WriteLine("RabbitMQ is up and running!");
-                return; // Connection successful
+                return; 
             }
         }
         catch (SocketException)
@@ -127,5 +126,5 @@ async Task WaitForRabbitMQAsync(string host, int port, int maxRetries = 10, int 
     }
 
     Console.WriteLine("Failed to connect to RabbitMQ after several attempts.");
-    Environment.Exit(1); // Exit the application if RabbitMQ is still down
+    Environment.Exit(1);
 }

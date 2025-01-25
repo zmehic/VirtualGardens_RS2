@@ -15,10 +15,8 @@ namespace VirtualGardens.Services.AllServices.Setovi
 {
     public class SetoviService : BaseCRUDService<Models.DTOs.SetoviDTO, SetoviSearchObject, Database.Setovi, SetoviUpsertRequest, SetoviUpsertRequest>, ISetoviService
     {
-        public _210011Context _210011Context { get; set; }
-        public SetoviService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public SetoviService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
-            _210011Context = context;
         }
 
         public override IQueryable<Database.Setovi> AddFilter(SetoviSearchObject search, IQueryable<Database.Setovi> query)
@@ -68,11 +66,11 @@ namespace VirtualGardens.Services.AllServices.Setovi
 
         public override void AfterDelete(int id, Database.Setovi entity)
         {
-            var narudzba = _210011Context.Narudzbes.Where(x => x.NarudzbaId == entity.NarudzbaId).FirstOrDefault();
+            var narudzba = context.Narudzbes.Where(x => x.NarudzbaId == entity.NarudzbaId).FirstOrDefault();
             if(narudzba!=null && entity!=null)
                 narudzba.UkupnaCijena -= (float)entity.CijenaSaPopustom!;
 
-            _210011Context.SaveChanges();
+            context.SaveChanges();
 
             return;
         }
@@ -84,7 +82,7 @@ namespace VirtualGardens.Services.AllServices.Setovi
             {
                 foreach (var item in request.ProizvodiSets)
                 {
-                    float cijena = _210011Context.Proizvodis.Where(x => x.ProizvodId == item.ProizvodId).FirstOrDefault()?.Cijena ?? 0.0f;
+                    float cijena = context.Proizvodis.Where(x => x.ProizvodId == item.ProizvodId).FirstOrDefault()?.Cijena ?? 0.0f;
                     if (cijena != 0.0f && item != null)
                     {
                         float ukupnacijena = item.Kolicina * cijena;
@@ -118,8 +116,8 @@ namespace VirtualGardens.Services.AllServices.Setovi
 
         public override void AfterInsert(SetoviUpsertRequest request, Database.Setovi entity)
         {
-            var setovi = _210011Context.Setovis.Where(x => x.NarudzbaId == request.NarudzbaId && x.IsDeleted==false).ToList();
-            var narudzba = _210011Context.Narudzbes.Where(x => x.NarudzbaId == request.NarudzbaId).FirstOrDefault();
+            var setovi = context.Setovis.Where(x => x.NarudzbaId == request.NarudzbaId && x.IsDeleted==false).ToList();
+            var narudzba = context.Narudzbes.Where(x => x.NarudzbaId == request.NarudzbaId).FirstOrDefault();
 
             float ukupnacijena = 0.0f;
             foreach (var x in setovi)
@@ -129,9 +127,9 @@ namespace VirtualGardens.Services.AllServices.Setovi
             if (narudzba != null)
             {
                 narudzba.UkupnaCijena = ukupnacijena;
-                _210011Context.Update(narudzba);
+                context.Update(narudzba);
             }
-                _210011Context.SaveChanges();
+            context.SaveChanges();
 
             base.AfterInsert(request, entity);
         }

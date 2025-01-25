@@ -11,18 +11,19 @@ namespace VirtualGardens.Services.PonudeStateMachine
 {
     public class ActivePonudaState : BasePonudaState
     {
-        public ActivePonudaState(_210011Context context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
+        public ActivePonudaState(_210011Context _context, IMapper _mapper, IServiceProvider _serviceProvider) : base(_context, _mapper, _serviceProvider)
         {
         }
 
         public override PonudeDTO Finish(int id)
         {
-            var set = Context.Set<Ponude>();
+            var set = context.Set<Ponude>();
             var entity = set.Find(id);
-            entity.StateMachine = "finished";
-            Context.SaveChanges();
+            if(entity != null) 
+                entity.StateMachine = "finished";
+            context.SaveChanges();
 
-            return Mapper.Map<PonudeDTO>(entity);
+            return mapper.Map<PonudeDTO>(entity!);
         }
         public override List<string> AllowedActions(Ponude entity)
         {

@@ -418,10 +418,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   request.containsKey('lozinka') ==
                                       request.containsKey('lozinkaPotvrda'))) {
                             try {
-                              await _korisnikProvider.update(
+                              var response = await _korisnikProvider.update(
                                   AuthProvider.korisnikId!, request);
 
+                              AuthProvider.username = response.korisnickoIme;
+                              AuthProvider.korisnikId = response.korisnikId;
+
                               QuickAlert.show(
+                                // ignore: use_build_context_synchronously
                                 context: context,
                                 type: QuickAlertType.success,
                                 title:
@@ -446,6 +450,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               );
                             } on Exception {
                               QuickAlert.show(
+                                  // ignore: use_build_context_synchronously
                                   context: context,
                                   type: QuickAlertType.error,
                                   title: "Greška prilikom ažuriranja profila",
@@ -465,6 +470,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           }
                         } on Exception catch (e) {
                           QuickAlert.show(
+                              // ignore: use_build_context_synchronously
                               context: context,
                               type: QuickAlertType.error,
                               title: "Greška prilikom ažuriranja",

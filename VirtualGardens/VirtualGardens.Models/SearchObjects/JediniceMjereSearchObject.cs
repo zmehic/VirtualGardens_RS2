@@ -4,7 +4,7 @@ using System.Text;
 
 namespace VirtualGardens.Models.SearchObjects
 {
-    public class JediniceMjereSearchObject:BaseSearchObject
+    public class JediniceMjereSearchObject : BaseSearchObject
     {
         public string? NazivGTE { get; set; }
 

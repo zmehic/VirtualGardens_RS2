@@ -16,7 +16,7 @@ namespace VirtualGardens.Services.AllServices.JediniceMjere
 {
     public class JediniceMjereService : BaseCRUDService<Models.DTOs.JediniceMjereDTO, JediniceMjereSearchObject, Database.JediniceMjere, JediniceMjereUpsertRequest, JediniceMjereUpsertRequest>, IJediniceMjereService
     {
-        public JediniceMjereService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public JediniceMjereService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 

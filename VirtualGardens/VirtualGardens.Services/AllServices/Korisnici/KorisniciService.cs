@@ -9,30 +9,28 @@ using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
 using VirtualGardens.Models.Exceptions;
-using VirtualGardens.Models.Requests;
+using VirtualGardens.Models.Requests.Korisnici;
 using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.Auth;
 using VirtualGardens.Services.BaseServices;
 using VirtualGardens.Services.Database;
 
-namespace VirtualGardens.Services.AllServices
+namespace VirtualGardens.Services.AllServices.Korisnici
 {
-    public class KorisniciService : BaseCRUDService<Models.DTOs.KorisniciDTO, KorisniciSearchObject, Database.Korisnici, KorisniciInsertRequest, KorisniciUpdateRequest>, IKorisniciService
+    public class KorisniciService : BaseCRUDService<KorisniciDTO, KorisniciSearchObject, Database.Korisnici, KorisniciInsertRequest, KorisniciUpdateRequest>, IKorisniciService
     {
-        private readonly ILogger<KorisniciService> _logger;
-        private readonly IPasswordService _passwordService;
-        _210011Context _context;
+        private readonly ILogger<KorisniciService> logger;
+        private readonly IPasswordService passwordService;
 
-        public KorisniciService(_210011Context context, IMapper mapper, ILogger<KorisniciService> logger, IPasswordService passwordService) : base(context,mapper)
+        public KorisniciService(_210011Context _context, IMapper _mapper, ILogger<KorisniciService> _logger, IPasswordService _passwordService) : base(_context, _mapper)
         {
-            _logger = logger;
-            this._passwordService = passwordService;
-            _context = context;
+            logger = _logger;
+            passwordService = _passwordService;
         }
 
-        public override IQueryable<Korisnici> AddFilter(KorisniciSearchObject search, IQueryable<Korisnici> query)
+        public override IQueryable<Database.Korisnici> AddFilter(KorisniciSearchObject search, IQueryable<Database.Korisnici> query)
         {
-            if(!string.IsNullOrEmpty(search?.ImeGTE))
+            if (!string.IsNullOrEmpty(search?.ImeGTE))
             {
                 query = query.Where(x => x.Ime.ToLower().StartsWith(search.ImeGTE.ToLower()));
             }
@@ -49,7 +47,7 @@ namespace VirtualGardens.Services.AllServices
 
             if (!string.IsNullOrEmpty(search?.Email))
             {
-                query = query.Where(x => x.Email==search.Email);
+                query = query.Where(x => x.Email == search.Email);
             }
 
             if (!string.IsNullOrEmpty(search?.BrojTelefona))
@@ -66,9 +64,9 @@ namespace VirtualGardens.Services.AllServices
             return query;
         }
 
-        public override void BeforeInsert(KorisniciInsertRequest request, Korisnici entity)
+        public override void BeforeInsert(KorisniciInsertRequest request, Database.Korisnici entity)
         {
-            _logger.LogInformation($"Adding user: {entity.KorisnickoIme}");
+            logger.LogInformation($"Adding user: {entity.KorisnickoIme}");
 
             if (string.IsNullOrEmpty(request.Lozinka) || string.IsNullOrEmpty(request.LozinkaPotvrda))
                 throw new Exception("Lozinka i potvrda lozinke moraju imati vrijednost");
@@ -76,32 +74,32 @@ namespace VirtualGardens.Services.AllServices
             if (request.Lozinka != request.LozinkaPotvrda)
                 throw new Exception("Lozinka i potvrda lozinke moraju biti iste");
 
-            entity.LozinkaSalt = _passwordService.GenerateSalt();
-            entity.LozinkaHash = _passwordService.GenerateHash(entity.LozinkaSalt, request.Lozinka);
+            entity.LozinkaSalt = passwordService.GenerateSalt();
+            entity.LozinkaHash = passwordService.GenerateHash(entity.LozinkaSalt, request.Lozinka);
             entity.DatumRegistracije = DateTime.Now;
 
         }
 
-        public override void AfterInsert(KorisniciInsertRequest request, Korisnici entity)
+        public override void AfterInsert(KorisniciInsertRequest request, Database.Korisnici entity)
         {
             if (request.Uloge != null && request.Uloge.Count > 0)
             {
                 foreach (var u in request.Uloge)
                 {
-                    Context.KorisniciUloges.Add(new Database.KorisniciUloge
+                    context.KorisniciUloges.Add(new Database.KorisniciUloge
                     {
                         KorisnikId = entity.KorisnikId,
                         UlogaId = u
                     });
                 }
-                Context.SaveChanges();
+                context.SaveChanges();
             }
-            else if(request.Uloge==null)
+            else if (request.Uloge == null)
             {
-                var uloga = _context.Uloges.Where(x => x.Naziv == "Kupac").FirstOrDefault();
-                if(uloga!=null)
+                var uloga = context.Uloges.Where(x => x.Naziv == "Kupac").FirstOrDefault();
+                if (uloga != null)
                 {
-                    _context.KorisniciUloges.Add(new Database.KorisniciUloge
+                    context.KorisniciUloges.Add(new Database.KorisniciUloge
                     {
                         KorisnikId = entity.KorisnikId,
                         UlogaId = uloga.UlogaId
@@ -112,45 +110,45 @@ namespace VirtualGardens.Services.AllServices
 
         }
 
-        public override void BeforeUpdate(KorisniciUpdateRequest request, Korisnici entity)
+        public override void BeforeUpdate(KorisniciUpdateRequest request, Database.Korisnici entity)
         {
 
-            if ((request.Lozinka != null && !string.IsNullOrEmpty(request.Lozinka)) && (request.LozinkaPotvrda != null && !string.IsNullOrEmpty(request.LozinkaPotvrda)))
+            if (request.Lozinka != null && !string.IsNullOrEmpty(request.Lozinka) && request.LozinkaPotvrda != null && !string.IsNullOrEmpty(request.LozinkaPotvrda))
             {
                 if (request.StaraLozinka == null)
                     throw new UserException("Morate poslati staru lozinku!");
-                var lozinkaCheck = _passwordService.GenerateHash(entity.LozinkaSalt, request.StaraLozinka) == entity.LozinkaHash;
+                var lozinkaCheck = passwordService.GenerateHash(entity.LozinkaSalt, request.StaraLozinka) == entity.LozinkaHash;
                 if (lozinkaCheck == false)
                     throw new UserException("Pogrešna stara lozinka");
                 if (request.Lozinka == request.LozinkaPotvrda)
                 {
-                    entity.LozinkaHash = _passwordService.GenerateHash(entity.LozinkaSalt, request.Lozinka);
+                    entity.LozinkaHash = passwordService.GenerateHash(entity.LozinkaSalt, request.Lozinka);
                 }
             }
         }
 
 
-        public Models.DTOs.KorisniciDTO Login(string username, string password)
+        public KorisniciDTO Login(string username, string password)
         {
-            var entity = Context
+            var entity = context
                 .Korisnicis
                 .Include(x => x.KorisniciUloges)
                     .ThenInclude(y => y.Uloga).FirstOrDefault(x => x.KorisnickoIme == username);
 
             if (entity == null)
             {
-                return null;
+                throw new UserException("Ne postoji korisnik u bazi sa tim korisničkim imenom");
             }
 
-            var hash = _passwordService.GenerateHash(entity.LozinkaSalt, password);
+            var hash = passwordService.GenerateHash(entity.LozinkaSalt, password);
 
             if (hash != entity.LozinkaHash)
             {
-                return null;
+                throw new UserException("Netačna lozinka ili korisničko ime");
             }
             entity.ZadnjiLogin = DateTime.Now;
-            Context.SaveChanges();
-            var mapped = this.Mapper.Map<Models.DTOs.KorisniciDTO>(entity);
+            context.SaveChanges();
+            var mapped = this.mapper.Map<KorisniciDTO>(entity);
 
             return mapped;
         }

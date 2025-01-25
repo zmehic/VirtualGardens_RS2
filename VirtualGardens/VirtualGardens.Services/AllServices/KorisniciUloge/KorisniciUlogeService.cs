@@ -14,7 +14,7 @@ namespace VirtualGardens.Services.AllServices.KorisniciUloge
 {
     public class KorisniciUlogeService : BaseCRUDService<Models.DTOs.KorisniciUlogeDTO, KorisniciUlogeSearchObject, Database.KorisniciUloge, KorisniciUlogeUpsertRequest, KorisniciUlogeUpsertRequest>, IKorisniciUlogeService
     {
-        public KorisniciUlogeService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public KorisniciUlogeService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 

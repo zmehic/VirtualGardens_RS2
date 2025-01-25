@@ -14,7 +14,7 @@ namespace VirtualGardens.Services.AllServices.Recenzije
 {
     public class RecenzijeService : BaseCRUDService<Models.DTOs.RecenzijeDTO, RecenzijeSearchObject, Database.Recenzije, RecenzijeUpsertRequest, RecenzijeUpsertRequest>, IRecenzijeService
     {
-        public RecenzijeService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public RecenzijeService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 

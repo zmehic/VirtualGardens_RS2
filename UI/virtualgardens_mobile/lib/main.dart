@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_mobile/providers/auth_provider.dart';
@@ -139,12 +140,10 @@ class LoginPage extends StatelessWidget {
                           border: Border(
                               bottom: BorderSide(color: Colors.grey[350]!))),
                       child: FormBuilderTextField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        },
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                              errorText: "Korisničko ime je obavezno."),
+                        ]),
                         name: "username",
                         controller: _usernameController,
                         decoration: InputDecoration(
@@ -158,12 +157,10 @@ class LoginPage extends StatelessWidget {
                           border: Border(
                               bottom: BorderSide(color: Colors.grey[350]!))),
                       child: FormBuilderTextField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        },
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.required(
+                              errorText: "Lozinka je obavezna."),
+                        ]),
                         name: "password",
                         obscureText: true,
                         controller: _passwordController,
@@ -196,24 +193,23 @@ class LoginPage extends StatelessWidget {
                                   "credentials: ${_usernameController.text} : ${_passwordController.text}");
                               AuthProvider.username = _usernameController.text;
                               AuthProvider.password = _passwordController.text;
-                            }
-                            try {
-                              await provider.login(
-                                  username: AuthProvider.username,
-                                  password: AuthProvider.password);
-                              // ignore: use_build_context_synchronously
-                              navigator.push(MaterialPageRoute(
-                                  builder: (context) => const HomeScreen()));
-                            } on Exception {
-                              QuickAlert.show(
-                                  context: context,
-                                  type: QuickAlertType.error,
-                                  title: "Greška prilikom prijave",
-                                  text:
-                                      "Korisničko ime ili lozinka nisu ispravni.",
-                                  confirmBtnText: "U redu");
-                              _usernameController.text = "";
-                              _passwordController.text = "";
+                              try {
+                                await provider.login(
+                                    username: AuthProvider.username,
+                                    password: AuthProvider.password);
+                                // ignore: use_build_context_synchronously
+                                navigator.push(MaterialPageRoute(
+                                    builder: (context) => const HomeScreen()));
+                              } on Exception catch (e) {
+                                QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: "Greška prilikom prijave",
+                                    text: e.toString().split(': ')[1],
+                                    confirmBtnText: "U redu");
+                                _usernameController.text = "";
+                                _passwordController.text = "";
+                              }
                             }
                           },
                           child: const Center(

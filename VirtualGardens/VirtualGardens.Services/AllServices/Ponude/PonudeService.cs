@@ -23,12 +23,10 @@ namespace VirtualGardens.Services.AllServices.Ponude
 {
     public class PonudeService : BaseCRUDService<Models.DTOs.PonudeDTO, PonudeSearchObject, Database.Ponude, PonudeUpsertRequest, PonudeUpsertRequest>, IPonudeService
     {
-        public BasePonudaState BasePonudaState { get; set; }
-        public _210011Context _210011Context { get; set; }
-        public PonudeService(_210011Context context, BasePonudaState basePonudaState, IMapper mapper) : base(context, mapper)
+        public BasePonudaState basePonudaState { get; set; }
+        public PonudeService(_210011Context _context, BasePonudaState _basePonudaState, IMapper _mapper) : base(_context, _mapper)
         {
-            BasePonudaState = basePonudaState;
-            _210011Context = context;
+            basePonudaState = _basePonudaState;
         }
 
         public override IQueryable<Database.Ponude> AddFilter(PonudeSearchObject search, IQueryable<Database.Ponude> query)
@@ -79,48 +77,48 @@ namespace VirtualGardens.Services.AllServices.Ponude
 
         public override PonudeDTO Insert(PonudeUpsertRequest request)
         {
-            var state = BasePonudaState.CreateState("initial");
+            var state = basePonudaState.CreateState("initial");
             return state.Insert(request);
         }
 
         public override PonudeDTO Update(int id, PonudeUpsertRequest request)
         {
             var entity = GetById(id);
-            var state = BasePonudaState.CreateState(entity.StateMachine);
+            var state = basePonudaState.CreateState(entity.StateMachine!);
             return state.Update(id, request);
         }
 
         public override void Delete(int id)
         {
             var entity = GetById(id);
-            var state = BasePonudaState.CreateState(entity.StateMachine);
+            var state = basePonudaState.CreateState(entity.StateMachine!);
             state.Delete(id);
         }
 
         public PonudeDTO Edit(int id)
         {
             var entity = GetById(id);
-            var state = BasePonudaState.CreateState(entity.StateMachine);
+            var state = basePonudaState.CreateState(entity.StateMachine!);
             return state.Edit(id);
         }
 
         public PonudeDTO Activate(int id)
         {
             var entity = GetById(id);
-            var state = BasePonudaState.CreateState(entity.StateMachine);
+            var state = basePonudaState.CreateState(entity.StateMachine!);
             return state.Activate(id);
         }
 
         public PonudeDTO Finish(int id)
         {
             var entity = GetById(id);
-            var state = BasePonudaState.CreateState(entity.StateMachine);
+            var state = basePonudaState.CreateState(entity.StateMachine!);
             return state.Finish(id);
         }
         public PonudeDTO AddSet(SetoviPonudeUpsertRequest request)
         {
             var entity = GetById(request.PonudaId);
-            var state = BasePonudaState.CreateState(entity.StateMachine);
+            var state = basePonudaState.CreateState(entity.StateMachine!);
             return state.AddSet(request);
         }
 
@@ -128,37 +126,37 @@ namespace VirtualGardens.Services.AllServices.Ponude
         {
             if (id <= 0)
             {
-                var state = BasePonudaState.CreateState("initial");
-                return state.AllowedActions(null);
+                var state = basePonudaState.CreateState("initial");
+                return state.AllowedActions(null!);
             }
             else
             {
-                var entity = Context.Ponudes.Find(id);
-                var state = BasePonudaState.CreateState(entity.StateMachine);
+                var entity = context.Ponudes.Find(id);
+                var state = basePonudaState.CreateState(entity!.StateMachine!);
                 return state.AllowedActions(entity);
             }
         }
 
         public NarudzbeDTO AddPonudaToOrder(int ponudaId, int narudzbaId)
         {
-            var setovi = Context.SetoviPonudes.Include(x => x.Set).ThenInclude(x => x.ProizvodiSets).Where(x => x.PonudaId == ponudaId && x.IsDeleted==false && x.Set.IsDeleted==false).Select(x=> Mapper.Map<SetoviUpsertRequest>(x.Set)).ToList();
+            var setovi = context.SetoviPonudes.Include(x => x.Set).ThenInclude(x => x.ProizvodiSets).Where(x => x.PonudaId == ponudaId && x.IsDeleted==false && x.Set.IsDeleted==false).Select(x=> mapper.Map<SetoviUpsertRequest>(x.Set)).ToList();
             var suma = 0.0f;
             foreach (var item in setovi)
             {
-                Database.Setovi entity = Mapper.Map<Database.Setovi>(item);
+                Database.Setovi entity = mapper.Map<Database.Setovi>(item);
                 entity.NarudzbaId = narudzbaId;
-                Context.Add(entity);
+                context.Add(entity);
 
                 suma += (float)entity.CijenaSaPopustom!;
 
             }
-            var narudzba = Context.Narudzbes.Where(x => x.NarudzbaId == narudzbaId).FirstOrDefault();
+            var narudzba = context.Narudzbes.Where(x => x.NarudzbaId == narudzbaId).FirstOrDefault();
             if(narudzba!=null)
                 narudzba.UkupnaCijena += suma;
-
-            Context.Update(narudzba);
-            Context.SaveChanges();
-            return Mapper.Map<NarudzbeDTO>(narudzba);
+            if(narudzba!=null)
+                context.Update(narudzba);
+            context.SaveChanges();
+            return mapper.Map<NarudzbeDTO>(narudzba!);
 
 
         }

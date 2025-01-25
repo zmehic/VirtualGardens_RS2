@@ -23,41 +23,41 @@ namespace VirtualGardens.API.Controllers
         [HttpPut("{id}/inprogress")]
         public NarudzbeDTO InProgress(int id)
         {
-            return (_service as INarudzbeService).InProgress(id);
+            return (_service as INarudzbeService)!.InProgress(id);
         }
 
         [Authorize(Roles = "Kupac")]
         [HttpGet("CheckOrderValidity/{orderid}")]
         public List<string> CheckOrderValidity(int orderid)
         {
-            return (_service as INarudzbeService).CheckOrderValidity(orderid);
+            return (_service as INarudzbeService)!.CheckOrderValidity(orderid);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/edit")]
         public NarudzbeDTO Edit(int id)
         {
-            return (_service as INarudzbeService).Edit(id);
+            return (_service as INarudzbeService)!.Edit(id);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/finish")]
         public NarudzbeDTO Finish(int id)
         {
-            return (_service as INarudzbeService).Finish(id);
+            return (_service as INarudzbeService)!.Finish(id);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("{id}/allowedActions")]
         public List<string> AllowedActions(int id)
         {
-            return (_service as INarudzbeService).AllowedActions(id);
+            return (_service as INarudzbeService)!.AllowedActions(id);
         }
 
         [Authorize(Roles ="Admin")]
         [HttpGet("MonthlyStatistics")]
         public List<int> MonthlyStatistics(int year) {
-            return (_service as INarudzbeService).MonthlyStatistics(year);
+            return (_service as INarudzbeService)!.MonthlyStatistics(year);
         }
     }
 }

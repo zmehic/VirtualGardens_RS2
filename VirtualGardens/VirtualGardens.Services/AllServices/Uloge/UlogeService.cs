@@ -14,7 +14,7 @@ namespace VirtualGardens.Services.AllServices.Uloge
 {
     public class UlogeService : BaseCRUDService<Models.DTOs.UlogeDTO, UlogeSearchObject, Database.Uloge, UlogeInsertRequest, UlogeUpdateRequest>, IUlogeService
     {
-        public UlogeService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public UlogeService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 

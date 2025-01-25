@@ -19,23 +19,23 @@ namespace VirtualGardens.Services.PonudeStateMachine
 {
     public class CreatedPonudaState:BasePonudaState
     {
-        public CreatedPonudaState(_210011Context context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
+        public CreatedPonudaState(_210011Context _context, IMapper _mapper, IServiceProvider _serviceProvider) : base(_context, _mapper, _serviceProvider)
         {
         }
 
         public override PonudeDTO Update(int id, PonudeUpsertRequest request)
         {
-            var set = Context.Set<Ponude>();
+            var set = context.Set<Ponude>();
             var entity = set.Find(id);
-            Mapper.Map(request, entity);
-            Context.SaveChanges();
+            mapper.Map(request, entity);
+            context.SaveChanges();
 
-            return Mapper.Map<Models.DTOs.PonudeDTO>(entity);
+            return mapper.Map<Models.DTOs.PonudeDTO>(entity!);
         }
         
         public override void Delete(int id)
         {
-            var entity = Context.Set<Ponude>().Find(id);
+            var entity = context.Set<Ponude>().Find(id);
 
             if (entity == null)
             {
@@ -47,27 +47,28 @@ namespace VirtualGardens.Services.PonudeStateMachine
                 softDeletableEntity.IsDeleted = true;
                 softDeletableEntity.VrijemeBrisanja = DateTime.Now;
 
-                Context.Update(entity);
+                context.Update(entity);
             }
             else
             {
-                Context.Remove(entity);
+                context.Remove(entity);
             }
 
-            Context.SaveChanges();
+            context.SaveChanges();
         }
 
         public override PonudeDTO Activate(int id)
         {
-            var set = Context.Set<Ponude>();
+            var set = context.Set<Ponude>();
             var entity = set.Find(id);
-            entity.StateMachine = "active";
-            Context.SaveChanges();
+            if(entity != null)
+                entity.StateMachine = "active";
+            context.SaveChanges();
 
             var bus = RabbitHutch.CreateBus("host=rabbitmq:5672");
-            var mappedEntity = Mapper.Map<PonudeDTO>(entity);
+            var mappedEntity = mapper.Map<PonudeDTO>(entity!);
 
-            var users = Context.Korisnicis.Where(x => x.KorisniciUloges.Any(role => role.Uloga != null && role.Uloga.Naziv == "Kupac")).ToList();
+            var users = context.Korisnicis.Where(x => x.KorisniciUloges.Any(role => role.Uloga != null && role.Uloga.Naziv == "Kupac")).ToList();
 
             foreach ( var user in users )
             {
@@ -80,14 +81,14 @@ namespace VirtualGardens.Services.PonudeStateMachine
 
         public override PonudeDTO AddSet(SetoviPonudeUpsertRequest request)
         {
-            var set = Context.Set<SetoviPonude>();
-            var entity = Mapper.Map<SetoviPonude>(request);
-            var ponuda = (Context.Set<Ponude>()).Find(request.PonudaId);
+            var set = context.Set<SetoviPonude>();
+            var entity = mapper.Map<SetoviPonude>(request);
+            var ponuda = (context.Set<Ponude>()).Find(request.PonudaId);
 
             set.Add(entity);
-            Context.SaveChanges();
+            context.SaveChanges();
 
-            return Mapper.Map<PonudeDTO>(entity);
+            return mapper.Map<PonudeDTO>(entity);
         }
 
         public override List<string> AllowedActions(Ponude entity)

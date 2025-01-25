@@ -99,13 +99,13 @@ public partial class _210011Context : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Ime)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.KorisnickoIme)
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.Prezime)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.ZadnjiLogin).HasColumnType("datetime");
         });
 

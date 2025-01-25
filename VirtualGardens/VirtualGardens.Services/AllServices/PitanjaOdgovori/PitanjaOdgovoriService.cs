@@ -14,7 +14,7 @@ namespace VirtualGardens.Services.AllServices.PitanjaOdgovori
 {
     public class PitanjaOdgovoriService : BaseCRUDService<Models.DTOs.PitanjaOdgovoriDTO, PitanjaOdgovoriSearchObject, Database.PitanjaOdgovori, PitanjaOdgovoriUpsertRequest, PitanjaOdgovoriUpsertRequest>, IPitanjaOdgovoriService
     {
-        public PitanjaOdgovoriService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public PitanjaOdgovoriService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 

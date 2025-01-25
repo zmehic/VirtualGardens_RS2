@@ -402,6 +402,7 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
                                     productList?.map((e) => e.toJson()).toList()
                               };
                               await _setoviProvider.insert(request);
+                              // ignore: use_build_context_synchronously
                               Navigator.of(context).pushReplacement(
                                 MaterialPageRoute(
                                   builder: (context) =>

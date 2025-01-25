@@ -14,7 +14,7 @@ namespace VirtualGardens.Services.AllServices.Zaposlenici
 {
     public class ZaposleniciService : BaseCRUDService<Models.DTOs.ZaposleniciDTO, ZaposleniciSearchObject, Database.Zaposlenici, ZaposleniciInsertRequest, ZaposleniciUpdateRequest>, IZaposleniciService
     {
-        public ZaposleniciService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public ZaposleniciService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 
@@ -37,17 +37,17 @@ namespace VirtualGardens.Services.AllServices.Zaposlenici
 
             if (!string.IsNullOrEmpty(search?.AdresaGTE))
             {
-                query = query.Where(x => x.Adresa.ToLower().StartsWith(search.AdresaGTE.ToLower()));
+                query = query.Where(x => (x.Adresa ?? "").ToLower().StartsWith(search.AdresaGTE.ToLower()));
             }
 
             if (!string.IsNullOrEmpty(search?.GradGTE))
             {
-                query = query.Where(x => x.Grad.ToLower().StartsWith(search.GradGTE.ToLower()));
+                query = query.Where(x => (x.Grad ?? "").ToLower().StartsWith(search.GradGTE.ToLower()));
             }
 
             if (!string.IsNullOrEmpty(search?.DrzavaGTE))
             {
-                query = query.Where(x => x.Drzava.ToLower().StartsWith(search.DrzavaGTE.ToLower()));
+                query = query.Where(x => (x.Drzava ?? "").ToLower().StartsWith(search.DrzavaGTE.ToLower()));
             }
 
             if (search?.JeAktivan.HasValue == true)

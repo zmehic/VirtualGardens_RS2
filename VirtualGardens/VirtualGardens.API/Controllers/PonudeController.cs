@@ -31,7 +31,7 @@ namespace VirtualGardens.API.Controllers
         [HttpPut("addOfferToOrder/{ponudaId}/{narudzbaId}")]
         public NarudzbeDTO AddPonudaToOrder(int ponudaId, int narudzbaId)
         {
-            return (_service as IPonudeService).AddPonudaToOrder(ponudaId,narudzbaId);
+            return (_service as IPonudeService)!.AddPonudaToOrder(ponudaId,narudzbaId);
         }
 
         [Authorize(Roles = "Admin")]
@@ -50,35 +50,35 @@ namespace VirtualGardens.API.Controllers
         [HttpPut("{id}/activate")]
         public PonudeDTO Activate(int id)
         {
-            return (_service as IPonudeService).Activate(id);
+            return (_service as IPonudeService)!.Activate(id);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/edit")]
         public PonudeDTO Edit(int id)
         {
-            return (_service as IPonudeService).Edit(id);
+            return (_service as IPonudeService)!.Edit(id);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/finish")]
         public PonudeDTO Finish(int id)
         {
-            return (_service as IPonudeService).Finish(id);
+            return (_service as IPonudeService)!.Finish(id);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("{id}/allowedActions")]
         public List<string> AllowedActions(int id)
         {
-            return (_service as IPonudeService).AllowedActions(id);
+            return (_service as IPonudeService)!.AllowedActions(id);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpPost("{id}/addSet")]
         public PonudeDTO AddSet(SetoviPonudeUpsertRequest request)
         {
-            return (_service as IPonudeService).AddSet(request);
+            return (_service as IPonudeService)!.AddSet(request);
         }
     }
 }

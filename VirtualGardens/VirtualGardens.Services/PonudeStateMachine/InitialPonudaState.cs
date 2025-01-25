@@ -13,19 +13,19 @@ namespace VirtualGardens.Services.PonudeStateMachine
 {
     public class InitialPonudaState:BasePonudaState
     {
-        public InitialPonudaState(_210011Context context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
+        public InitialPonudaState(_210011Context _context, IMapper _mapper, IServiceProvider _serviceProvider) : base(_context, _mapper, _serviceProvider)
         {
         }
 
         public override PonudeDTO Insert(PonudeUpsertRequest request)
         {
-            var set = Context.Set<Ponude>();
-            var entity = Mapper.Map<Ponude>(request);
+            var set = context.Set<Ponude>();
+            var entity = mapper.Map<Ponude>(request);
             entity.StateMachine = "created";
             set.Add(entity);
-            Context.SaveChanges();
+            context.SaveChanges();
 
-            return Mapper.Map<PonudeDTO>(entity);
+            return mapper.Map<PonudeDTO>(entity);
         }
 
         public override List<string> AllowedActions(Ponude entity)

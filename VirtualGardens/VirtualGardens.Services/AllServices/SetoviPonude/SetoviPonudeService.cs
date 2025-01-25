@@ -15,7 +15,7 @@ namespace VirtualGardens.Services.AllServices.SetoviPonude
 {
     public class SetoviPonudeService : BaseCRUDService<Models.DTOs.SetoviPonudeDTO, SetoviPonudeSearchObject, Database.SetoviPonude, SetoviPonudeUpsertRequest, SetoviPonudeUpsertRequest>, ISetoviPonudeService
     {
-        public SetoviPonudeService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public SetoviPonudeService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 

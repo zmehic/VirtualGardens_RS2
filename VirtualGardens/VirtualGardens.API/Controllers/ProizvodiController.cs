@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using VirtualGardens.Services.Database;
-using VirtualGardens.Services;
 using VirtualGardens.API.Controllers.BaseControllers;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.SearchObjects;
@@ -10,6 +9,7 @@ using VirtualGardens.Models.DTOs;
 using VirtualGardens.Models.HelperClasses;
 using Microsoft.AspNetCore.Authorization;
 using VirtualGardens.Services.AllServices;
+using VirtualGardens.Services.AllServices.Proizvodi;
 
 namespace VirtualGardens.API.Controllers
 {
@@ -39,29 +39,19 @@ namespace VirtualGardens.API.Controllers
             base.Delete(id);
         }
 
-        [HttpPut("recalculate")]
-        [Authorize(Roles = "Admin")]
-        public IActionResult RecalculateQuantity()
-        {
-            if((_service as IProizvodiService).RecalcuclateQuantity())
-            {
-                return Ok();
-            }
-            else { return BadRequest(); }
-        }
 
         [Authorize(Roles="Kupac")]
         [HttpGet("{id}/recommend")]
         public List<ProizvodiDTO> Recommend(int id)
         {
-            return (_service as IProizvodiService).Recommend(id);
+            return (_service as IProizvodiService)!.Recommend(id);
         }
 
         [HttpGet("trainmodel")]
         [Authorize(Roles ="Admin")]
         public void TrainModel()
         {
-            (_service as IProizvodiService).TrainModel();
+            (_service as IProizvodiService)!.TrainModel();
         }
     }
 }

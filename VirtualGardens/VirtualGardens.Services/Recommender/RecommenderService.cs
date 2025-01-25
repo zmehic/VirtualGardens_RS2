@@ -8,23 +8,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Services.AllServices.Proizvodi;
 using VirtualGardens.Services.Database;
 
 namespace VirtualGardens.Services.Recommender
 {
     public class RecommenderService : IRecommenderService
     {
-        _210011Context _context;
-        IMapper _mapper;
+        _210011Context context;
+        IMapper mapper;
         static MLContext mLContext = null;
         static object isLocked = new object();
         static ITransformer model = null;
 
         private const string ModelFilePath = "set-model.zip";
-        public RecommenderService(_210011Context context, IMapper mapper)
+        public RecommenderService(_210011Context _context, IMapper _mapper)
         {
-            _context = context;
-            _mapper = mapper;
+            context = _context;
+            mapper = _mapper;
         }
         public List<ProizvodiDTO> Recommend(int id)
         {
@@ -50,7 +51,7 @@ namespace VirtualGardens.Services.Recommender
 
             }
 
-            var products = _context.Proizvodis.Where(x => x.ProizvodId != id).Include(x => x.VrstaProizvoda).ToList();
+            var products = context.Proizvodis.Where(x => x.ProizvodId != id).Include(x => x.VrstaProizvoda).ToList();
             var predictionResult = new List<(Database.Proizvodi, float)>();
 
             foreach (var product in products)
@@ -68,7 +69,7 @@ namespace VirtualGardens.Services.Recommender
             var finalResult = predictionResult.Where(x => x.Item1.VrstaProizvoda.Naziv == "Prihrana").OrderByDescending(x => x.Item2).Select(x => x.Item1).Take(1).ToList();
             finalResult.Add(predictionResult.Where(x => x.Item1.VrstaProizvoda.Naziv == "Tlo").OrderByDescending(x => x.Item2).Select(x => x.Item1).FirstOrDefault()!);
 
-            return _mapper.Map<List<ProizvodiDTO>>(finalResult);
+            return mapper.Map<List<ProizvodiDTO>>(finalResult);
         }
 
         public void TrainModel()
@@ -76,7 +77,7 @@ namespace VirtualGardens.Services.Recommender
             if(mLContext==null)
                 mLContext = new MLContext();
 
-            var tmpData = _context.Setovis.Include(x => x.ProizvodiSets).ToList();
+            var tmpData = context.Setovis.Include(x => x.ProizvodiSets).ToList();
             var data = new List<ProductEntry>();
             foreach (var item in tmpData)
             {

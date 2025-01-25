@@ -16,15 +16,15 @@ namespace VirtualGardens.Services.PonudeStateMachine
 {
     public class BasePonudaState
     {
-        public _210011Context Context { get; set; }
-        public IMapper Mapper { get; set; }
-        public IServiceProvider ServiceProvider { get; set; }
+        public _210011Context context { get; set; }
+        public IMapper mapper { get; set; }
+        public IServiceProvider serviceProvider { get; set; }
 
-        public BasePonudaState(_210011Context context, IMapper mapper, IServiceProvider serviceProvider)
+        public BasePonudaState(_210011Context _context, IMapper _mapper, IServiceProvider _serviceProvider)
         {
-            Context = context;
-            Mapper = mapper;
-            ServiceProvider = serviceProvider;
+            context = _context;
+            mapper = _mapper;
+            serviceProvider = _serviceProvider;
         }
         public virtual Models.DTOs.PonudeDTO Insert(PonudeUpsertRequest request)
         {
@@ -76,13 +76,13 @@ namespace VirtualGardens.Services.PonudeStateMachine
             switch (statename)
             {
                 case "initial":
-                    return ServiceProvider.GetService<InitialPonudaState>();
+                    return serviceProvider.GetService<InitialPonudaState>()!;
                 case "created":
-                    return ServiceProvider.GetService<CreatedPonudaState>();
+                    return serviceProvider.GetService<CreatedPonudaState>()!;
                 case "active":
-                    return ServiceProvider.GetService<ActivePonudaState>();
+                    return serviceProvider.GetService<ActivePonudaState>()!;
                 case "finished":
-                    return ServiceProvider.GetService<FinishedPonudaState>();
+                    return serviceProvider.GetService<FinishedPonudaState>()!;
 
                 default: throw new Exception("State not recognized");
             }

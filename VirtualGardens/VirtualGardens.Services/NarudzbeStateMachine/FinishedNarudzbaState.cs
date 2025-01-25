@@ -11,21 +11,22 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
 {
     public class FinishedNarudzbaState : BaseNarudzbaState
     {
-        public FinishedNarudzbaState(_210011Context context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
+        public FinishedNarudzbaState(_210011Context _context, IMapper _mapper, IServiceProvider _serviceProvider) : base(_context, _mapper, _serviceProvider)
         {
         }
 
         public override NarudzbeDTO Edit(int id)
         {
-            var set = Context.Set<Narudzbe>();
+            var set = context.Set<Narudzbe>();
             var entity = set.Find(id);
-            entity.StateMachine = "created";
-            Context.SaveChanges();
+            if(entity != null)
+                entity.StateMachine = "created";
+            context.SaveChanges();
 
-            return Mapper.Map<NarudzbeDTO>(entity);
+            return mapper.Map<NarudzbeDTO>(entity!);
         }
 
-        public override List<string> AllowedActions(Narudzbe entity)
+        public override List<string> AllowedActions(Narudzbe? entity)
         {
             return new List<string>() { "edit" };
         }

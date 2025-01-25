@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace VirtualGardens.Models.Requests
+namespace VirtualGardens.Models.Requests.Korisnici
 {
     public class KorisniciUpdateRequest
     {

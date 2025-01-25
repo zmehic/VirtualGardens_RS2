@@ -13,7 +13,7 @@ namespace VirtualGardens.Services.AllServices.VrsteProizvoda
 {
     public class VrsteProizvodaService : BaseCRUDService<Models.DTOs.VrsteProizvodaDTO, VrsteProizvodaSearchObject, Database.VrsteProizvodum, VrsteProizvodaUpsertRequest, VrsteProizvodaUpsertRequest>, IVrsteProizvodaService
     {
-        public VrsteProizvodaService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public VrsteProizvodaService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 

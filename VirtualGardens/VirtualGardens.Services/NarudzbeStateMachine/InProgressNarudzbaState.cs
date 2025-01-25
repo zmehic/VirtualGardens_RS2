@@ -12,30 +12,31 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
 {
     public class InProgressNarudzbaState : BaseNarudzbaState
     {
-        public InProgressNarudzbaState(_210011Context context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
+        public InProgressNarudzbaState(_210011Context _context, IMapper _mapper, IServiceProvider _serviceProvider) : base(_context, _mapper, _serviceProvider)
         {
         }
 
         public override NarudzbeDTO Finish(int id)
         {
-            var set = Context.Set<Narudzbe>();
+            var set = context.Set<Narudzbe>();
             var entity = set.Find(id);
-            entity.StateMachine = "finished";
-            Context.SaveChanges();
+            if(entity != null) 
+                entity.StateMachine = "finished";
+            context.SaveChanges();
 
-            return Mapper.Map<NarudzbeDTO>(entity);
+            return mapper.Map<NarudzbeDTO>(entity!);
         }
 
         public override NarudzbeDTO Update(int id, NarudzbeUpsertRequest request)
         {
-            var set = Context.Set<Narudzbe>();
+            var set = context.Set<Narudzbe>();
             var entity = set.Find(id);
-            Mapper.Map(request, entity);
-            Context.SaveChanges();
+            mapper.Map(request, entity);
+            context.SaveChanges();
 
-            return Mapper.Map<Models.DTOs.NarudzbeDTO>(entity);
+            return mapper.Map<Models.DTOs.NarudzbeDTO>(entity!);
         }
-        public override List<string> AllowedActions(Narudzbe entity)
+        public override List<string> AllowedActions(Narudzbe? entity)
         {
             return new List<string>() { "finish" };
         }

@@ -8,15 +8,15 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
 {
     public class BaseNarudzbaState
     {
-        public _210011Context Context { get; set; }
-        public IMapper Mapper { get; set; }
-        public IServiceProvider ServiceProvider { get; set; }
+        public _210011Context context { get; set; }
+        public IMapper mapper { get; set; }
+        public IServiceProvider serviceProvider { get; set; }
 
-        public BaseNarudzbaState(_210011Context context, IMapper mapper, IServiceProvider serviceProvider)
+        public BaseNarudzbaState(_210011Context _context, IMapper _mapper, IServiceProvider _serviceProvider)
         {
-            Context = context;
-            Mapper = mapper;
-            ServiceProvider = serviceProvider;
+            context = _context;
+            mapper = _mapper;
+            serviceProvider = _serviceProvider;
         }
         public virtual Models.DTOs.NarudzbeDTO Insert(NarudzbeUpsertRequest request)
         {
@@ -63,17 +63,16 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
             switch(statename)
             {
                 case "initial":
-                    return ServiceProvider.GetService<InitialNarudzbaState>();
+                    return serviceProvider.GetService<InitialNarudzbaState>()!;
                 case "created":
-                    return ServiceProvider.GetService<CreatedNarudzbaState>();
+                    return serviceProvider.GetService<CreatedNarudzbaState>()!;
                 case "inprogress":
-                    return ServiceProvider.GetService<InProgressNarudzbaState>();
+                    return serviceProvider.GetService<InProgressNarudzbaState>()!;
                 case "finished":
-                    return ServiceProvider.GetService<FinishedNarudzbaState>();
+                    return serviceProvider.GetService<FinishedNarudzbaState>()!;
 
                 default: throw new Exception("State not recognized");
             }
         }
     }
 }
-//initial, created, inprogress, finished

@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
-using VirtualGardens.Services.AllServices;
+using VirtualGardens.Services.AllServices.Korisnici;
 
 namespace VirtualGardens.API
 {
@@ -24,7 +24,7 @@ namespace VirtualGardens.API
                 return AuthenticateResult.Fail("Missing header");
             }
 
-            var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
+            var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]!);
             var credentialsBytes = Convert.FromBase64String(authHeader.Parameter!);
             var credentials = Encoding.UTF8.GetString(credentialsBytes).Split(':');
 

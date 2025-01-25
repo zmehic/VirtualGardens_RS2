@@ -120,7 +120,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
     var newResult = await provider.get(filter: filter);
 
     setState(() {
-      if (newResult == null || newResult.result.isEmpty) {
+      if (newResult.result.isEmpty) {
         hasMoreData = false;
       } else {
         if (reset) {
@@ -170,8 +170,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
-                    Navigator.of(context)
-                        .pop(); // Go back to the previous screen
+                    Navigator.of(context).pop();
                     Navigator.of(context).pop();
                   },
                 ),
@@ -252,6 +251,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
           children: [
             Expanded(
               child: FormBuilderTextField(
+                controller: _searchController,
                 name: 'naziv',
                 decoration: const InputDecoration(
                   labelText: "Pretraži proizvode",

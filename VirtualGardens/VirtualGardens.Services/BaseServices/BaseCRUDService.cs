@@ -12,43 +12,42 @@ namespace VirtualGardens.Services.BaseServices
 {
     public abstract class BaseCRUDService<TModel, TSearch, TDbEntity, TInsert, TUpdate> : BaseService<TModel, TSearch, TDbEntity> where TModel : class where TSearch : BaseSearchObject where TDbEntity : class
     {
-        public BaseCRUDService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public BaseCRUDService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 
         public virtual TModel Insert(TInsert request)
         {
-            TDbEntity entity = Mapper.Map<TDbEntity>(request);
+            TDbEntity entity = mapper.Map<TDbEntity>(request);
 
             BeforeInsert(request, entity);
 
-            Context.Add(entity);
-            Context.SaveChanges();
+            context.Add(entity);
+            context.SaveChanges();
             AfterInsert(request, entity);
 
-            return Mapper.Map<TModel>(entity);
+            return mapper.Map<TModel>(entity);
         }
 
         public virtual TModel Update(int id, TUpdate request)
         {
-            var set = Context.Set<TDbEntity>();
-
+            var set = context.Set<TDbEntity>();
             var entity = set.Find(id);
 
-            Mapper.Map(request, entity);
+            mapper.Map(request, entity);
 
             BeforeUpdate(request, entity);
 
-            Context.SaveChanges();
+            context.SaveChanges();
 
             AfterUpdate(request, entity);
 
-            return Mapper.Map<TModel>(entity);
+            return mapper.Map<TModel>(entity);
         }
 
         public virtual void Delete(int id)
         {
-            var entity = Context.Set<TDbEntity>().Find(id);
+            var entity = context.Set<TDbEntity>().Find(id);
 
             if(entity == null)
             {
@@ -62,14 +61,14 @@ namespace VirtualGardens.Services.BaseServices
                 softDeletableEntity.IsDeleted = true;
                 softDeletableEntity.VrijemeBrisanja = DateTime.Now;
 
-                Context.Update(entity);
+                context.Update(entity);
             }
             else
             {
-                Context.Remove(entity);
+                context.Remove(entity);
             }
 
-            Context.SaveChanges();
+            context.SaveChanges();
 
             AfterDelete(id, entity);
         }

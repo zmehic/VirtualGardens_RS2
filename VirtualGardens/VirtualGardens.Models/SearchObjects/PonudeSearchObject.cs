@@ -6,7 +6,7 @@ namespace VirtualGardens.Models.SearchObjects
 {
     public class PonudeSearchObject : BaseSearchObject
     {
-        public string? NazivContains { get; set; } // For partial text search
+        public string? NazivContains { get; set; }
 
         public int? PopustFrom { get; set; }
 

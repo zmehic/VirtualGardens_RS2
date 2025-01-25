@@ -10,11 +10,10 @@ using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.BaseInterfaces;
 using VirtualGardens.Services.Database;
 
-namespace VirtualGardens.Services
+namespace VirtualGardens.Services.AllServices.Proizvodi
 {
-    public interface IProizvodiService : ICRUDService<Models.DTOs.ProizvodiDTO, ProizvodiSearchObject, ProizvodiUpsertRequest, ProizvodiUpsertRequest>
+    public interface IProizvodiService : ICRUDService<ProizvodiDTO, ProizvodiSearchObject, ProizvodiUpsertRequest, ProizvodiUpsertRequest>
     {
-        bool RecalcuclateQuantity();
         List<ProizvodiDTO> Recommend(int id);
         void TrainModel();
     }

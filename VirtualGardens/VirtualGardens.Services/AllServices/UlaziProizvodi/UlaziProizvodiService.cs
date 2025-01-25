@@ -14,7 +14,7 @@ namespace VirtualGardens.Services.AllServices.UlaziProizvodi
 {
     public class UlaziProizvodiService : BaseCRUDService<Models.DTOs.UlaziProizvodiDTO, UlaziProizvodiSearchObject, Database.UlaziProizvodi, UlaziProizvodiUpsertRequest, UlaziProizvodiUpsertRequest>, IUlaziProizvodiService
     {
-        public UlaziProizvodiService(_210011Context context, IMapper mapper) : base(context, mapper)
+        public UlaziProizvodiService(_210011Context _context, IMapper _mapper) : base(_context, _mapper)
         {
         }
 
@@ -22,25 +22,21 @@ namespace VirtualGardens.Services.AllServices.UlaziProizvodi
         {
             if (search.UlazId.HasValue)
             {
-                // Filter by UlazId (Entry ID)
                 query = query.Where(x => x.UlazId == search.UlazId.Value);
             }
 
             if (search.ProizvodId.HasValue)
             {
-                // Filter by ProizvodId (Product ID)
                 query = query.Where(x => x.ProizvodId == search.ProizvodId.Value);
             }
 
             if (search.KolicinaFrom.HasValue)
             {
-                // Filter by Kolicina (Quantity) - greater than or equal to specified value
                 query = query.Where(x => x.Kolicina >= search.KolicinaFrom.Value);
             }
 
             if (search.KolicinaTo.HasValue)
             {
-                // Filter by Kolicina (Quantity) - less than or equal to specified value
                 query = query.Where(x => x.Kolicina <= search.KolicinaTo.Value);
             }
 
@@ -54,29 +50,29 @@ namespace VirtualGardens.Services.AllServices.UlaziProizvodi
 
         public override void AfterInsert(UlaziProizvodiUpsertRequest request, Database.UlaziProizvodi entity)
         {
-            var proizvod = Context.Set<Proizvodi>().Find(request.ProizvodId);
+            var proizvod = context.Set<Database.Proizvodi>().Find(request.ProizvodId);
 
             if (proizvod != null)
             {
                 proizvod.DostupnaKolicina += request.Kolicina;
-                Context.Update<Proizvodi>(proizvod);
+                context.Update<Database.Proizvodi>(proizvod);
             }
 
-            Context.SaveChanges();
+            context.SaveChanges();
 
         }
 
         public override void BeforeDelete(int id, Database.UlaziProizvodi entity)
         {
-            var proizvod = Context.Set<Proizvodi>().Find(entity.ProizvodId);
+            var proizvod = context.Set<Database.Proizvodi>().Find(entity.ProizvodId);
 
             if(proizvod != null)
             {
                 proizvod.DostupnaKolicina -= entity.Kolicina;
-                Context.Update<Proizvodi>(proizvod);
+                context.Update<Database.Proizvodi>(proizvod);
             }
 
-            Context.SaveChanges();
+            context.SaveChanges();
         }
 
     }

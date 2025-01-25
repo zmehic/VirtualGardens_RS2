@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.Exceptions;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Services.BaseInterfaces;
 using VirtualGardens.Services.Database;
@@ -15,44 +16,42 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
 {
     public class CreatedNarudzbaState : BaseNarudzbaState
     {
-        public _210011Context _210011Context { get; set; }
-        public CreatedNarudzbaState(_210011Context context, IMapper mapper, IServiceProvider serviceProvider) : base(context, mapper, serviceProvider)
+        public CreatedNarudzbaState(_210011Context _context, IMapper _mapper, IServiceProvider _serviceProvider) : base(_context, _mapper, _serviceProvider)
         {
-            _210011Context = context;
         }
 
         void BeforeUpdate(Narudzbe entity)
         {
-            var orderProducts = _210011Context.ProizvodiSets.Include(x => x.Set).Where(x => x.Set.NarudzbaId == entity.NarudzbaId && x.Set.IsDeleted==false).ToList();
+            var orderProducts = context.ProizvodiSets.Include(x => x.Set).Where(x => x.Set.NarudzbaId == entity.NarudzbaId && x.Set.IsDeleted==false).ToList();
             foreach (var item in orderProducts)
             {
-                var product = _210011Context.Proizvodis.Where(x => x.ProizvodId == item.ProizvodId).FirstOrDefault();
+                var product = context.Proizvodis.Where(x => x.ProizvodId == item.ProizvodId).FirstOrDefault();
                 if(product!=null)
                 {
                     product.DostupnaKolicina -= item.Kolicina;
-                    _210011Context.Update(product);
-                    _210011Context.SaveChanges();
+                    context.Update(product);
+                    context.SaveChanges();
                 }
             }
         }
 
         public override NarudzbeDTO Update(int id, NarudzbeUpsertRequest request)
         {
-            var set = Context.Set<Narudzbe>();
+            var set = context.Set<Narudzbe>();
             var entity = set.Find(id);
-            Mapper.Map(request, entity);
-            Context.SaveChanges();
+            mapper.Map(request, entity);
+            context.SaveChanges();
 
-            return Mapper.Map<Models.DTOs.NarudzbeDTO>(entity);
+            return mapper.Map<Models.DTOs.NarudzbeDTO>(entity!);
         }
 
         public override void Delete(int id)
         {
-            var entity = Context.Set<Narudzbe>().Find(id);
+            var entity = context.Set<Narudzbe>().Find(id);
 
             if (entity == null)
             {
-                throw new Exception("Nemoguće pronaći objekat sa poslanim id-om!");
+                throw new UserException("Taj objekat ne postoji u bazi podataka!");
             }
 
             if (entity is ISoftDeletable softDeletableEntity)
@@ -61,39 +60,44 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
                 softDeletableEntity.IsDeleted = true;
                 softDeletableEntity.VrijemeBrisanja = DateTime.Now;
 
-                Context.Update(entity);
+                context.Update(entity);
             }
             else
             {
-                Context.Remove(entity);
+                context.Remove(entity);
             }
 
-            Context.SaveChanges();
+            context.SaveChanges();
 
         }
 
         public override NarudzbeDTO InProgress(int id)
         {
-            var set = Context.Set<Narudzbe>();
+            var set = context.Set<Narudzbe>();
             var entity = set.Find(id);
-            entity.StateMachine = "inprogress";
-            BeforeUpdate(entity);
-            Context.SaveChanges();
 
-            return Mapper.Map<NarudzbeDTO>(entity);
+            if(entity != null)
+            {
+                entity.StateMachine = "inprogress";
+                BeforeUpdate(entity);
+            }
+            context.SaveChanges();
+
+            return mapper.Map<NarudzbeDTO>(entity!);
         }
 
         public override NarudzbeDTO Finish(int id)
         {
-            var set = Context.Set<Narudzbe>();
+            var set = context.Set<Narudzbe>();
             var entity = set.Find(id);
-            entity.StateMachine = "finished";
-            Context.SaveChanges();
+            if(entity != null ) 
+                entity.StateMachine = "finished";
+            context.SaveChanges();
 
-            return Mapper.Map<NarudzbeDTO>(entity);
+            return mapper.Map<NarudzbeDTO>(entity!);
         }
 
-        public override List<string> AllowedActions(Narudzbe entity)
+        public override List<string> AllowedActions(Narudzbe? entity)
         {
             return new List<string>() { "update", "inprogress", "finish", "delete" };
         }
