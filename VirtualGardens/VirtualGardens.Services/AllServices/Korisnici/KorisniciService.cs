@@ -105,7 +105,7 @@ namespace VirtualGardens.Services.AllServices.Korisnici
                         UlogaId = uloga.UlogaId
                     });
                 }
-
+                context.SaveChanges();
             }
 
         }
@@ -113,8 +113,13 @@ namespace VirtualGardens.Services.AllServices.Korisnici
         public override void BeforeUpdate(KorisniciUpdateRequest request, Database.Korisnici entity)
         {
 
+
             if (request.Lozinka != null && !string.IsNullOrEmpty(request.Lozinka) && request.LozinkaPotvrda != null && !string.IsNullOrEmpty(request.LozinkaPotvrda))
             {
+                if (request.Lozinka != request.LozinkaPotvrda)
+                {
+                    throw new UserException("Lozinka i Lozinka potvrda moraju biti jednake");
+                }
                 if (request.StaraLozinka == null)
                     throw new UserException("Morate poslati staru lozinku!");
                 var lozinkaCheck = passwordService.GenerateHash(entity.LozinkaSalt, request.StaraLozinka) == entity.LozinkaHash;
@@ -137,7 +142,7 @@ namespace VirtualGardens.Services.AllServices.Korisnici
 
             if (entity == null)
             {
-                throw new UserException("Ne postoji korisnik u bazi sa tim korisničkim imenom");
+                return null;
             }
 
             var hash = passwordService.GenerateHash(entity.LozinkaSalt, password);

@@ -14,8 +14,7 @@ class FullScreenLoader extends StatelessWidget {
         isLoading == false
             ? child
             : Container(
-                color: const Color.fromRGBO(
-                    32, 76, 56, 1), // Optional: Semi-transparent background
+                color: const Color.fromRGBO(32, 76, 56, 1),
                 child: const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -27,7 +26,7 @@ class FullScreenLoader extends StatelessWidget {
                         height: 20,
                       ),
                       Text(
-                        "Good things come to those who wait!",
+                        '“Od svih ratnika najjača su dva: vrijeme i strpljenje.” L. Tolstoy, ',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

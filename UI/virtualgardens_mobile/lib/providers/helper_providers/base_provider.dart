@@ -1,8 +1,6 @@
 import 'dart:convert';
-
-import 'package:virtualgardens_mobile/models/search_result.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
-
+import 'package:virtualgardens_mobile/models/helper_models/search_result.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
@@ -14,7 +12,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
     baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "http://localhost:5203/");
+        defaultValue: "https://localhost:7011/");
   }
 
 //https://10.0.2.2:7011/

@@ -4,11 +4,11 @@ import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/korisnici.dart';
 import 'package:virtualgardens_mobile/models/ponuda.dart';
-import 'package:virtualgardens_mobile/models/search_result.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/models/helper_models/search_result.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/korisnik_provider.dart';
 import 'package:virtualgardens_mobile/providers/ponude_provider.dart';
-import 'package:virtualgardens_mobile/providers/utils.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_mobile/screens/narudzbe_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/ponude_details_screen.dart';
 
@@ -179,7 +179,6 @@ class _HomeScreenState extends State<HomeScreen> {
               trailing: IconButton(
                 icon: const Icon(Icons.arrow_forward, color: Colors.black),
                 onPressed: () {
-                  // Navigate to a new screen with the specific `ponuda`
                   if (ponuda != null) {
                     Navigator.push(
                       context,

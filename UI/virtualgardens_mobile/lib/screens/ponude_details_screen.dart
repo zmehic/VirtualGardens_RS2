@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/ponuda.dart';
-import 'package:virtualgardens_mobile/models/search_result.dart';
+import 'package:virtualgardens_mobile/models/helper_models/search_result.dart';
 import 'package:virtualgardens_mobile/models/setovi_ponude.dart';
 import 'package:virtualgardens_mobile/providers/setovi_ponude_provider.dart';
 

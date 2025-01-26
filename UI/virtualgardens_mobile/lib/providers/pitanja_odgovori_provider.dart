@@ -1,5 +1,5 @@
 import 'package:virtualgardens_mobile/models/pitanja_odgovori.dart';
-import 'package:virtualgardens_mobile/providers/base_provider.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/base_provider.dart';
 
 class PitanjaOdgovoriProvider extends BaseProvider<PitanjeOdgovor> {
   PitanjaOdgovoriProvider() : super("api/PitanjaOdgovori");

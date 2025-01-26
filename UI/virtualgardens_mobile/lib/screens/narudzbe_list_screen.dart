@@ -4,8 +4,8 @@ import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/narudzbe.dart';
-import 'package:virtualgardens_mobile/models/search_result.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/models/helper_models/search_result.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_mobile/screens/narudzbe_details_screen.dart';
 
@@ -33,10 +33,6 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
   }
 
   Future fetchUserOrders() async {
-    setState(() {
-      isLoading = true;
-    });
-
     final currentUserId = AuthProvider.korisnikId;
     var filter = {'korisnikId': currentUserId, 'isDeleted': false};
     result = await _narudzbaProvider.get(filter: filter);
@@ -216,14 +212,16 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
                 setState(() {
                   isLoading = false;
                 });
-                QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.success,
-                  title: "Narudžba je uspješno kreirana!",
-                  text:
-                      "Kliknite na narudžbu da biste vidjeli detalje i dodali proizvode.",
-                  confirmBtnText: "U redu",
-                );
+                if (mounted) {
+                  QuickAlert.show(
+                    context: context,
+                    type: QuickAlertType.success,
+                    title: "Narudžba je uspješno kreirana!",
+                    text:
+                        "Kliknite na narudžbu da biste vidjeli detalje i dodali proizvode.",
+                    confirmBtnText: "U redu",
+                  );
+                }
               },
               child: const Text(
                 "Kreiraj novu narudžbu",

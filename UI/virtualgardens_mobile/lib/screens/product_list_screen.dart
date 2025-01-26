@@ -1,19 +1,18 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/proizvod.dart';
-import 'package:virtualgardens_mobile/models/search_result.dart';
+import 'package:virtualgardens_mobile/models/helper_models/search_result.dart';
 import 'package:virtualgardens_mobile/models/vrsta_proizvoda.dart';
 import 'package:virtualgardens_mobile/providers/product_provider.dart';
 import 'package:virtualgardens_mobile/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_mobile/screens/product_details_screen.dart';
 
 class ProductListScreen extends StatefulWidget {
-  const ProductListScreen({Key? key}) : super(key: key);
+  const ProductListScreen({super.key});
 
   @override
   State<ProductListScreen> createState() => _ProductListScreenState();
@@ -24,22 +23,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
   late VrsteProizvodaProvider vrsteProizvodaProvider;
 
   Map<String, dynamic> _initialValue = {};
-  final ScrollController _scrollController = ScrollController();
 
-  final TextEditingController _cijenaOdEditingController =
-      TextEditingController();
-  final TextEditingController _cijenaDoEditingController =
-      TextEditingController();
+  final ScrollController _scrollController = ScrollController();
 
   SearchResult<Proizvod>? result;
   SearchResult<VrstaProizvoda>? vrsteProizvodaResult;
 
   double _cijenaOd = 0;
-  double _cijenaDo = 1000;
-
+  double _cijenaDo = 10;
   String? sortBy;
   bool isAscending = true;
-
   bool isLoading = true;
   bool isLoadingMore = false;
   bool hasMoreData = true;
@@ -57,9 +50,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
     super.initState();
     provider = context.read<ProductProvider>();
     initForm();
-    vrsteProizvodaProvider = context.read<VrsteProizvodaProvider>();
-    selectedVrstaProizvoda = 0;
-    _fetchProducts(vrstaProizvodaId: selectedVrstaProizvoda, reset: true);
 
     _scrollController.addListener(() {
       if (_scrollController.position.pixels ==
@@ -75,6 +65,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
     _initialValue = {
       'naziv': "",
     };
+
+    vrsteProizvodaProvider = context.read<VrsteProizvodaProvider>();
+    selectedVrstaProizvoda = 0;
+    _fetchProducts(vrstaProizvodaId: selectedVrstaProizvoda, reset: true);
 
     setState(() {
       isLoading = false;
@@ -141,22 +135,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
     await _fetchProducts(reset: false);
   }
 
-  Future initScreen(int? vrstaProizvodaId) async {
-    vrsteProizvodaResult = await vrsteProizvodaProvider.get();
-    vrsteProizvodaResult?.result
-        .insert(0, VrstaProizvoda(vrstaProizvodaId: 0, naziv: "Svi"));
-
-    _fetchProducts(vrstaProizvodaId: vrstaProizvodaId);
-
-    selectedVrstaProizvoda ??= vrsteProizvodaResult?.result[0].vrstaProizvodaId;
-    _cijenaDoEditingController.text = "";
-    _searchController.text = "";
-    _cijenaOdEditingController.text = "";
-    setState(() {
-      isLoading = false;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
@@ -192,49 +170,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                       ),
                     ],
                   ),
-                  Positioned(
-                    bottom: 16,
-                    left: 16,
-                    right: 16,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FloatingActionButton.extended(
-                          heroTag: "filter",
-                          onPressed: () {
-                            _scaffoldKey.currentState?.openDrawer();
-                          },
-                          label: const Text(
-                            "Filter",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          icon: const Icon(
-                            Icons.filter_list,
-                            color: Colors.white,
-                          ),
-                          backgroundColor: Colors.green.shade700,
-                        ),
-                        const SizedBox(
-                          width: 5,
-                        ),
-                        FloatingActionButton.extended(
-                          heroTag: "sort",
-                          onPressed: () {
-                            _scaffoldKey.currentState?.openEndDrawer();
-                          },
-                          label: const Text(
-                            "Sort",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                          icon: const Icon(
-                            Icons.sort,
-                            color: Colors.white,
-                          ),
-                          backgroundColor: Colors.green.shade700,
-                        ),
-                      ],
-                    ),
-                  ),
+                  _buildFilterAndSortButtons(),
                 ],
               ),
             )),
@@ -299,7 +235,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
               ),
             ),
           ),
-          // Your filter form inside the drawer
           Padding(
             padding: const EdgeInsets.all(8.0),
             child: Column(
@@ -332,9 +267,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
               Expanded(
                 child: RangeSlider(
                   min: 0,
-                  max: 1000, // Maximum price (adjust as needed)
+                  max: 30,
                   values: RangeValues(_cijenaOd, _cijenaDo),
-                  divisions: 200,
+                  divisions: 30,
                   labels: RangeLabels(
                     "KM ${_cijenaOd.toStringAsFixed(0)}",
                     "KM ${_cijenaDo.toStringAsFixed(0)}",
@@ -422,51 +357,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
             child: ListView(
               padding: const EdgeInsets.all(16.0),
               children: [
-                ListTile(
-                  leading: const Icon(Icons.sort),
-                  trailing: sortBy != null && sortBy == "Naziv"
-                      ? isAscending
-                          ? const Icon(Icons.arrow_upward)
-                          : const Icon(Icons.arrow_downward)
-                      : const Icon(Icons.horizontal_rule),
-                  title: const Text("Po nazivu"),
-                  onTap: () {
-                    setState(() {
-                      sortBy = "Naziv";
-                      isAscending = !isAscending;
-                    });
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.sort),
-                  trailing: sortBy != null && sortBy == "Cijena"
-                      ? isAscending
-                          ? const Icon(Icons.arrow_upward)
-                          : const Icon(Icons.arrow_downward)
-                      : const Icon(Icons.horizontal_rule),
-                  title: const Text("Po cijeni"),
-                  onTap: () {
-                    setState(() {
-                      sortBy = "Cijena";
-                      isAscending = !isAscending;
-                    });
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.sort),
-                  trailing: sortBy != null && sortBy == "DostupnaKolicina"
-                      ? isAscending
-                          ? const Icon(Icons.arrow_upward)
-                          : const Icon(Icons.arrow_downward)
-                      : const Icon(Icons.horizontal_rule),
-                  title: const Text("Po količini"),
-                  onTap: () {
-                    setState(() {
-                      sortBy = "DostupnaKolicina";
-                      isAscending = !isAscending;
-                    });
-                  },
-                ),
+                _buildSortListTile(
+                    isAscendingList: isAscending,
+                    sortByField: "Naziv",
+                    label: "Po nazivu"),
+                _buildSortListTile(
+                    isAscendingList: isAscending,
+                    sortByField: "Cijena",
+                    label: "Po cijeni"),
+                _buildSortListTile(
+                    isAscendingList: isAscending,
+                    sortByField: "DostupnaKolicina",
+                    label: "Po količini"),
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -482,10 +384,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     ),
                     ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          sortBy = null;
-                          isAscending = true;
-                        });
+                        sortBy = null;
+                        isAscending = true;
+                        _fetchProducts(reset: true);
+                        _scaffoldKey.currentState?.closeEndDrawer();
+                        setState(() {});
                       },
                       child: const Text("Ukloni sortiranje"),
                     ),
@@ -529,79 +432,150 @@ class _ProductListScreenState extends State<ProductListScreen> {
               ? const EdgeInsets.only(top: 8.0, bottom: 70.0)
               : const EdgeInsets.symmetric(vertical: 8.0),
           child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ProductDetailsScreen(product: product),
-                ),
-              );
-            },
-            child: Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: product.slika != null
-                          ? Image.memory(
-                              base64Decode(product.slika!),
-                              width: 150,
-                              height: 150,
-                              fit: BoxFit.cover,
-                            )
-                          : Container(
-                              width: 150,
-                              height: 150,
-                              color: Colors.grey.shade200,
-                              child: const Icon(
-                                Icons.image,
-                                size: 60,
-                                color: Colors.grey,
-                              ),
-                            ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            product.naziv ?? "",
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            "${product.cijena} KM / ${product.jedinicaMjere?.skracenica ?? ''}",
-                            style: const TextStyle(
-                              fontSize: 16,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Na stanju: ${product.dostupnaKolicina} ${product.jedinicaMjere?.skracenica ?? ''}",
-                            style: const TextStyle(fontSize: 14),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ProductDetailsScreen(product: product),
+                  ),
+                );
+              },
+              child: _buildProductCard(product)),
         );
       },
+    );
+  }
+
+  Widget _buildFilterAndSortButtons() {
+    return Positioned(
+      bottom: 16,
+      left: 16,
+      right: 16,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          FloatingActionButton.extended(
+            heroTag: "filter",
+            onPressed: () {
+              _scaffoldKey.currentState?.openDrawer();
+            },
+            label: const Text(
+              "Filter",
+              style: TextStyle(color: Colors.white),
+            ),
+            icon: const Icon(
+              Icons.filter_list,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.green.shade700,
+          ),
+          const SizedBox(
+            width: 5,
+          ),
+          FloatingActionButton.extended(
+            heroTag: "sort",
+            onPressed: () {
+              _scaffoldKey.currentState?.openEndDrawer();
+            },
+            label: const Text(
+              "Sort",
+              style: TextStyle(color: Colors.white),
+            ),
+            icon: const Icon(
+              Icons.sort,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.green.shade700,
+          ),
+        ],
+      ),
+    );
+  }
+
+  _buildSortListTile(
+      {bool isAscendingList = false,
+      String? sortByField,
+      String label = "Nasumično"}) {
+    return ListTile(
+      leading: const Icon(Icons.sort),
+      trailing: sortBy != null && sortBy == sortByField
+          ? isAscendingList
+              ? const Icon(Icons.arrow_upward)
+              : const Icon(Icons.arrow_downward)
+          : const Icon(Icons.horizontal_rule),
+      title: Text(label),
+      onTap: () {
+        setState(() {
+          sortBy = sortByField;
+          isAscending = !isAscendingList;
+        });
+      },
+    );
+  }
+
+  Widget _buildProductCard(Proizvod product) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: product.slika != null
+                  ? Image.memory(
+                      base64Decode(product.slika!),
+                      width: 150,
+                      height: 150,
+                      fit: BoxFit.cover,
+                    )
+                  : Container(
+                      width: 150,
+                      height: 150,
+                      color: Colors.grey.shade200,
+                      child: const Icon(
+                        Icons.image,
+                        size: 60,
+                        color: Colors.grey,
+                      ),
+                    ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    product.naziv ?? "",
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "${product.cijena} KM / ${product.jedinicaMjere?.skracenica ?? ''}",
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    "Na stanju: ${product.dostupnaKolicina} ${product.jedinicaMjere?.skracenica ?? ''}",
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_mobile/providers/korisnik_provider.dart';
 import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
@@ -197,17 +196,17 @@ class LoginPage extends StatelessWidget {
                                 await provider.login(
                                     username: AuthProvider.username,
                                     password: AuthProvider.password);
-                                // ignore: use_build_context_synchronously
                                 navigator.push(MaterialPageRoute(
                                     builder: (context) => const HomeScreen()));
                               } on Exception catch (e) {
-                                QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.error,
-                                    title: "Greška prilikom prijave",
-                                    text: e.toString().split(': ')[1],
-                                    confirmBtnText: "U redu");
-                                _usernameController.text = "";
+                                if (context.mounted) {
+                                  QuickAlert.show(
+                                      context: context,
+                                      type: QuickAlertType.error,
+                                      title: "Greška prilikom prijave",
+                                      text: e.toString().split(': ')[1],
+                                      confirmBtnText: "U redu");
+                                }
                                 _passwordController.text = "";
                               }
                             }

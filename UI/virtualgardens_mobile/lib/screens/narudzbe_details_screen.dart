@@ -2,20 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:flutter_paypal_payment/flutter_paypal_payment.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/narudzbe.dart';
 import 'package:virtualgardens_mobile/models/ponuda.dart';
-import 'package:virtualgardens_mobile/models/search_result.dart';
+import 'package:virtualgardens_mobile/models/helper_models/search_result.dart';
 import 'package:virtualgardens_mobile/models/set.dart';
 import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_mobile/providers/ponude_provider.dart';
 import 'package:virtualgardens_mobile/providers/setovi_provider.dart';
-import 'package:virtualgardens_mobile/providers/utils.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_mobile/screens/add_product_set_screen.dart';
 import 'package:virtualgardens_mobile/screens/narudzbe_list_screen.dart';
+import 'package:virtualgardens_mobile/screens/pitanja_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/ponude_details_screen.dart';
 
 // ignore: must_be_immutable
@@ -56,7 +56,6 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
     _ponudeProvider = context.read<PonudeProvider>();
 
     initForm();
-    fetchOffers();
   }
 
   Future<bool> checkValidity() async {
@@ -79,6 +78,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
       'IncludeTables': "ProizvodiSets"
     };
     setoviResult = await _setoviProvider.get(filter: filter);
+    fetchOffers();
     setState(() {
       isLoading = false;
     });
@@ -109,7 +109,36 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                   );
                 },
               ),
-              actions: <Widget>[Container()],
+              actions: <Widget>[
+                widget.narudzba!.stateMachine != 'created'
+                    ? GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PitanjaOdgovoriListScreen(
+                                narudzba: widget.narudzba,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Container(
+                          margin: const EdgeInsets.only(right: 10),
+                          width: 40,
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            color: Colors.blue,
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.question_answer,
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
               iconTheme: const IconThemeData(color: Colors.white),
               title: const Text(
                 "Detalji narudžbe",
@@ -138,7 +167,6 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                           ],
                         ),
                   Expanded(
-                    // Ensure TabBarView has proper constraints
                     child: widget.narudzba?.stateMachine == "created"
                         ? TabBarView(
                             children: [
@@ -208,7 +236,6 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                   fontWeight: FontWeight.bold,
                   color: Colors.black),
             ),
-            // Add a delete button
             widget.narudzba?.stateMachine == 'created'
                 ? IconButton(
                     onPressed: () async {
@@ -258,7 +285,6 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // PayPal Button
             widget.narudzba?.ukupnaCijena != null &&
                     widget.narudzba!.ukupnaCijena > 0
                 ? ElevatedButton.icon(
@@ -266,13 +292,14 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                       var response = await checkValidity();
                       String errorText = listaValidity.join("\n");
                       if (response == false) {
-                        QuickAlert.show(
-                            // ignore: use_build_context_synchronously
-                            context: context,
-                            type: QuickAlertType.error,
-                            title: "Vaša narudžba nije validna",
-                            confirmBtnText: "U redu",
-                            text: errorText);
+                        if (mounted) {
+                          QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.error,
+                              title: "Vaša narudžba nije validna",
+                              confirmBtnText: "U redu",
+                              text: errorText);
+                        }
                         return;
                       } else {
                         var secret = dotenv.env['SECRETKEY'] ?? "";
@@ -290,12 +317,13 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
 
                         if ((secretValue?.isEmpty ?? true) ||
                             (clientValue?.isEmpty ?? true)) {
-                          QuickAlert.show(
-                              // ignore: use_build_context_synchronously
-                              context: context,
-                              type: QuickAlertType.error,
-                              title: "Greška",
-                              text: "Greška sa plaćanjem");
+                          if (mounted) {
+                            QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.error,
+                                title: "Greška",
+                                text: "Greška sa plaćanjem");
+                          }
                           return;
                         }
 
@@ -313,74 +341,75 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                           }
                         });
 
-                        // ignore: use_build_context_synchronously
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(
-                          builder: (context) => PaypalCheckoutView(
-                            sandboxMode: true,
-                            clientId: clientValue,
-                            secretKey: secretValue,
-                            transactions: [
-                              {
-                                "amount": {
-                                  "total": widget.narudzba!.ukupnaCijena
-                                      .toStringAsFixed(2),
-                                  "currency": "EUR",
-                                  "details": {
-                                    "subtotal": widget.narudzba!.ukupnaCijena
+                        if (mounted) {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(
+                            builder: (context) => PaypalCheckoutView(
+                              sandboxMode: true,
+                              clientId: clientValue,
+                              secretKey: secretValue,
+                              transactions: [
+                                {
+                                  "amount": {
+                                    "total": widget.narudzba!.ukupnaCijena
                                         .toStringAsFixed(2),
-                                    "shipping": '0',
-                                    "shipping_discount": 0
+                                    "currency": "EUR",
+                                    "details": {
+                                      "subtotal": widget.narudzba!.ukupnaCijena
+                                          .toStringAsFixed(2),
+                                      "shipping": '0',
+                                      "shipping_discount": 0
+                                    }
+                                  },
+                                  "description": "Plaćanje narudžbe",
+                                  "item_list": {
+                                    "items": transactions,
                                   }
-                                },
-                                "description": "Plaćanje narudžbe",
-                                "item_list": {
-                                  "items": transactions,
                                 }
-                              }
-                            ],
-                            note: "Hvala Vam na plaćanju",
-                            onSuccess: (Map params) async {
-                              var request = {
-                                "brojNarudzbe": widget.narudzba!.brojNarudzbe,
-                                "ukupnaCijena": widget.narudzba!.ukupnaCijena,
-                                "korisnikId": widget.narudzba!.korisnikId,
-                                "nalogId": null,
-                                "placeno": true
-                              };
-                              var response = await _narudzbaProvider.update(
-                                  widget.narudzba!.narudzbaId, request);
-                              if (response.narudzbaId ==
-                                  widget.narudzba!.narudzbaId) {
-                                await _narudzbaProvider.narudzbeState(
-                                    action: "inprogress",
-                                    id: widget.narudzba?.narudzbaId);
-                              }
+                              ],
+                              note: "Hvala Vam na plaćanju",
+                              onSuccess: (Map params) async {
+                                var request = {
+                                  "brojNarudzbe": widget.narudzba!.brojNarudzbe,
+                                  "ukupnaCijena": widget.narudzba!.ukupnaCijena,
+                                  "korisnikId": widget.narudzba!.korisnikId,
+                                  "nalogId": null,
+                                  "placeno": true
+                                };
+                                var response = await _narudzbaProvider.update(
+                                    widget.narudzba!.narudzbaId, request);
+                                if (response.narudzbaId ==
+                                    widget.narudzba!.narudzbaId) {
+                                  await _narudzbaProvider.narudzbeState(
+                                      action: "inprogress",
+                                      id: widget.narudzba?.narudzbaId);
+                                }
 
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).pop(true);
-                            },
-                            onError: (error) {
-                              Navigator.pop(context);
-                            },
-                            onCancel: () {},
-                          ),
-                        ))
-                            .then((result) async {
-                          if (result == true) {
-                            widget.narudzba = await _narudzbaProvider
-                                .getById(widget.narudzba!.narudzbaId);
-                            setState(() {});
-                            QuickAlert.show(
-                                // ignore: use_build_context_synchronously
-                                context: context,
-                                type: QuickAlertType.success,
-                                title: "Plaćanje",
-                                text:
-                                    "Uspješno ste izvršili uplatu, vaša narudžba se sada nalazi u procesu.",
-                                confirmBtnText: "U redu");
-                          }
-                        });
+                                Navigator.of(context).pop(true);
+                              },
+                              onError: (error) {
+                                Navigator.pop(context);
+                              },
+                              onCancel: () {},
+                            ),
+                          ))
+                              .then((result) async {
+                            if (result == true) {
+                              widget.narudzba = await _narudzbaProvider
+                                  .getById(widget.narudzba!.narudzbaId);
+                              setState(() {});
+                              if (mounted) {
+                                QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Plaćanje",
+                                    text:
+                                        "Uspješno ste izvršili uplatu, vaša narudžba se sada nalazi u procesu.",
+                                    confirmBtnText: "U redu");
+                              }
+                            }
+                          });
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -395,9 +424,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                         style: TextStyle(color: Colors.white, fontSize: 16)),
                   )
                 : Container(),
-            const SizedBox(width: 20), // Space between buttons
-
-            // Add New Set Button
+            const SizedBox(width: 20),
             ElevatedButton.icon(
               onPressed: () {
                 Navigator.of(context).push(
@@ -524,13 +551,14 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                     await _ponudeProvider.addOfferToOrder(
                         ponudaId: offer?.ponudaId,
                         narudzbaId: widget.narudzba?.narudzbaId);
-
-                    QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno dodano!",
-                        text: "Ponuda je dodana u narudzbu.",
-                        confirmBtnText: "U redu");
+                    if (mounted) {
+                      QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.success,
+                          title: "Uspješno dodano!",
+                          text: "Ponuda je dodana u narudzbu.",
+                          confirmBtnText: "U redu");
+                    }
                     initForm();
                   },
                   child: const Text("Odaberi"),

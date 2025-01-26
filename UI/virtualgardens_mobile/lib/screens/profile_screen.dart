@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
@@ -10,9 +7,9 @@ import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/main.dart';
 import 'package:virtualgardens_mobile/models/korisnici.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/korisnik_provider.dart';
-import 'package:virtualgardens_mobile/providers/utils.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_mobile/screens/home_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -24,10 +21,7 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic> _initialValue = {};
-
-  File? _profileImage;
   String? _base64Image;
-
   bool changePassword = false;
   bool isLoading = true;
 
@@ -35,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Korisnik? korisnikResult;
 
   final TextEditingController _birthDateController = TextEditingController();
-
   final GlobalKey<ScaffoldState> _scaffoldKeyProfile =
       GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormBuilderState>();
@@ -79,115 +72,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       isLoading = false;
     });
-  }
-
-  Future<void> _pickImage() async {
-    final result = await FilePicker.platform.pickFiles(type: FileType.image);
-    if (result != null && result.files.single.path != null) {
-      final selectedImage = File(result.files.single.path!);
-      final fileSizeInBytes = await selectedImage.length();
-      final fileSizeInMb = fileSizeInBytes / (1024 * 1024);
-
-      if (fileSizeInMb > 2) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Please select an image up to 2 MB in size"),
-            backgroundColor: Colors.red,
-          ),
-        );
-      } else {
-        setState(() {
-          _profileImage = selectedImage;
-          _base64Image = base64Encode(selectedImage.readAsBytesSync());
-        });
-      }
-    }
-  }
-
-  Widget _buildDateField(String name, String label) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: FormBuilderTextField(
-        controller: _birthDateController,
-        decoration: const InputDecoration(labelText: "Datum rođenja"),
-        name: "datumRodjenja",
-        validator: FormBuilderValidators.compose([
-          FormBuilderValidators.required(
-              errorText: "Datum rođenja je obavezan."),
-        ]),
-        onTap: () async {
-          DateTime? pickedDate = await showDatePicker(
-              context: context,
-              firstDate: DateTime(1900),
-              lastDate: DateTime(2101));
-          if (pickedDate != null) {
-            _birthDateController.text =
-                formatDateString(pickedDate.toIso8601String());
-            _initialValue['datumRodjenja'] = pickedDate.toIso8601String();
-          }
-        },
-      ),
-    );
-  }
-
-  Widget _buildPasswordFields() {
-    return Visibility(
-      visible: changePassword,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: FormBuilderTextField(
-              obscureText: true,
-              name: "lozinka",
-              decoration: const InputDecoration(labelText: "Nova lozinka"),
-              validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(
-                    errorText: "Nova lozinka je obavezna."),
-                FormBuilderValidators.minLength(8,
-                    errorText: "Lozinka mora imati najmanje 8 znakova."),
-                FormBuilderValidators.match(
-                    r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
-                    errorText:
-                        "Lozinka mora sadržavati velika slova, mala slova, brojeve \n i specijalne znakove.")
-              ]),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: FormBuilderTextField(
-              obscureText: true,
-              name: "lozinkaPotvrda",
-              decoration: const InputDecoration(labelText: "Potvrdite lozinku"),
-              validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(
-                    errorText: "Potvrda lozinke je obavezna."),
-                (value) {
-                  if (value !=
-                      _formKey.currentState?.fields['lozinka']?.value) {
-                    return "Potvrda lozinke se ne poklapa s novom lozinkom.";
-                  }
-                  return null;
-                }
-              ]),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: FormBuilderTextField(
-              obscureText: true,
-              name: "staraLozinka",
-              decoration: const InputDecoration(labelText: "Stara lozinka"),
-              validator: FormBuilderValidators.compose([
-                FormBuilderValidators.required(
-                    errorText: "Stara lozinka je obavezna."),
-              ]),
-            ),
-          )
-        ],
-      ),
-    );
   }
 
   @override
@@ -253,249 +137,301 @@ class _ProfileScreenState extends State<ProfileScreen> {
             child: FormBuilder(
               key: _formKey,
               initialValue: _initialValue,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(
-                    child: GestureDetector(
-                      onTap: _pickImage,
-                      child: CircleAvatar(
-                        backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-                        radius: 60,
-                        backgroundImage: _profileImage != null
-                            ? FileImage(_profileImage!)
-                            : null,
-                        child: _profileImage == null
-                            ? const Icon(
-                                Icons.camera_alt,
-                                size: 50,
-                                color: Colors.white,
-                              )
-                            : null,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Center(
+                      child: GestureDetector(
+                        onTap: chooseAnImage,
+                        child: CircleAvatar(
+                          backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+                          radius: 60,
+                          backgroundImage: _base64Image != null
+                              ? imageFromString(_base64Image!).image
+                              : null,
+                          child: _base64Image == null
+                              ? const Icon(
+                                  Icons.camera_alt,
+                                  size: 50,
+                                  color: Colors.white,
+                                )
+                              : null,
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: FormBuilderTextField(
-                      name: "korisnickoIme",
-                      decoration:
-                          const InputDecoration(labelText: "Korisničko ime"),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(
-                            errorText: "Korisničko ime je obavezno."),
-                        FormBuilderValidators.minLength(3,
-                            errorText:
-                                "Korisničko ime mora imati najmanje 3 slova."),
-                        FormBuilderValidators.match(r'^\S+$',
-                            errorText:
-                                "Korisničko ime ne smije sadržavati razmake.")
-                      ]),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: FormBuilderTextField(
+                    const SizedBox(height: 20),
+                    buildFormBuilderTextField(
+                        name: "korisnickoIme",
+                        label: "Korisničko ime",
+                        isRequired: true,
+                        minLength: 3,
+                        match: r'^\S+$',
+                        matchErrorText:
+                            "Korisničko ime ne smije sadržavati razmake."),
+                    const SizedBox(height: 10),
+                    buildFormBuilderTextField(
                       name: "email",
-                      decoration: const InputDecoration(labelText: "Email"),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(
-                            errorText: "Email je obavezan."),
-                        FormBuilderValidators.email(
-                            errorText: "Unesite ispravnu email adresu.")
-                      ]),
+                      label: "Email",
+                      isEmail: true,
+                      isRequired: true,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: FormBuilderTextField(
-                      name: "ime",
-                      decoration: const InputDecoration(labelText: "Ime"),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.required(
-                            errorText: "Ime je obavezno."),
-                        FormBuilderValidators.match(r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
-                            errorText: "Ime može sadržavati samo slova.")
-                      ]),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: FormBuilderTextField(
+                    const SizedBox(height: 10),
+                    buildFormBuilderTextField(
+                        name: "ime",
+                        label: "Ime",
+                        isRequired: true,
+                        match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
+                        matchErrorText: "Ime može sadržavati samo slova."),
+                    const SizedBox(height: 10),
+                    buildFormBuilderTextField(
                         name: "prezime",
-                        decoration: const InputDecoration(labelText: "Prezime"),
-                        validator: FormBuilderValidators.compose([
-                          FormBuilderValidators.required(
-                              errorText: "Prezime je obavezno."),
-                          FormBuilderValidators.match(r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
-                              errorText: "Prezime može sadržavati samo slova.")
-                        ])),
-                  ),
-                  _buildDateField("datumRodjenja", "Datum rođenja"),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: FormBuilderTextField(
+                        label: "Prezime",
+                        isRequired: true,
+                        match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
+                        matchErrorText: "Prezime može sadržavati samo slova."),
+                    const SizedBox(height: 10),
+                    _buildDateField("datumRodjenja", "Datum rođenja"),
+                    const SizedBox(height: 10),
+                    buildFormBuilderTextField(
                       name: "brojTelefona",
-                      decoration:
-                          const InputDecoration(labelText: "Broj telefona"),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.match(
-                            r'^(?:\+387[0-9]{2}[0-9]{6}|06[0-9]{7})$',
-                            errorText:
-                                "Unesite ispravan broj mobitela (npr. +38761234567).")
-                      ]),
+                      label: "Broj telefona",
+                      match: r'^(?:\+387[0-9]{2}[0-9]{6}|06[0-9]{7})$',
+                      matchErrorText:
+                          "Unesite ispravan broj mobitela (npr. +38761234567).",
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: FormBuilderTextField(
+                    const SizedBox(height: 10),
+                    buildFormBuilderTextField(
                       name: "adresa",
-                      decoration: const InputDecoration(labelText: "Adresa"),
+                      label: "Adresa",
+                      isValidated: false,
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: FormBuilderTextField(
-                      name: "grad",
-                      decoration: const InputDecoration(labelText: "Grad"),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.match(r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
-                            errorText: "Grad može sadržavati samo slova.")
-                      ]),
+                    const SizedBox(height: 10),
+                    buildFormBuilderTextField(
+                        name: "grad",
+                        label: "Grad",
+                        match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
+                        matchErrorText: "Grad može sadržavati samo slova."),
+                    const SizedBox(height: 10),
+                    buildFormBuilderTextField(
+                        name: "drzava",
+                        label: "Država",
+                        match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
+                        matchErrorText: "Država može sadržavati samo slova."),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text("Želite li promijeniti lozinku?"),
+                          Checkbox(
+                            value: changePassword,
+                            onChanged: (value) {
+                              setState(() {
+                                changePassword = value!;
+                                _formKey.currentState
+                                    ?.setInternalFieldValue('lozinka', "");
+                              });
+                            },
+                            semanticLabel: "Promjeni lozinku",
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: FormBuilderTextField(
-                      name: "drzava",
-                      decoration: const InputDecoration(labelText: "Država"),
-                      validator: FormBuilderValidators.compose([
-                        FormBuilderValidators.match(r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
-                            errorText: "Država može sadržavati samo slova.")
-                      ]),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Želite li promijeniti lozinku?"),
-                        Checkbox(
-                          value: changePassword,
-                          onChanged: (value) {
-                            setState(() {
-                              changePassword = value!;
-                              _formKey.currentState
-                                  ?.setInternalFieldValue('lozinka', "");
-                            });
-                          },
-                          semanticLabel: "Promjeni lozinku",
-                        ),
-                      ],
-                    ),
-                  ),
-                  _buildPasswordFields(),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () async {
-                      if (_formKey.currentState?.saveAndValidate() == true) {
-                        debugPrint(_formKey.currentState?.value.toString());
+                    const SizedBox(height: 10),
+                    _buildPasswordFields(),
+                    const SizedBox(height: 20),
+                    ElevatedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState?.saveAndValidate() == true) {
+                          debugPrint(_formKey.currentState?.value.toString());
 
-                        var request = Map.from(_formKey.currentState!.value);
-                        request['slika'] = _base64Image;
-                        var key = request.entries.elementAt(4).key;
-                        request[key] = _initialValue['datumRodjenja'];
-                        setState(() {});
+                          var request = Map.from(_formKey.currentState!.value);
+                          request['slika'] = _base64Image;
+                          var key = request.entries.elementAt(4).key;
+                          request[key] = _initialValue['datumRodjenja'];
+                          setState(() {});
 
-                        try {
-                          if (request.containsKey('lozinka') == false ||
-                              (request.containsKey('lozinka') == true &&
-                                  request.containsKey('staraLozinka') == true &&
-                                  request.containsKey('lozinkaPotvrda') ==
-                                      true &&
-                                  request.containsKey('lozinka') ==
-                                      request.containsKey('lozinkaPotvrda'))) {
-                            try {
+                          try {
+                            if (request.containsKey('lozinka') == false ||
+                                (request.containsKey('lozinka') == true &&
+                                    request.containsKey('staraLozinka') ==
+                                        true &&
+                                    request.containsKey('lozinkaPotvrda') ==
+                                        true &&
+                                    request.containsKey('lozinka') ==
+                                        request
+                                            .containsKey('lozinkaPotvrda'))) {
                               var response = await _korisnikProvider.update(
                                   AuthProvider.korisnikId!, request);
 
                               AuthProvider.username = response.korisnickoIme;
                               AuthProvider.korisnikId = response.korisnikId;
 
-                              QuickAlert.show(
-                                // ignore: use_build_context_synchronously
-                                context: context,
-                                type: QuickAlertType.success,
-                                title:
-                                    "Uspješno ste ažurirali podatke o vašem profilu",
-                                confirmBtnText: "U redu",
-                                text:
-                                    "Ukoliko ste mijenjali lozinku, potrebno je da se ponovo prijavite na sistem!",
-                                onConfirmBtnTap: () {
-                                  if (request.containsKey('lozinka') == false) {
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const HomeScreen()));
-                                  } else {
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginPage()));
-                                  }
-                                },
-                              );
-                            } on Exception {
-                              QuickAlert.show(
-                                  // ignore: use_build_context_synchronously
+                              if (mounted) {
+                                QuickAlert.show(
                                   context: context,
-                                  type: QuickAlertType.error,
-                                  title: "Greška prilikom ažuriranja profila",
+                                  type: QuickAlertType.success,
+                                  title:
+                                      "Uspješno ste ažurirali podatke o vašem profilu",
                                   confirmBtnText: "U redu",
                                   text:
-                                      "Molimo Vas kontaktirajte korisničku podršku");
+                                      "Ukoliko ste mijenjali lozinku, potrebno je da se ponovo prijavite na sistem!",
+                                  onConfirmBtnTap: () {
+                                    if (request.containsKey('lozinka') ==
+                                        false) {
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const HomeScreen()));
+                                    } else {
+                                      Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  LoginPage()));
+                                    }
+                                  },
+                                );
+                              }
                             }
-                          } else {
-                            QuickAlert.show(
-                                context: context,
-                                type: QuickAlertType.error,
-                                title: "Greška prilikom ažuriranja profila",
-                                confirmBtnText: "U redu",
-                                text:
-                                    "Molimo Vas kontaktirajte korisničku podršku");
+                          } on Exception catch (e) {
+                            if (mounted) {
+                              QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  title: "Greška prilikom ažuriranja",
+                                  text: (e.toString().split(': '))[1],
+                                  confirmBtnText: "U redu");
+                            }
                             setState(() {});
                           }
-                        } on Exception catch (e) {
-                          QuickAlert.show(
-                              // ignore: use_build_context_synchronously
-                              context: context,
-                              type: QuickAlertType.error,
-                              title: "Greška prilikom ažuriranja",
-                              text: (e.toString().split(': '))[1],
-                              confirmBtnText: "U redu");
-
-                          setState(() {});
                         }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-                      padding: const EdgeInsets.symmetric(vertical: 15),
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+                        padding: const EdgeInsets.symmetric(vertical: 15),
+                      ),
+                      child: const Text(
+                        "Spasi promjene",
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
-                    child: const Text(
-                      "Spasi promjene",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
     );
+  }
+
+  Widget _buildDateField(String name, String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: FormBuilderTextField(
+        controller: _birthDateController,
+        decoration: const InputDecoration(labelText: "Datum rođenja"),
+        name: "datumRodjenja",
+        validator: FormBuilderValidators.compose([
+          FormBuilderValidators.required(
+              errorText: "Datum rođenja je obavezan."),
+        ]),
+        onTap: () async {
+          DateTime? pickedDate = await showDatePicker(
+              context: context,
+              firstDate: DateTime(1900),
+              lastDate: DateTime(2101));
+          if (pickedDate != null) {
+            _birthDateController.text =
+                formatDateString(pickedDate.toIso8601String());
+            _initialValue['datumRodjenja'] = pickedDate.toIso8601String();
+          }
+        },
+      ),
+    );
+  }
+
+  Widget _buildPasswordFields() {
+    return Visibility(
+      visible: changePassword,
+      child: Column(
+        children: [
+          buildFormBuilderTextField(
+            name: "lozinka",
+            label: "Nova lozinka",
+            isRequired: true,
+            minLength: 8,
+            match:
+                r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
+            matchErrorText:
+                "Lozinka mora sadržavati velika slova, mala slova, brojeve \n i specijalne znakove.",
+            obscureText: true,
+          ),
+          const SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: FormBuilderTextField(
+                  decoration:
+                      const InputDecoration(labelText: "Potvrdite lozinku"),
+                  obscureText: true,
+                  name: "lozinkaPotvrda",
+                  validator: FormBuilderValidators.compose([
+                    FormBuilderValidators.required(
+                        errorText: "Potvrda lozinke je obavezno."),
+                    (value) {
+                      if (value !=
+                          _formKey.currentState?.fields['lozinka']?.value) {
+                        return "Potvrda lozinke se ne poklapa s novom lozinkom.";
+                      }
+                      return null;
+                    }
+                  ]),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          buildFormBuilderTextField(
+            name: "staraLozinka",
+            label: "Stara lozinka",
+            isRequired: true,
+            obscureText: true,
+          ),
+        ],
+      ),
+    );
+  }
+
+  void chooseAnImage() async {
+    var image = await getImage();
+    if (image == null) {
+      if (mounted) {
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.info,
+          title: "Informacija",
+          text: "Niste odabrali sliku ili ona premašuje veličinu od 2 MB.",
+          confirmBtnText: "U redu",
+        );
+        _base64Image = null;
+      }
+    } else {
+      if (mounted) {
+        QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          title: "Slika uspješno dodana",
+          text: "Uspješno ste odabrali sliku.",
+          confirmBtnText: "U redu",
+        );
+      }
+      _base64Image = image.toString();
+    }
+    setState(() {});
   }
 }

@@ -77,13 +77,13 @@ namespace VirtualGardens.Services.Recommender
             if(mLContext==null)
                 mLContext = new MLContext();
 
-            var tmpData = context.Setovis.Include(x => x.ProizvodiSets).ToList();
+            var tmpData = context.Setovis.Where(x=>x.IsDeleted == false).Include(x => x.ProizvodiSets).ToList();
             var data = new List<ProductEntry>();
             foreach (var item in tmpData)
             {
                 if (item.ProizvodiSets.Count > 1)
                 {
-                    var distinctIdemId = item.ProizvodiSets.Select(x => x.ProizvodId).Distinct().ToList();
+                    var distinctIdemId = item.ProizvodiSets.Where(x=>x.IsDeleted==false).Select(x => x.ProizvodId).Distinct().ToList();
 
                     distinctIdemId.ForEach(y =>
                     {

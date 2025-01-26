@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:virtualgardens_mobile/models/korisnici.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
-import 'package:virtualgardens_mobile/providers/base_provider.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/base_provider.dart';
 
 class KorisnikProvider extends BaseProvider<Korisnik> {
   KorisnikProvider() : super("api/Korisnici");

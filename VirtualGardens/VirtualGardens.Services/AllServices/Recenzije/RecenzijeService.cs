@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VirtualGardens.Models.Exceptions;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Recenzije;
 using VirtualGardens.Models.SearchObjects;
@@ -56,6 +57,16 @@ namespace VirtualGardens.Services.AllServices.Recenzije
             }
 
             return query;
+        }
+
+        public override void BeforeInsert(RecenzijeUpsertRequest request, Database.Recenzije entity)
+        {
+            var recenzije = context.Recenzijes.Where(x=>x.KorisnikId==request.KorisnikId && request.ProizvodId==x.ProizvodId && x.IsDeleted == false).FirstOrDefault();
+            if(recenzije != null)
+            {
+                throw new UserException("Moguće je dodati samo jednu recenziju po proizvodu");
+            }
+            base.BeforeInsert(request, entity);
         }
 
     }

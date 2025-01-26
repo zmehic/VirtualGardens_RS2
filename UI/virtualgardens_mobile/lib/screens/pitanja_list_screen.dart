@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
+import 'package:virtualgardens_mobile/models/korisnici.dart';
 import 'package:virtualgardens_mobile/models/narudzbe.dart';
 import 'package:virtualgardens_mobile/models/pitanja_odgovori.dart';
-import 'package:virtualgardens_mobile/models/search_result.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/models/helper_models/search_result.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/pitanja_odgovori_provider.dart';
-import 'package:virtualgardens_mobile/providers/utils.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
 
-// ignore: must_be_immutable
 class PitanjaOdgovoriListScreen extends StatefulWidget {
-  Narudzba? narudzba;
-  PitanjaOdgovoriListScreen({super.key, this.narudzba});
+  final Narudzba? narudzba;
+  const PitanjaOdgovoriListScreen({super.key, this.narudzba});
 
   @override
   State<PitanjaOdgovoriListScreen> createState() =>
@@ -25,6 +25,11 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
   SearchResult<PitanjeOdgovor>? result;
 
   bool isLoading = true;
+
+  final TextEditingController _porukaEditingController =
+      TextEditingController();
+
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void didChangeDependencies() {
@@ -44,6 +49,7 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
       'IncludeTables': "Korisnik",
       'isDeleted': false
     };
+
     result = await provider.get(filter: filter);
 
     _porukaEditingController.text = "";
@@ -57,23 +63,32 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
   Widget build(BuildContext context) {
     return MasterScreen(
       FullScreenLoader(
-        isLoading: isLoading, // Your loading state
-        child: Container(
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
-            children: [
-              _buildBanner(),
-              _buildResultView(),
-            ],
+        isLoading: isLoading,
+        child: Scaffold(
+          key: _scaffoldKey,
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            actions: <Widget>[Container()],
+            iconTheme: const IconThemeData(color: Colors.white),
+            title: const Text(
+              "Pitanja za narudžbu",
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+          ),
+          body: Column(
+            children: [_buildResultView()],
           ),
         ),
       ),
-      "Pitanja za narudžbu - ${widget.narudzba?.brojNarudzbe}",
+      "Pitanja za narudžbu",
     );
   }
-
-  final TextEditingController _porukaEditingController =
-      TextEditingController();
 
   Widget _buildResultView() {
     return Expanded(
@@ -103,24 +118,8 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (!isLoggedInUser)
-                          ClipOval(
-                            child: SizedBox(
-                                width: 40,
-                                height: 40,
-                                child: message?.korisnik?.slika != null
-                                    ? imageFromString(
-                                        message?.korisnik?.slika ?? "")
-                                    : Image.asset(
-                                        'assets/images/user.png',
-                                        fit: BoxFit.cover,
-                                        width: 24,
-                                        height:
-                                            24, // Cover the whole area of the circle
-                                      )),
-                          ),
+                          _buildUserProfilePicture(message?.korisnik),
                         if (!isLoggedInUser) const SizedBox(width: 10),
-
-                        // Message bubble
                         Flexible(
                           child: Container(
                             padding: const EdgeInsets.all(10),
@@ -150,32 +149,15 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                             ),
                           ),
                         ),
-
-                        // Show profile picture for logged-in user
                         if (isLoggedInUser) const SizedBox(width: 10),
                         if (isLoggedInUser)
-                          ClipOval(
-                            child: SizedBox(
-                                width: 40,
-                                height: 40,
-                                child: message?.korisnik?.slika != null
-                                    ? imageFromString(
-                                        message?.korisnik?.slika ?? "")
-                                    : Image.asset(
-                                        'assets/images/user.png',
-                                        fit: BoxFit.cover,
-                                        width: 24,
-                                        height:
-                                            24, // Cover the whole area of the circle
-                                      )),
-                          ),
+                          _buildUserProfilePicture(message?.korisnik),
                       ],
                     ),
                   );
                 },
               ),
             ),
-            // Input field for new messages
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -212,31 +194,6 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
     );
   }
 
-  Widget _buildBanner() {
-    return Container(
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(size: 45, color: Colors.white, Icons.question_answer),
-            const SizedBox(
-              width: 10,
-            ),
-            Text("Pitanja za narudžbu - ${widget.narudzba?.brojNarudzbe}",
-                style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "arial",
-                    color: Colors.white)),
-          ],
-        ),
-      ),
-    );
-  }
-
   void _sendMessage() async {
     if (_porukaEditingController.text.isEmpty) return;
     Map<dynamic, dynamic> request = {
@@ -246,5 +203,21 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
     };
     await provider.insert(request);
     initScreen();
+  }
+
+  _buildUserProfilePicture(Korisnik? korisnik) {
+    return ClipOval(
+      child: SizedBox(
+          width: 40,
+          height: 40,
+          child: korisnik?.slika != null
+              ? imageFromString(korisnik?.slika ?? "")
+              : Image.asset(
+                  'assets/images/user.png',
+                  fit: BoxFit.cover,
+                  width: 24,
+                  height: 24,
+                )),
+    );
   }
 }

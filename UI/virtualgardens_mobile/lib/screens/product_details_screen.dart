@@ -9,10 +9,10 @@ import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/proizvod.dart';
 import 'package:virtualgardens_mobile/models/recenzija.dart';
-import 'package:virtualgardens_mobile/models/search_result.dart';
-import 'package:virtualgardens_mobile/providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/models/helper_models/search_result.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/recenzije_provider.dart';
-import 'package:virtualgardens_mobile/providers/utils.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
   final Proizvod? product;
@@ -24,11 +24,11 @@ class ProductDetailsScreen extends StatefulWidget {
 }
 
 class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
-  late RecenzijeProvider _recenzijeProvider;
-
   Map<String, dynamic> _initialValue = {};
 
+  late RecenzijeProvider _recenzijeProvider;
   SearchResult<Recenzija>? recenzijeResult;
+
   bool isLoading = true;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -64,7 +64,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
             isLoading: isLoading,
             child: Scaffold(
               key: _scaffoldKey,
-              endDrawer: _buildEndDrawer("Recenzija"),
+              endDrawer: _buildEndDrawer("Recenzija", null),
               resizeToAvoidBottomInset: false,
               appBar: AppBar(
                 actions: <Widget>[Container()],
@@ -81,7 +81,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Product Image
                       Container(
                         height: 200,
                         width: double.infinity,
@@ -100,8 +99,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Product Name
                       Text(
                         widget.product?.naziv ?? "Naziv proizvoda",
                         style: const TextStyle(
@@ -111,8 +108,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-
-                      // Product Price
                       Text(
                         "${widget.product?.cijena ?? 0} KM / ${widget.product?.jedinicaMjere?.skracenica ?? ''}",
                         style: const TextStyle(
@@ -121,8 +116,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Product Description
                       Text(
                         widget.product?.opis ?? "Opis proizvoda nije dostupan.",
                         style: const TextStyle(
@@ -131,8 +124,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 24),
-
-                      // Reviews Section Header
                       const Text(
                         "Recenzije",
                         style: TextStyle(
@@ -141,9 +132,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 8),
-
-                      // Reviews List
-                      Container(
+                      SizedBox(
                         height: 250,
                         child: SingleChildScrollView(
                           child: Column(
@@ -158,45 +147,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       itemBuilder: (context, index) {
                                         final recenzija =
                                             recenzijeResult!.result[index];
-                                        return Card(
-                                          margin: const EdgeInsets.symmetric(
-                                              vertical: 8.0, horizontal: 0.0),
-                                          child: ListTile(
-                                            title: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(
-                                                  recenzija.korisnik?.ime ??
-                                                      "Nepoznati korisnik",
-                                                  style: const TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                  ),
-                                                ),
-                                                RatingBarIndicator(
-                                                  rating: recenzija.ocjena
-                                                      .toDouble(),
-                                                  itemBuilder:
-                                                      (context, index) =>
-                                                          const Icon(
-                                                    Icons.star,
-                                                    color: Colors.amber,
-                                                  ),
-                                                  itemSize: 20,
-                                                ),
-                                              ],
-                                            ),
-                                            subtitle: Padding(
-                                              padding: const EdgeInsets.only(
-                                                  top: 8.0),
-                                              child: Text(
-                                                recenzija.komentar ??
-                                                    "Bez komentara",
-                                              ),
-                                            ),
-                                          ),
-                                        );
+                                        return _buildRecenzijaWidget(recenzija);
                                       },
                                     )
                                   : const Text("Nema dostupnih recenzija."),
@@ -205,8 +156,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Write Review Button
                       Center(
                         child: ElevatedButton.icon(
                           onPressed: () {
@@ -234,9 +183,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         "Detalji o proizvodu");
   }
 
-  _buildEndDrawer(String title) {
-    double userRating = 1; // To store the user's selected rating
-    TextEditingController _commentController = TextEditingController();
+  _buildEndDrawer(String title, Recenzija? recenzija) {
+    double userRating = 1;
+    TextEditingController commentController = TextEditingController();
 
     return Drawer(
       child: FormBuilder(
@@ -273,8 +222,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         ),
                       ),
                       const SizedBox(height: 16),
-
-                      // Rating Bar
                       RatingBar(
                         ignoreGestures: false,
                         allowHalfRating: false,
@@ -293,8 +240,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-
-                      // Comment Field
                       const Text(
                         "Vaš komentar",
                         style: TextStyle(
@@ -312,12 +257,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ),
                           hintText: "Napišite svoj komentar ovdje...",
                         ),
-                        validator: FormBuilderValidators.compose(
-                            [FormBuilderValidators.maxLength(100)]),
+                        validator: FormBuilderValidators.compose([
+                          FormBuilderValidators.maxLength(100,
+                              errorText: "Maksimalno dozvoljeno je 100 znakova")
+                        ]),
                       ),
                       const SizedBox(height: 16),
-
-                      // Buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -327,7 +272,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       ?.saveAndValidate() ==
                                   true) {
                                 if (userRating == 0) {
-                                  // Show an error if the user hasn't given a rating
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     const SnackBar(
                                       content: Text("Molimo odaberite ocjenu."),
@@ -338,7 +282,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 setState(() {
                                   isLoading = true;
                                 });
-                                // Handle review submission here
                                 final newReview = {
                                   'ocjena': userRating.toInt(),
                                   'komentar': _productRatingFormKey
@@ -349,21 +292,37 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   'korisnikId': AuthProvider.korisnikId,
                                   'proizvodId': widget.product!.proizvodId,
                                 };
-
-                                var result =
-                                    await _recenzijeProvider.insert(newReview);
-                                recenzijeResult!.result.add(result);
-                                QuickAlert.show(
-                                  context: context,
-                                  type: QuickAlertType.success,
-                                  text: "Vaša recenzija je uspješno poslana!",
-                                );
-
-                                // Clear inputs after submission
+                                try {
+                                  var result = await _recenzijeProvider
+                                      .insert(newReview);
+                                  recenzijeResult!.result.add(result);
+                                  if (mounted) {
+                                    QuickAlert.show(
+                                      context: context,
+                                      type: QuickAlertType.success,
+                                      title: "Uspješno!",
+                                      text:
+                                          "Vaša recenzija je uspješno poslana!",
+                                      confirmBtnText: "U redu",
+                                    );
+                                  }
+                                  userRating = 0;
+                                  commentController.clear();
+                                  _scaffoldKey.currentState?.closeEndDrawer();
+                                  setState(() {});
+                                } on Exception catch (e) {
+                                  if (mounted) {
+                                    QuickAlert.show(
+                                      title: "Greška",
+                                      context: context,
+                                      type: QuickAlertType.error,
+                                      text: e.toString().split(': ')[1],
+                                    );
+                                  }
+                                  setState(() {});
+                                }
                                 userRating = 0;
-                                _commentController.clear();
-
-                                // Close the drawer
+                                commentController.clear();
                                 _scaffoldKey.currentState?.closeEndDrawer();
 
                                 setState(() {
@@ -393,6 +352,64 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRecenzijaWidget(Recenzija recenzija) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 0.0),
+      child: ListTile(
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              recenzija.korisnik?.ime ?? "Nepoznati korisnik",
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            RatingBarIndicator(
+              rating: recenzija.ocjena.toDouble(),
+              itemBuilder: (context, index) => const Icon(
+                Icons.star,
+                color: Colors.amber,
+              ),
+              itemSize: 20,
+            ),
+          ],
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 8.0),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  recenzija.komentar ?? "Bez komentara",
+                ),
+              ),
+              recenzija.korisnikId == AuthProvider.korisnikId
+                  ? IconButton(
+                      icon: const Icon(Icons.delete),
+                      onPressed: () async {
+                        await _recenzijeProvider.delete(recenzija.recenzijaId);
+                        if (mounted) {
+                          QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.success,
+                            title: "Uspješno!",
+                            text: "Recenzija je uspješno obrisana.",
+                            confirmBtnText: "U redu",
+                          );
+                        }
+                        recenzijeResult!.result.remove(recenzija);
+                        setState(() {});
+                      },
+                    )
+                  : Container(),
+            ],
+          ),
         ),
       ),
     );
