@@ -7,7 +7,7 @@ import 'package:virtualgardens_admin/models/proizvod.dart';
 import 'package:virtualgardens_admin/models/recenzija.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/providers/recenzije_provider.dart';
-import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 
 // ignore: must_be_immutable
 class RecenzijeListScreen extends StatefulWidget {

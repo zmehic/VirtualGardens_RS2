@@ -8,7 +8,7 @@ import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/models/ulazi_proizvodi.dart';
 import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_provider.dart';
-import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
 import 'package:virtualgardens_admin/screens/pitanja_list_screen.dart';
 import 'package:virtualgardens_admin/screens/zaposlenici_list_screen.dart';

@@ -8,11 +8,11 @@ import 'package:virtualgardens_admin/models/proizvod.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/models/ulazi.dart';
 import 'package:virtualgardens_admin/models/ulazi_proizvodi.dart';
-import 'package:virtualgardens_admin/providers/auth_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/ulazi_proizvodi_provider.dart';
 import 'package:virtualgardens_admin/providers/ulazi_provider.dart';
-import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/screens/ulazi_list_screen.dart';
 
 // ignore: must_be_immutable

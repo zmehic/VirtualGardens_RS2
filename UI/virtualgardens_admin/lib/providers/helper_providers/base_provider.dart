@@ -1,27 +1,24 @@
 import 'dart:convert';
-
 import 'package:virtualgardens_admin/models/search_result.dart';
-import 'package:virtualgardens_admin/providers/auth_provider.dart';
-
+import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
 abstract class BaseProvider<T> with ChangeNotifier {
-  static String? _baseUrl;
+  static String? baseUrl;
   String _endpoint = "";
 
   BaseProvider(String endpoint) {
     _endpoint = endpoint;
-    _baseUrl = const String.fromEnvironment("baseUrl",
+    baseUrl = const String.fromEnvironment("baseUrl",
         defaultValue: "https://localhost:7011/");
   }
 
   //http://localhost:5203/
 
   Future<SearchResult<T>> get({dynamic filter}) async {
-    var url = "$_baseUrl$_endpoint";
-
+    var url = "$baseUrl$_endpoint";
     if (filter != null) {
       var queryString = getQueryString(filter);
       url = "$url?$queryString";
@@ -29,52 +26,41 @@ abstract class BaseProvider<T> with ChangeNotifier {
 
     var uri = Uri.parse(url);
     var headers = createHeaders();
-
     var response = await http.get(uri, headers: headers);
 
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
-
       var result = SearchResult<T>();
-
       result.count = data['count'];
 
       for (var item in data['resultList']) {
         result.result.add(fromJson(item));
       }
-
       return result;
     } else {
-      throw new Exception("Unknown error");
+      throw Exception("Unknown error");
     }
     // print("response: ${response.request} ${response.statusCode}, ${response.body}");
   }
 
   Future<T> getById(int id) async {
-    var url = "$_baseUrl$_endpoint/$id";
-
+    var url = "$baseUrl$_endpoint/$id";
     var uri = Uri.parse(url);
     var headers = createHeaders();
-
     var response = await http.get(uri, headers: headers);
-    // throw new Exception("Greška");
+
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
-
-      // var result = data as T;
       return fromJson(data);
-      // return result;
     } else {
       throw new Exception("Unknown error");
     }
-    // print("response: ${response.request} ${response.statusCode}, ${response.body}");
   }
 
   Future<T> insert(dynamic request) async {
-    var url = "$_baseUrl$_endpoint";
+    var url = "$baseUrl$_endpoint";
     var uri = Uri.parse(url);
     var headers = createHeaders();
-
     var jsonRequest = jsonEncode(request);
     var response = await http.post(uri, headers: headers, body: jsonRequest);
 
@@ -87,10 +73,9 @@ abstract class BaseProvider<T> with ChangeNotifier {
   }
 
   Future<T> update(int id, [dynamic request]) async {
-    var url = "$_baseUrl$_endpoint/$id";
+    var url = "$baseUrl$_endpoint/$id";
     var uri = Uri.parse(url);
     var headers = createHeaders();
-
     var jsonRequest = jsonEncode(request);
     var response = await http.put(uri, headers: headers, body: jsonRequest);
 
@@ -103,10 +88,9 @@ abstract class BaseProvider<T> with ChangeNotifier {
   }
 
   Future delete(int id) async {
-    var url = "$_baseUrl$_endpoint/$id";
+    var url = "$baseUrl$_endpoint/$id";
     var uri = Uri.parse(url);
     var headers = createHeaders();
-
     var response = await http.delete(uri, headers: headers);
 
     if (!isValidResponse(response)) {
@@ -124,7 +108,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     } else if (response.statusCode == 401) {
       throw new Exception("Unauthorized");
     } else {
-      final Map<String, dynamic> decodedResponse = jsonDecode(response.body);
+      var decodedResponse = jsonDecode(response.body);
 
       if (decodedResponse['errors'] != null &&
           decodedResponse['errors']['userError'] != null) {
@@ -133,7 +117,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
         throw new Exception(userError[0]);
       } else {
         print(response.body);
-        throw new Exception("Something bad happened, please try again later!");
+        throw Exception("Something bad happened, please try again later!");
       }
     }
   }

@@ -64,7 +64,7 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.JedinicaMjereId).HasColumnName("JedinicaMjereID");
             entity.Property(e => e.Naziv)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Opis)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -82,7 +82,7 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.KorisnikId).HasColumnName("KorisnikID");
             entity.Property(e => e.Adresa)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.BrojTelefona)
                 .HasMaxLength(20)
                 .IsUnicode(false);
@@ -90,13 +90,13 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.DatumRodjenja).HasColumnType("datetime");
             entity.Property(e => e.Drzava)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.Grad)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Ime)
                 .HasMaxLength(50)
                 .IsUnicode(true);
@@ -208,7 +208,7 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.DatumKreiranja).HasColumnType("datetime");
             entity.Property(e => e.Naziv)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Proizvodi>(entity =>
@@ -221,7 +221,7 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.JedinicaMjereId).HasColumnName("JedinicaMjereID");
             entity.Property(e => e.Naziv)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Opis)
                 .HasMaxLength(255)
                 .IsUnicode(false);
@@ -275,7 +275,7 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.Datum).HasColumnType("datetime");
             entity.Property(e => e.Komentar)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.KorisnikId).HasColumnName("KorisnikID");
             entity.Property(e => e.ProizvodId).HasColumnName("ProizvodID");
 
@@ -377,10 +377,10 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.UlogaId).HasColumnName("UlogaID");
             entity.Property(e => e.Naziv)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Opis)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<VrsteProizvodum>(entity =>
@@ -390,7 +390,7 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.VrstaProizvodaId).HasColumnName("VrstaProizvodaID");
             entity.Property(e => e.Naziv)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         modelBuilder.Entity<Zaposlenici>(entity =>
@@ -402,26 +402,26 @@ public partial class _210011Context : DbContext
             entity.Property(e => e.ZaposlenikId).HasColumnName("ZaposlenikID");
             entity.Property(e => e.Adresa)
                 .HasMaxLength(255)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.BrojTelefona)
                 .HasMaxLength(20)
                 .IsUnicode(false);
             entity.Property(e => e.DatumRodjenja).HasColumnType("datetime");
             entity.Property(e => e.Drzava)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.Grad)
                 .HasMaxLength(100)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Ime)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
             entity.Property(e => e.Prezime)
                 .HasMaxLength(50)
-                .IsUnicode(false);
+                .IsUnicode(true);
         });
 
         OnModelCreatingPartial(modelBuilder);

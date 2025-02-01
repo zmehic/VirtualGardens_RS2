@@ -1,6 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:virtualgardens_admin/models/proizvod.dart';
-import 'package:virtualgardens_admin/providers/base_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/base_provider.dart';
 
 class ProductProvider extends BaseProvider<Proizvod> {
   ProductProvider() : super("Proizvodi");

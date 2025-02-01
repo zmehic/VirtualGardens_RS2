@@ -1,5 +1,5 @@
 import 'package:virtualgardens_admin/models/ulazi_proizvodi.dart';
-import 'package:virtualgardens_admin/providers/base_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/base_provider.dart';
 
 class UlaziProizvodiProvider extends BaseProvider<UlazProizvod> {
   UlaziProizvodiProvider() : super("api/UlaziProizvodi");

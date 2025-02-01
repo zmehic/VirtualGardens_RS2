@@ -1,9 +1,10 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
-import 'package:virtualgardens_admin/providers/auth_provider.dart';
+import 'package:quickalert/quickalert.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_admin/providers/korisnik_provider.dart';
 import 'package:virtualgardens_admin/providers/nalozi_provider.dart';
@@ -20,6 +21,7 @@ import 'package:virtualgardens_admin/providers/ulazi_provider.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_admin/providers/zaposlenici_provider.dart';
 import 'package:virtualgardens_admin/screens/home_screen.dart';
+import 'package:window_manager/window_manager.dart';
 
 class MyHttpOverrides extends HttpOverrides {
   @override
@@ -30,7 +32,14 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  windowManager.waitUntilReadyToShow().then((_) async {
+    await windowManager.setMinimumSize(const Size(1000, 600));
+    await windowManager.maximize();
+  });
+
   HttpOverrides.global = MyHttpOverrides();
   runApp(MultiProvider(
     providers: [
@@ -97,8 +106,11 @@ class LoginPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Login"),
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        title: const Text(
+          "Login",
+          style: TextStyle(color: Colors.white),
+        ),
+        backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
       ),
       body: Center(
         child: Center(
@@ -132,28 +144,24 @@ class LoginPage extends StatelessWidget {
             controller: _usernameController,
             decoration: const InputDecoration(
                 labelText: "Username", prefixIcon: Icon(Icons.person)),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Please enter some text';
-              }
-              return null;
-            },
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(
+                  errorText: "Korisničko ime je obavezno."),
+            ]),
           ),
           const SizedBox(
             height: 10,
           ),
           FormBuilderTextField(
-              name: "password",
-              controller: _passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                  labelText: "Password", prefixIcon: Icon(Icons.password)),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter some text';
-                }
-                return null;
-              }),
+            name: "password",
+            controller: _passwordController,
+            obscureText: true,
+            decoration: const InputDecoration(
+                labelText: "Password", prefixIcon: Icon(Icons.password)),
+            validator: FormBuilderValidators.compose([
+              FormBuilderValidators.required(errorText: "Lozinka je obavezna."),
+            ]),
+          ),
           const SizedBox(
             height: 10,
           ),
@@ -168,22 +176,21 @@ class LoginPage extends StatelessWidget {
                     await provider.login(
                         username: AuthProvider.username,
                         password: AuthProvider.password);
-                    // ignore: use_build_context_synchronously
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => const HomeScreen()));
+                    if (context.mounted) {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => const HomeScreen()));
+                    }
                   } on Exception catch (e) {
-                    showDialog(
-                        // ignore: use_build_context_synchronously
-                        context: context,
-                        builder: (context) => AlertDialog(
-                              title: const Text("Error"),
-                              content: Text(e.toString()),
-                              actions: [
-                                TextButton(
-                                    onPressed: () => Navigator.pop(context),
-                                    child: const Text("Ok"))
-                              ],
-                            ));
+                    if (context.mounted) {
+                      QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.error,
+                          title: "Greška prilikom prijave",
+                          text: e.toString().split(': ')[1],
+                          confirmBtnText: "U redu");
+                    }
+                    _usernameController.clear();
+                    _passwordController.clear();
                   }
                 }
               },

@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:virtualgardens_admin/models/narudzbe.dart';
-import 'package:virtualgardens_admin/providers/base_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/base_provider.dart';
 import 'package:http/http.dart' as http;
 
 class NarudzbaProvider extends BaseProvider<Narudzba> {

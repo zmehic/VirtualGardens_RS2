@@ -393,17 +393,37 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ? IconButton(
                       icon: const Icon(Icons.delete),
                       onPressed: () async {
-                        await _recenzijeProvider.delete(recenzija.recenzijaId);
                         if (mounted) {
-                          QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.success,
-                            title: "Uspješno!",
-                            text: "Recenzija je uspješno obrisana.",
-                            confirmBtnText: "U redu",
-                          );
+                          await QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.confirm,
+                              title: "Brisanje seta",
+                              text:
+                                  "Jeste li sigurni da želite obrisati ovaj set?",
+                              confirmBtnText: "Da",
+                              showCancelBtn: true,
+                              cancelBtnText: "Ne",
+                              onConfirmBtnTap: () async {
+                                await _recenzijeProvider
+                                    .delete(recenzija.recenzijaId);
+                                recenzijeResult!.result.remove(recenzija);
+                                if (context.mounted) {
+                                  Navigator.of(context).pop(true);
+                                }
+                                if (mounted) {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Uspješno!",
+                                    text: "Recenzija je uspješno obrisana.",
+                                    confirmBtnText: "U redu",
+                                  );
+                                }
+                                setState(() {});
+                                return;
+                              });
                         }
-                        recenzijeResult!.result.remove(recenzija);
+
                         setState(() {});
                       },
                     )

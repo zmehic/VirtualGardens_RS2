@@ -1,5 +1,5 @@
 import 'package:virtualgardens_admin/models/recenzija.dart';
-import 'package:virtualgardens_admin/providers/base_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/base_provider.dart';
 
 class RecenzijeProvider extends BaseProvider<Recenzija> {
   RecenzijeProvider() : super("api/Recenzije");

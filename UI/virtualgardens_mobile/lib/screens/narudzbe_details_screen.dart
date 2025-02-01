@@ -239,14 +239,24 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
             widget.narudzba?.stateMachine == 'created'
                 ? IconButton(
                     onPressed: () async {
-                      setState(() {
-                        isLoading = true;
-                      });
-                      await _setoviProvider
-                          .delete(setoviResult!.result[index].setId);
-                      setState(() {
-                        initForm();
-                      });
+                      QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.confirm,
+                          title: "Brisanje seta",
+                          text: "Jeste li sigurni da želite obrisati ovaj set?",
+                          confirmBtnText: "Da",
+                          showCancelBtn: true,
+                          cancelBtnText: "Ne",
+                          onConfirmBtnTap: () async {
+                            await _setoviProvider
+                                .delete(setoviResult!.result[index].setId);
+                            setoviResult!.result.removeAt(index);
+                            if (context.mounted) {
+                              Navigator.of(context).pop(true);
+                            }
+                            setState(() {});
+                            return;
+                          });
                     },
                     icon: const Icon(
                       Icons.delete,

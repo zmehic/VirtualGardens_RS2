@@ -1,5 +1,5 @@
 import 'package:virtualgardens_admin/models/ponuda.dart';
-import 'package:virtualgardens_admin/providers/base_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/base_provider.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 

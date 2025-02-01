@@ -5,7 +5,7 @@ import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/models/ulazi.dart';
 import 'package:virtualgardens_admin/providers/ulazi_provider.dart';
-import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/screens/ulazi_details_screen.dart';
 
 class UlaziListScreen extends StatefulWidget {

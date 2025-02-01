@@ -5,7 +5,7 @@ import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/ponuda.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/providers/ponude_provider.dart';
-import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/screens/ponude_details_screen.dart';
 
 class PonudeListScreen extends StatefulWidget {

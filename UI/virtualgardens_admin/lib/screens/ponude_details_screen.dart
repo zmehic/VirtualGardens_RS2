@@ -14,7 +14,7 @@ import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_ponude_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_proizvodi_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_provider.dart';
-import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/screens/ponude_list_screen.dart';
 
 class ProizvodiSetDTO {

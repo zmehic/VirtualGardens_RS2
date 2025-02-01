@@ -10,7 +10,7 @@ import 'package:virtualgardens_admin/models/ulazi_proizvodi.dart';
 import 'package:virtualgardens_admin/models/zaposlenici.dart';
 import 'package:virtualgardens_admin/providers/nalozi_provider.dart';
 import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
-import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/providers/zaposlenici_provider.dart';
 import 'package:virtualgardens_admin/screens/nalozi_list_screen.dart';
 

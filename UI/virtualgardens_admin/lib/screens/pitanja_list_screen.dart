@@ -5,9 +5,9 @@ import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/narudzbe.dart';
 import 'package:virtualgardens_admin/models/pitanja_odgovori.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
-import 'package:virtualgardens_admin/providers/auth_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/pitanja_odgovori_provider.dart';
-import 'package:virtualgardens_admin/providers/utils.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 
 // ignore: must_be_immutable
 class PitanjaOdgovoriListScreen extends StatefulWidget {

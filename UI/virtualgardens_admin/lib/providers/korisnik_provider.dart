@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:virtualgardens_admin/models/korisnici.dart';
-import 'package:virtualgardens_admin/providers/auth_provider.dart';
-import 'package:virtualgardens_admin/providers/base_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/base_provider.dart';
 
 class KorisnikProvider extends BaseProvider<Korisnik> {
   KorisnikProvider() : super("api/Korisnici");
@@ -25,9 +25,8 @@ class KorisnikProvider extends BaseProvider<Korisnik> {
     }
 
     var uri = Uri.parse(url);
-    var headers = createHeaders();
 
-    var response = await http.post(uri, headers: headers);
+    var response = await http.post(uri);
 
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
@@ -40,7 +39,8 @@ class KorisnikProvider extends BaseProvider<Korisnik> {
         if (item.uloga.naziv == "Admin") {
           break;
         } else {
-          throw Exception("Not authorized");
+          throw Exception(
+              "Ne možete pristupiti interfejsu kupca putem dekstop aplikacije");
         }
       }
     } else {
