@@ -186,8 +186,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     minimumSize:
                         MaterialStateProperty.all(const Size(150, 50))),
                 onPressed: () async {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => ProductDetailsScreen()));
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => const ProductDetailsScreen()));
                 },
                 child: const Text("Dodaj")),
             const SizedBox(
@@ -197,7 +197,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
               style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all(const Size(150, 50))),
               onPressed: () async {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => const UlaziListScreen()));
               },
               child: const Text("Ulazi"),
@@ -322,7 +322,7 @@ class ProductDataSource extends AdvancedDataTableSource<Proizvod> {
         onSelectChanged: (selected) => {
               if (selected == true)
                 {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) =>
                           ProductDetailsScreen(product: item)))
                 }

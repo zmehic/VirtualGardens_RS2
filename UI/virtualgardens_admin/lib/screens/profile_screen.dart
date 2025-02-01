@@ -415,12 +415,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         return InputDecorator(
                           decoration: const InputDecoration(
                               labelText: "Profilna fotografija"),
-                          child: ListTile(
-                            leading: const Icon(Icons.image),
-                            title: const Text(
-                                "Odaberite profilnu fotografiju (do 2 MB)"),
-                            trailing: const Icon(Icons.file_upload),
-                            onTap: chooseAnImage,
+                          child: InkWell(
+                            onTap: () async {
+                              _base64Image = await chooseAnImage(context);
+                              setState(() {});
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 12),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.image, size: 24),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                        "Odaberite profilnu fotografiju (do 2 MB)"),
+                                  ),
+                                  Icon(Icons.file_upload),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },
@@ -587,34 +601,5 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
-  }
-
-  void chooseAnImage() async {
-    var image = await getImage();
-    if (image == null) {
-      if (mounted) {
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.info,
-          title: "Informacija",
-          text:
-              "Niste odabrali sliku ili ona premašuje veličinu od 2 MB. Ukoliko spremite promjene ukloniti ćete postojeću profilnu fotografiju.",
-          confirmBtnText: "U redu",
-        );
-        _base64Image = null;
-      }
-    } else {
-      if (mounted) {
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.success,
-          title: "Slika uspješno dodana",
-          text: "Uspješno ste odabrali sliku.",
-          confirmBtnText: "U redu",
-        );
-      }
-      _base64Image = image.toString();
-    }
-    setState(() {});
   }
 }

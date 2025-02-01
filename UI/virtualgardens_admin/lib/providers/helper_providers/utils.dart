@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:file_picker/file_picker.dart';
@@ -5,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
+import 'package:quickalert/quickalert.dart';
 
 String formatNumber(dynamic) {
   var f = NumberFormat('#,##0.00');
@@ -88,4 +90,32 @@ Widget buildFormBuilderTextField(
       decoration: InputDecoration(labelText: label),
     ),
   );
+}
+
+Future<String?> chooseAnImage(BuildContext context) async {
+  var image = await getImage();
+  if (image == null) {
+    if (context.mounted) {
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.info,
+        title: "Informacija",
+        text:
+            "Niste odabrali sliku ili ona premašuje veličinu od 2 MB. Ukoliko spremite promjene ukloniti ćete postojeću profilnu fotografiju.",
+        confirmBtnText: "U redu",
+      );
+      return null;
+    }
+  } else {
+    if (context.mounted) {
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.success,
+        title: "Slika uspješno dodana",
+        text: "Uspješno ste odabrali sliku.",
+        confirmBtnText: "U redu",
+      );
+    }
+  }
+  return image.toString();
 }

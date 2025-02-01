@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
@@ -19,12 +17,10 @@ import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 import 'package:virtualgardens_admin/screens/recenzije_list_screen.dart';
-import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 
-// ignore: must_be_immutable
 class ProductDetailsScreen extends StatefulWidget {
-  Proizvod? product;
-  ProductDetailsScreen({super.key, this.product});
+  final Proizvod? product;
+  const ProductDetailsScreen({super.key, this.product});
 
   @override
   State<ProductDetailsScreen> createState() => _ProductDetailsScreenState();
@@ -45,6 +41,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   bool isLoadingSave = false;
 
   String? _base64Image;
+  dynamic image;
 
   final GlobalKey<ScaffoldState> _scaffoldProductDetails =
       GlobalKey<ScaffoldState>();
@@ -97,10 +94,29 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.of(context).pop();
                 },
               ),
-              actions: <Widget>[Container()],
+              actions: <Widget>[
+                widget.product != null
+                    ? Container(
+                        margin: const EdgeInsets.only(right: 10),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => RecenzijeListScreen(
+                                        proizvod: widget.product,
+                                      )));
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.yellow.shade700,
+                            ),
+                            child: const Text(
+                              "Recenzije",
+                              style: TextStyle(color: Colors.white),
+                            )),
+                      )
+                    : Container(),
+              ],
               iconTheme: const IconThemeData(color: Colors.white),
               centerTitle: true,
               title: const Text(
@@ -327,21 +343,27 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       builder: (field) {
                         return InputDecorator(
                           decoration: const InputDecoration(
-                              labelText: "Profilna fotografija"),
-                          child: ListTile(
-                            leading: const Icon(Icons.image),
-                            title: const Text(
-                                "Odaberite profilnu fotografiju (do 2 MB)"),
-                            trailing: const Icon(Icons.file_upload),
-                            onTap: () {
-                              setState(() {
-                                isLoading = true;
-                              });
-                              chooseAnImage();
-                              setState(() {
-                                isLoading = false;
-                              });
+                              labelText: "Fotografija proizvoda"),
+                          child: InkWell(
+                            onTap: () async {
+                              _base64Image = await chooseAnImage(context);
+                              setState(() {});
                             },
+                            child: const Padding(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 8, horizontal: 12),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.image, size: 24),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Text(
+                                        "Odaberite fotografiju proizvoda (do 2 MB)"),
+                                  ),
+                                  Icon(Icons.file_upload),
+                                ],
+                              ),
+                            ),
                           ),
                         );
                       },
@@ -349,67 +371,69 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                   ),
                   Expanded(
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              if (_formKey.currentState?.saveAndValidate() ==
-                                  true) {
-                                debugPrint(
-                                    _formKey.currentState?.value.toString());
+                        Expanded(
+                          child: SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState?.saveAndValidate() ==
+                                    true) {
+                                  debugPrint(
+                                      _formKey.currentState?.value.toString());
 
-                                var request =
-                                    Map.from(_formKey.currentState!.value);
-                                request['slika'] = _base64Image;
-                                request['slikaThumb'] = _base64Image;
-                                setState(() {});
-                                try {
-                                  if (widget.product == null) {
-                                    await productProvider.insert(request);
-                                  } else {
-                                    await productProvider.update(
-                                        widget.product!.proizvodId!, request);
-                                  }
-                                  if (mounted) {
-                                    QuickAlert.show(
-                                      context: context,
-                                      type: QuickAlertType.success,
-                                      title: "Proizvod je ažuriran",
-                                      confirmBtnText: "U redu",
-                                      text:
-                                          "Uspješno ste ažurirali podatke o proizvodu",
-                                      onConfirmBtnTap: () {
-                                        Navigator.of(context).pushReplacement(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const ProductListScreen()));
-                                      },
-                                    );
-                                  }
-                                } on Exception catch (e) {
-                                  if (mounted) {
-                                    QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.error,
-                                        title: "Greška prilikom ažuriranja",
-                                        text: (e.toString().split(': '))[1],
-                                        confirmBtnText: "U redu");
-                                  }
+                                  var request =
+                                      Map.from(_formKey.currentState!.value);
+                                  request['slika'] = _base64Image;
+                                  request['slikaThumb'] = _base64Image;
                                   setState(() {});
+                                  try {
+                                    if (widget.product == null) {
+                                      await productProvider.insert(request);
+                                    } else {
+                                      await productProvider.update(
+                                          widget.product!.proizvodId!, request);
+                                    }
+                                    if (mounted) {
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.success,
+                                        title: "Proizvod je ažuriran",
+                                        confirmBtnText: "U redu",
+                                        text:
+                                            "Uspješno ste ažurirali podatke o proizvodu",
+                                        onConfirmBtnTap: () {
+                                          Navigator.of(context).pushReplacement(
+                                              MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const ProductListScreen()));
+                                        },
+                                      );
+                                    }
+                                  } on Exception catch (e) {
+                                    if (mounted) {
+                                      QuickAlert.show(
+                                          context: context,
+                                          type: QuickAlertType.error,
+                                          title: "Greška prilikom ažuriranja",
+                                          text: (e.toString().split(': '))[1],
+                                          confirmBtnText: "U redu");
+                                    }
+                                    setState(() {});
+                                  }
                                 }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              shape: const CircleBorder(),
-                              padding: const EdgeInsets.all(8),
-                            ),
-                            child: const Icon(
-                              Icons.save,
-                              color: Colors.white,
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(8),
+                              ),
+                              child: const Icon(
+                                Icons.save,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
@@ -423,34 +447,5 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
         ),
       ),
     );
-  }
-
-  void chooseAnImage() async {
-    var image = await getImage();
-    if (image == null) {
-      if (mounted) {
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.info,
-          title: "Informacija",
-          text:
-              "Niste odabrali sliku ili ona premašuje veličinu od 2 MB. Ukoliko spremite promjene ukloniti ćete postojeću profilnu fotografiju.",
-          confirmBtnText: "U redu",
-        );
-        _base64Image = null;
-      }
-    } else {
-      if (mounted) {
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.success,
-          title: "Slika uspješno dodana",
-          text: "Uspješno ste odabrali sliku.",
-          confirmBtnText: "U redu",
-        );
-      }
-      _base64Image = image.toString();
-    }
-    setState(() {});
   }
 }
