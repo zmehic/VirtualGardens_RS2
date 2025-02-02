@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VirtualGardens.Models.DTOs;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Ulazi;
 using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.BaseServices;
 using VirtualGardens.Services.Database;
+using VirtualGardens.Services.NarudzbeStateMachine;
 
 namespace VirtualGardens.Services.AllServices.Ulazi
 {
@@ -46,6 +48,22 @@ namespace VirtualGardens.Services.AllServices.Ulazi
             }
 
             return query;
+        }
+
+        public override UlaziDTO Insert(UlaziUpsertRequest request)
+        {
+            int? lastNumber;
+            if (!context.Narudzbes.Any())
+            {
+                lastNumber = 0;
+            }
+            else
+            {
+                var lastOrderNumberSplit = (context.Ulazis.OrderBy(x => x.UlazId).Last().BrojUlaza).Split('-');
+                lastNumber = Int32.Parse(lastOrderNumberSplit[1]);
+            }
+            request.BrojUlaza = $"ULAZ-{lastNumber + 1}";
+            return base.Insert(request);
         }
 
         public override void AfterDelete(int id, Database.Ulazi entity)

@@ -15,7 +15,6 @@ import 'package:virtualgardens_admin/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
-import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 import 'package:virtualgardens_admin/screens/recenzije_list_screen.dart';
 
 class ProductDetailsScreen extends StatefulWidget {
@@ -93,7 +92,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
-                  Navigator.of(context).pop();
+                  Navigator.of(context).pop(false);
                 },
               ),
               actions: <Widget>[
@@ -119,9 +118,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ],
               iconTheme: const IconThemeData(color: Colors.white),
               centerTitle: true,
-              title: const Text(
-                "Detalji o proizvodu",
-                style: TextStyle(color: Colors.white),
+              title: Text(
+                widget.product != null
+                    ? "Detalji o proizvodu"
+                    : "Dodaj proizvod",
+                style: const TextStyle(color: Colors.white),
               ),
               backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
             ),
@@ -392,32 +393,45 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   try {
                                     if (widget.product == null) {
                                       await productProvider.insert(request);
+                                      if (mounted) {
+                                        QuickAlert.show(
+                                          context: context,
+                                          type: QuickAlertType.success,
+                                          title: "Proizvod je dodan",
+                                          confirmBtnText: "U redu",
+                                          text:
+                                              "Uspješno ste dodali novi proizvod",
+                                          onConfirmBtnTap: () {
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).pop(true);
+                                          },
+                                        );
+                                      }
                                     } else {
                                       await productProvider.update(
                                           widget.product!.proizvodId!, request);
-                                    }
-                                    if (mounted) {
-                                      QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.success,
-                                        title: "Proizvod je ažuriran",
-                                        confirmBtnText: "U redu",
-                                        text:
-                                            "Uspješno ste ažurirali podatke o proizvodu",
-                                        onConfirmBtnTap: () {
-                                          Navigator.of(context).pushReplacement(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const ProductListScreen()));
-                                        },
-                                      );
+                                      if (mounted) {
+                                        QuickAlert.show(
+                                          context: context,
+                                          type: QuickAlertType.success,
+                                          title: "Proizvod je ažuriran",
+                                          confirmBtnText: "U redu",
+                                          text:
+                                              "Uspješno ste ažurirali podatke o proizvodu",
+                                          onConfirmBtnTap: () {
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).pop(true);
+                                          },
+                                        );
+                                      }
                                     }
                                   } on Exception catch (e) {
                                     if (mounted) {
                                       QuickAlert.show(
                                           context: context,
                                           type: QuickAlertType.error,
-                                          title: "Greška prilikom ažuriranja",
+                                          title:
+                                              "Greška prilikom ažuriranja ili dodavanja",
                                           text: (e.toString().split(': '))[1],
                                           confirmBtnText: "U redu");
                                     }

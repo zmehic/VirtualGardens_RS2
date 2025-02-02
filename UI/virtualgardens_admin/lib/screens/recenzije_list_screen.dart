@@ -253,7 +253,9 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
                     labels: RangeLabels(selectedRange.start.round().toString(),
                         selectedRange.end.round().toString()),
                     onChangeEnd: (values) async {
-                      selectedRange = values;
+                      selectedRange = RangeValues(
+                          values.start.round().toDouble(),
+                          values.end.round().toDouble());
                       await _fetchPage(0, true);
                       setState(() {});
                     },

@@ -1,37 +1,39 @@
+import 'package:advanced_datatable/advanced_datatable_source.dart';
+import 'package:advanced_datatable/datatable.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/proizvod.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/models/ulazi.dart';
 import 'package:virtualgardens_admin/models/ulazi_proizvodi.dart';
-import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/ulazi_proizvodi_provider.dart';
-import 'package:virtualgardens_admin/providers/ulazi_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
-import 'package:virtualgardens_admin/screens/ulazi_list_screen.dart';
 
-// ignore: must_be_immutable
 class UlaziDetailsScreen extends StatefulWidget {
-  Ulaz? ulaz;
-  UlaziDetailsScreen({super.key, this.ulaz});
+  final Ulaz? ulaz;
+  const UlaziDetailsScreen({super.key, this.ulaz});
 
   @override
   State<UlaziDetailsScreen> createState() => _UlaziDetailsScreenState();
 }
 
 class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
+  late UlaziProizvodiDataSource dataSource;
   final _formKey = GlobalKey<FormBuilderState>();
   final _formKey2 = GlobalKey<FormBuilderState>();
+
+  int selectedProizvodId = 0;
 
   Map<String, dynamic> _initialValue = {};
   Map<String, dynamic> _initialValue2 = {};
 
-  late UlaziProvider _ulaziProvider;
   late UlaziProizvodiProvider _ulaziProizvodiProvider;
   late ProductProvider _proizvodiProvider;
 
@@ -43,8 +45,6 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
 
   final TextEditingController _datumUlazaController = TextEditingController();
 
-  final Map<int, TextEditingController> _controllers = {};
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -52,12 +52,18 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
 
   @override
   void initState() {
-    _ulaziProvider = context.read<UlaziProvider>();
     _ulaziProizvodiProvider = context.read<UlaziProizvodiProvider>();
     _proizvodiProvider = context.read<ProductProvider>();
+    dataSource = UlaziProizvodiDataSource(
+      provider: _ulaziProizvodiProvider,
+      context: context,
+    );
 
+    initForm();
     super.initState();
+  }
 
+  Future initForm() async {
     _initialValue = {
       'ulazId': widget.ulaz?.ulazId,
       'brojUlaza': widget.ulaz?.brojUlaza,
@@ -70,37 +76,21 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
       'proizvoidId': null,
       'kolicina': null
     };
-
     _datumUlazaController.text = widget.ulaz != null
         ? formatDateString(widget.ulaz!.datumUlaza.toIso8601String())
         : "";
 
-    initForm();
-  }
-
-  Future initForm() async {
-    var filter = {
-      'UlazId': widget.ulaz?.ulazId,
-      'IsDeleted': false,
-      'IncludeTables': "Proizvod"
-    };
-
     if (widget.ulaz != null) {
-      ulaziProizvodiResult = await _ulaziProizvodiProvider.get(filter: filter);
-      if (ulaziProizvodiResult != null) {
-        for (var product in ulaziProizvodiResult!.result) {
-          _controllers[product.ulaziProizvodiId] =
-              TextEditingController(text: product.kolicina.toString());
-        }
-      }
-
       var filter2 = {'IsDeleted': false, 'IncludeTables': "JedinicaMjere"};
 
       proizvodiResult = await _proizvodiProvider.get(filter: filter2);
+      if (proizvodiResult != null) {
+        selectedProizvodId = proizvodiResult!.result[0].proizvodId!;
+      }
     }
+    dataSource.filterServerSide(widget.ulaz?.ulazId);
     setState(() {
       isLoading = false;
-      isLoadingSave = false;
     });
   }
 
@@ -109,85 +99,74 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
     return MasterScreen(
         FullScreenLoader(
             isLoading: isLoading,
-            child: Container(
-              margin: const EdgeInsets.only(
-                  left: 40, right: 40, top: 20, bottom: 10),
-              color: const Color.fromRGBO(235, 241, 224, 1),
-              child: Column(
-                children: [_buildBanner(), _buildMain()],
+            child: Scaffold(
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+                actions: <Widget>[Container()],
+                iconTheme: const IconThemeData(color: Colors.white),
+                centerTitle: true,
+                title: const Text(
+                  "Detalji o ulazu",
+                  style: TextStyle(color: Colors.white),
+                ),
+                backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+              ),
+              backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
+              body: Container(
+                margin: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(10),
+                color: const Color.fromRGBO(235, 241, 224, 1),
+                child: Column(
+                  children: [_buildMain()],
+                ),
               ),
             )),
         "Detalji");
   }
 
-  Widget _buildBanner() {
-    return Container(
-      margin: const EdgeInsets.only(top: 30),
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
-            const SizedBox(
-              width: 10,
-            ),
-            widget.ulaz == null
-                ? const Text("Novi ulaz",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "arial",
-                        color: Colors.white))
-                : const Text("Detalji o ulazu",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "arial",
-                        color: Colors.white))
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildMain() {
     return Expanded(
-      child: Container(
-          height: 300,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: const Color.fromRGBO(32, 76, 56, 1),
-          ),
-          margin: const EdgeInsets.all(15),
-          child: Container(
-            margin: const EdgeInsets.all(15),
-            child: Row(
-              children: [
-                widget.ulaz != null
-                    ? Expanded(
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                margin: const EdgeInsets.all(15),
+                child: Container(
+                  margin: const EdgeInsets.all(15),
+                  child: Row(
+                    children: [
+                      Expanded(
                         child: Container(
-                          color: const Color.fromRGBO(235, 241, 224, 1),
+                          color: const Color.fromRGBO(32, 76, 56, 1),
                           child: Column(children: [
                             _buildUlaziProizvodiForm(),
-                            Expanded(
-                              child: _buildResultView(),
-                            )
+                            _buildResultView(),
                           ]),
                         ),
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      Expanded(
+                        child: Container(
+                          color: const Color.fromRGBO(32, 76, 56, 1),
+                          child: _buildNewForm(),
+                        ),
                       )
-                    : Container(),
-                Expanded(
-                  child: Container(
-                    color: const Color.fromRGBO(235, 241, 224, 1),
-                    child: _buildNewForm(),
+                    ],
                   ),
-                )
-              ],
-            ),
-          )),
+                )),
+          ),
+        ],
+      ),
     );
   }
 
@@ -195,8 +174,10 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
     return FormBuilder(
         key: _formKey,
         initialValue: _initialValue,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
+        child: Container(
+          color: const Color.fromRGBO(235, 241, 224, 1),
+          margin: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
@@ -204,17 +185,11 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Expanded(
-                    child: FormBuilderTextField(
-                        decoration:
-                            const InputDecoration(labelText: "Broj ulaza"),
-                        name: "brojUlaza",
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
-                          }
-                          return null;
-                        }),
-                  )
+                      child: FormBuilderTextField(
+                    enabled: false,
+                    decoration: const InputDecoration(labelText: "Broj ulaza"),
+                    name: "brojUlaza",
+                  ))
                 ],
               ),
               const SizedBox(height: 15),
@@ -223,29 +198,12 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
                 children: [
                   Expanded(
                     child: FormBuilderTextField(
+                      enabled: false,
                       controller: _datumUlazaController,
                       decoration:
                           const InputDecoration(labelText: "Datum ulaza"),
                       name: "datumUlaza",
                       readOnly: true,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please choose some value';
-                        }
-                        return null;
-                      },
-                      onTap: () async {
-                        DateTime? pickedDate = await showDatePicker(
-                            context: context,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2101));
-                        if (pickedDate != null) {
-                          _datumUlazaController.text =
-                              formatDateString(pickedDate.toIso8601String());
-                          _initialValue['datumUlaza'] =
-                              pickedDate.toIso8601String();
-                        }
-                      },
                     ),
                   )
                 ],
@@ -253,287 +211,119 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
               const SizedBox(height: 15),
               Row(
                 children: [
-                  widget.ulaz != null
-                      ? Expanded(
-                          child: FormBuilderDropdown(
-                              enabled: false,
-                              name: "korisnikId",
-                              decoration:
-                                  const InputDecoration(labelText: "Korisnik"),
-                              items: [
-                                DropdownMenuItem(
-                                    value: widget.ulaz?.korisnikId,
-                                    child: Text(
-                                        "${widget.ulaz?.korisnik.ime} ${widget.ulaz?.korisnik.prezime}"))
-                              ],
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please choose some value';
-                                }
-                                return null;
-                              }))
-                      : Container(),
+                  Expanded(
+                      child: FormBuilderDropdown(
+                    enabled: false,
+                    name: "korisnikId",
+                    decoration: const InputDecoration(labelText: "Korisnik"),
+                    items: [
+                      DropdownMenuItem(
+                          value: widget.ulaz?.korisnikId,
+                          child: Text(
+                              "${widget.ulaz?.korisnik.ime} ${widget.ulaz?.korisnik.prezime}"))
+                    ],
+                  )),
                   const SizedBox(
                     width: 10,
                   ),
                 ],
               ),
-              const SizedBox(
-                height: 15,
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        SizedBox(
-                          width: 60,
-                          height: 60,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              if (_formKey.currentState?.saveAndValidate() ==
-                                  true) {
-                                debugPrint(
-                                    _formKey.currentState?.value.toString());
-
-                                var request =
-                                    Map.from(_formKey.currentState!.value);
-                                var key = request.entries.elementAt(1).key;
-                                request[key] = _initialValue['datumUlaza'];
-                                request['korisnikId'] = AuthProvider.korisnikId;
-                                isLoadingSave = true;
-                                setState(() {});
-                                try {
-                                  if (widget.ulaz == null) {
-                                    await _ulaziProvider.insert(request);
-                                  } else {
-                                    await _ulaziProvider.update(
-                                        widget.ulaz!.ulazId, request);
-                                  }
-
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.of(context).pushReplacement(
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const UlaziListScreen()));
-                                  // ignore: empty_catches
-                                } on Exception {}
-                              }
-                            }, // Define this function to handle the save action
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green,
-                              shape:
-                                  const CircleBorder(), // Makes the button circular
-                              padding: const EdgeInsets.all(
-                                  8), // Adjust padding for icon size // Background color
-                            ),
-
-                            child: isLoadingSave
-                                ? const CircularProgressIndicator()
-                                : const Icon(
-                                    Icons.save,
-                                    color: Colors.white,
-                                  ), // Save icon inside
-                          ),
-                        ),
-                        const SizedBox(
-                          width: 20,
-                        ),
-                        widget.ulaz != null
-                            ? SizedBox(
-                                width: 60,
-                                height: 60,
-                                child: ElevatedButton(
-                                  onPressed: () async {
-                                    isLoadingSave = true;
-                                    setState(() {});
-                                    if (widget.ulaz == null) {
-                                    } else {
-                                      await _ulaziProvider
-                                          .delete(widget.ulaz!.ulazId);
-                                    }
-
-                                    // ignore: use_build_context_synchronously
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const UlaziListScreen()));
-                                  }, // Define this function to handle the save action
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                    shape:
-                                        const CircleBorder(), // Makes the button circular
-                                    padding: const EdgeInsets.all(
-                                        8), // Adjust padding for icon size // Background color
-                                  ),
-
-                                  child: isLoadingSave
-                                      ? const CircularProgressIndicator()
-                                      : const Icon(
-                                          Icons.delete,
-                                          color: Colors.white,
-                                        ), // Save icon inside
-                                ),
-                              )
-                            : Container()
-                      ],
-                    ),
-                  )
-                ],
-              )
             ],
           ),
         ));
   }
 
   Widget _buildResultView() {
-    return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: const Color.fromRGBO(32, 76, 56, 1),
-        ),
-        margin: const EdgeInsets.all(15),
-        width: double.infinity,
-        child: SingleChildScrollView(
-            child: DataTable(
-                columns: const [
+    return Expanded(
+      child: Container(
+          decoration: const BoxDecoration(
+            color: Color.fromRGBO(235, 241, 224, 1),
+          ),
+          margin: const EdgeInsets.all(15),
+          width: double.infinity,
+          child: SingleChildScrollView(
+              child: AdvancedPaginatedDataTable(
+            showCheckboxColumn: false,
+            rowsPerPage: 9,
+            columns: const [
               DataColumn(
                   label: Text(
                 "Proizvod",
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                style: TextStyle(color: Colors.black, fontSize: 18),
               )),
               DataColumn(
                   label: Text(
                 "Količina",
-                style: TextStyle(color: Colors.white, fontSize: 18),
+                style: TextStyle(color: Colors.black, fontSize: 18),
               )),
               DataColumn(
                 label: Text(
                   "Obriši",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
+                  style: TextStyle(color: Colors.black, fontSize: 18),
                 ),
               ),
             ],
-                rows: ulaziProizvodiResult?.result
-                        .map((e) => DataRow(cells: [
-                              DataCell(Text(e.proizvod!.naziv!,
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 18))),
-                              DataCell(TextField(
-                                controller: _controllers[e.ulaziProizvodiId],
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 18),
-                                keyboardType: TextInputType.number,
-                                inputFormatters: [
-                                  FilteringTextInputFormatter.digitsOnly
-                                ],
-                                decoration: const InputDecoration(
-                                    border: InputBorder.none),
-                                onSubmitted: (value) async {
-                                  if (value.isEmpty) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                            "Molimo unesite neku vrijednost veću od 0!"),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                    _controllers[e.ulaziProizvodiId]?.text =
-                                        e.kolicina.toString();
-                                  } else {
-                                    int? intValue = int.tryParse(value);
-                                    if (intValue == null || intValue <= 0) {
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                              "Molimo unesite neku vrijednost veću od 0!"),
-                                          backgroundColor: Colors.red,
-                                        ),
-                                      );
-                                    } else {
-                                      var request = {
-                                        'ulazId': e.ulazId,
-                                        'proizvodId': e.proizvodId,
-                                        'kolicina': intValue
-                                      };
-                                      try {
-                                        await _ulaziProizvodiProvider.update(
-                                            e.ulaziProizvodiId, request);
-                                      } on Exception catch (e) {
-                                        debugPrint(e.toString());
-                                      }
-                                      setState(() {});
-                                    }
-                                  }
-                                },
-                              )),
-                              DataCell(
-                                IconButton(
-                                  icon: const Icon(Icons.delete,
-                                      color: Colors.red),
-                                  onPressed: () async {
-                                    try {
-                                      await _ulaziProizvodiProvider
-                                          .delete(e.ulaziProizvodiId);
-                                    } on Exception catch (e) {
-                                      debugPrint(e.toString());
-                                    }
-                                    initForm();
-                                    setState(() {});
-                                  },
-                                ),
-                              ),
-                            ]))
-                        .toList()
-                        .cast<DataRow>() ??
-                    [])));
+            source: dataSource,
+            addEmptyRows: false,
+          ))),
+    );
   }
 
   _buildUlaziProizvodiForm() {
     return FormBuilder(
       key: _formKey2,
       initialValue: _initialValue2,
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
+      child: Container(
+        margin: const EdgeInsets.all(10),
+        padding: const EdgeInsets.all(10),
+        decoration: const BoxDecoration(
+          color: Color.fromRGBO(235, 241, 224, 1),
+        ),
         child: Row(
           children: [
-            Expanded(
-              child: FormBuilderDropdown(
-                name: "proizvodId",
-                decoration: const InputDecoration(labelText: "Proizvod"),
-                items: proizvodiResult?.result
-                        .map((item) => DropdownMenuItem(
-                              value: item.proizvodId.toString(),
-                              child: Text(
-                                  "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
-                            ))
-                        .toList() ??
-                    [],
-                validator: (value) {
-                  if (value == null) {
-                    return 'Please choose some value';
-                  }
-                  return null;
-                },
-              ),
-            ),
+            DropdownButtonHideUnderline(
+                child: DropdownButton2(
+                    value: proizvodiResult?.result[0].proizvodId.toString(),
+                    iconStyleData:
+                        const IconStyleData(iconEnabledColor: Colors.black),
+                    buttonStyleData: ButtonStyleData(
+                      decoration: BoxDecoration(
+                          color: Colors.brown.shade100,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                              color: Colors.brown.shade300, width: 2)),
+                    ),
+                    items: proizvodiResult?.result
+                            .map((item) => DropdownMenuItem(
+                                  value: item.proizvodId.toString(),
+                                  child: Text(item.naziv ?? "",
+                                      style:
+                                          const TextStyle(color: Colors.black)),
+                                ))
+                            .toList() ??
+                        [],
+                    onChanged: (value) async {
+                      selectedProizvodId = int.tryParse(value.toString())!;
+                    })),
             const SizedBox(
               width: 10,
             ),
             Expanded(
               child: FormBuilderTextField(
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  decoration: const InputDecoration(labelText: "Kolicina"),
-                  name: "kolicina",
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Please enter some value';
-                    }
-                    return null;
-                  }),
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                decoration: const InputDecoration(
+                  labelText: "Količina",
+                  filled: true,
+                ),
+                name: "kolicina",
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Polje količina ne smije biti prazno.';
+                  }
+                  return null;
+                },
+              ),
             ),
             const SizedBox(
               width: 10,
@@ -548,40 +338,159 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
 
                     var request = Map.from(_formKey2.currentState!.value);
                     request['ulazId'] = widget.ulaz?.ulazId;
-                    isLoadingSave = true;
+                    request['proizvodId'] = selectedProizvodId;
                     setState(() {});
                     try {
                       if (widget.ulaz == null) {
                       } else {
                         await _ulaziProizvodiProvider.insert(request);
+                        if (mounted) {
+                          QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.success,
+                            text: "Proizvod uspješno dodan u ulaz.",
+                            title: "Dodan proizvod",
+                            confirmBtnText: "U redu",
+                            onConfirmBtnTap: () {
+                              Navigator.of(context).pop();
+                              dataSource.filterServerSide(widget.ulaz?.ulazId);
+                            },
+                          );
+                        }
                       }
 
                       _formKey2.currentState?.reset();
-                      initForm();
                       setState(() {});
                     } on Exception catch (e) {
                       debugPrint(e.toString());
                     }
                   }
-                }, // Define this function to handle the save action
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.green,
-                  shape: const CircleBorder(), // Makes the button circular
-                  padding: const EdgeInsets.all(
-                      8), // Adjust padding for icon size // Background color
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(8),
                 ),
-
-                child: isLoadingSave
-                    ? const CircularProgressIndicator()
-                    : const Icon(
-                        Icons.add,
-                        color: Colors.white,
-                      ), // Save icon inside
+                child: const Icon(
+                  Icons.add,
+                  color: Colors.white,
+                ),
               ),
             )
           ],
         ),
       ),
     );
+  }
+}
+
+class UlaziProizvodiDataSource extends AdvancedDataTableSource<UlazProizvod> {
+  List<UlazProizvod>? data = [];
+  final UlaziProizvodiProvider provider;
+  int count = 9;
+  int page = 1;
+  int pageSize = 9;
+  int ulazId = 0;
+  dynamic filter;
+  BuildContext context;
+  UlaziProizvodiDataSource({required this.provider, required this.context});
+
+  @override
+  DataRow? getRow(int index) {
+    if (index >= data!.length) {
+      return null;
+    }
+
+    final item = data?[index];
+
+    return DataRow(cells: [
+      DataCell(Text(item!.proizvod!.naziv ?? "",
+          style: const TextStyle(color: Colors.black, fontSize: 18))),
+      DataCell(Text(
+          "${item.kolicina.toString()} ${item.proizvod!.jedinicaMjere?.naziv}",
+          style: const TextStyle(color: Colors.black, fontSize: 18))),
+      DataCell(ElevatedButton(
+        onPressed: () async {
+          if (context.mounted) {
+            QuickAlert.show(
+              context: context,
+              type: QuickAlertType.confirm,
+              title: "Potvrda brisanja",
+              text: "Jeste li sigurni da želite obrisati proizvod?",
+              confirmBtnText: "U redu",
+              onConfirmBtnTap: () async {
+                await provider.delete(item.proizvodId);
+                if (context.mounted) {
+                  await QuickAlert.show(
+                    context: context,
+                    type: QuickAlertType.success,
+                    title: "Uspješno ste obrisali proizvod",
+                    confirmBtnText: "U redu",
+                    text: "Proizvod je obrisan",
+                    onConfirmBtnTap: () {
+                      Navigator.of(context).pop();
+                    },
+                  );
+                }
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                  filterServerSide(ulazId);
+                }
+              },
+            );
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red,
+          padding: const EdgeInsets.all(8),
+        ),
+        child: const Icon(
+          Icons.delete,
+          color: Colors.white,
+        ),
+      )),
+    ]);
+  }
+
+  void filterServerSide(ulazID) {
+    ulazId = ulazID;
+    setNextView();
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get selectedRowCount => 0;
+
+  @override
+  Future<RemoteDataSourceDetails<UlazProizvod>> getNextPage(
+      NextPageRequest pageRequest) async {
+    page = (pageRequest.offset ~/ pageSize).toInt() + 1;
+
+    var filter = {
+      'UlazId': ulazId,
+      'IsDeleted': false,
+      'IncludeTables': "Proizvod",
+      'Page': page,
+      'PageSize': pageSize
+    };
+
+    try {
+      var result = await provider.get(filter: filter);
+      data = result.result;
+      count = result.count;
+
+      notifyListeners();
+    } on Exception catch (e) {
+      if (context.mounted) {
+        QuickAlert.show(
+            context: context,
+            type: QuickAlertType.error,
+            text: e.toString().split(': ')[1]);
+      }
+    }
+
+    return RemoteDataSourceDetails(count, data!);
   }
 }

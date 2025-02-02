@@ -186,8 +186,18 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     minimumSize:
                         MaterialStateProperty.all(const Size(150, 50))),
                 onPressed: () async {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => const ProductDetailsScreen()));
+                  bool response = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) =>
+                              const ProductDetailsScreen())));
+                  if (response == true) {
+                    dataSource.filterServerSide(
+                        ftsEditingController.text,
+                        cijenaOdEditingController.text,
+                        cijenaDoEditingController.text,
+                        selectedVrstaProizvoda);
+                  }
                 },
                 child: const Text("Dodaj")),
             const SizedBox(
@@ -197,8 +207,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
               style: ButtonStyle(
                   minimumSize: MaterialStateProperty.all(const Size(150, 50))),
               onPressed: () async {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => const UlaziListScreen()));
+                bool result = await Navigator.of(context).push(
+                    MaterialPageRoute(
+                        builder: (context) => const UlaziListScreen()));
+                if (result == true) {
+                  dataSource.filterServerSide(
+                      ftsEditingController.text,
+                      cijenaOdEditingController.text,
+                      cijenaDoEditingController.text,
+                      selectedVrstaProizvoda);
+                }
               },
               child: const Text("Ulazi"),
             ),
@@ -319,14 +337,19 @@ class ProductDataSource extends AdvancedDataTableSource<Proizvod> {
     final item = data?[index];
 
     return DataRow(
-        onSelectChanged: (selected) => {
-              if (selected == true)
-                {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) =>
-                          ProductDetailsScreen(product: item)))
-                }
-            },
+        onSelectChanged: (selected) async {
+          if (selected == true) {
+            bool response = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: ((context) =>
+                        ProductDetailsScreen(product: item))));
+            if (response == true) {
+              filterServerSide(
+                  _nazivGTE, _cijenaFrom, _cijenaTo, _selectedVrstaProizvoda);
+            }
+          }
+        },
         cells: [
           DataCell(Text(item!.naziv ?? "",
               style: const TextStyle(color: Colors.black, fontSize: 18))),
@@ -355,19 +378,21 @@ class ProductDataSource extends AdvancedDataTableSource<Proizvod> {
                   onConfirmBtnTap: () async {
                     await provider.delete(item.proizvodId!);
                     if (context.mounted) {
-                      QuickAlert.show(
+                      await QuickAlert.show(
                         context: context,
                         type: QuickAlertType.success,
                         title: "Uspješno ste obrisali proizvod",
                         confirmBtnText: "U redu",
                         text: "Proizvod je obrisan",
                         onConfirmBtnTap: () {
-                          Navigator.of(context).pushReplacement(
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ProductListScreen()));
+                          Navigator.of(context).pop();
                         },
                       );
+                    }
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      filterServerSide(_nazivGTE, _cijenaFrom, _cijenaTo,
+                          _selectedVrstaProizvoda);
                     }
                   },
                 );
