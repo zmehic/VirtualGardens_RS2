@@ -53,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen> {
     vrsteProizvodaResult = await vrsteProizvodaProvider.get();
     selectedVrstaProizvoda = vrsteProizvodaResult?.result[0].vrstaProizvodaId;
 
-    fetchProducts(value);
+    await fetchProducts(value);
 
     korisnikResult = await korisnikProvider.getById(AuthProvider.korisnikId!);
 
@@ -168,6 +168,7 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(name,
+                  textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 19, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
