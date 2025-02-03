@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using VirtualGardens.API.Controllers.BaseControllers;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.DTOs.StatisticsDTOs;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Models.SearchObjects;
@@ -56,7 +57,7 @@ namespace VirtualGardens.API.Controllers
 
         [Authorize(Roles ="Admin")]
         [HttpGet("MonthlyStatistics")]
-        public List<int> MonthlyStatistics(int year) {
+        public StatisticsDTO MonthlyStatistics(int year) {
             return (_service as INarudzbeService)!.MonthlyStatistics(year);
         }
     }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.DTOs.StatisticsDTOs;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Models.SearchObjects;
@@ -17,7 +18,7 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
         public NarudzbeDTO Edit(int id);
         public NarudzbeDTO Finish(int id);
         public List<string> AllowedActions(int id);
-        List<int> MonthlyStatistics(int year);
+        StatisticsDTO MonthlyStatistics(int year);
         public List<string> CheckOrderValidity(int orderId);
     }
 }

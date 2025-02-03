@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:virtualgardens_admin/models/narudzbe.dart';
+import 'package:virtualgardens_admin/models/statistics_dtos/statistics.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/base_provider.dart';
 import 'package:http/http.dart' as http;
 
@@ -50,11 +51,9 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
     List<int> lista = [];
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
-      for (var element in data) {
-        lista.add(element);
-      }
+      StatisticsDTO statisticsDTO = StatisticsDTO.fromJson(data);
 
-      return lista;
+      return statisticsDTO;
     } else {
       throw Exception("Unknown error");
     }

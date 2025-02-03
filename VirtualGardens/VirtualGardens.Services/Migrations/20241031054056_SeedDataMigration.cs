@@ -41,7 +41,7 @@ namespace VirtualGardens.Services.Migrations
             {
                 {
                     1, "admin", "admin@example.com", "Admin", "User",
-                    null, "Admin Address", "Admin City", "Admin Country", "tVeXz/bhKIFIANPp0WrD4I0NPpo=",
+                    null, "Admin Address", "Admin City", "Admin Country", "I1PzXagqJGdStq2B+UIacXapKS0=",
                     "P2W0L0dMofP7yH0SvCzeyA==", DateTime.UtcNow, DateTime.UtcNow, true, new DateTime(1990, 1, 1), null
                 },
                 {

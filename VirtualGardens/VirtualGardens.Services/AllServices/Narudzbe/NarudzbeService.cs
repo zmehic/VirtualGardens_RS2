@@ -9,6 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Schema;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.DTOs.StatisticsDTOs;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Models.SearchObjects;
@@ -169,17 +170,37 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
             }
         }
 
-        public List<int> MonthlyStatistics(int year)
+        public StatisticsDTO MonthlyStatistics(int year)
         {
             var list = context.Narudzbes.Where(x=>x.Datum.Year==year && x.IsDeleted == false).ToList();
             List<int> result = new List<int> { 0,0,0,0,0,0,0,0,0,0,0,0};
+            List<float> prihod = new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             foreach(var item in list)
             {
                 result[item.Datum.Month - 1]++;
+                prihod[item.Datum.Month - 1] += item.UkupnaCijena;
             }
 
-            return result;
+            var kupci = context.Narudzbes.Where(x=>x.IsDeleted==false && x.Datum.Year==year).Include(x => x.Korisnik).Select(x => new Buyers { korisnik = mapper.Map<KorisniciDTO>(x.Korisnik) }).Distinct().ToList();
+            var radnici = context.Narudzbes.Where(x => x.IsDeleted == false && x.Datum.Year == year && x.Nalog != null).Include(x => x.Nalog).ThenInclude(x => x!.Zaposlenik).Select(x => new Workers { zaposlenik = mapper.Map<ZaposleniciDTO>(x.Nalog!.Zaposlenik) }).Distinct().ToList();
+            var narudzbe = context.Narudzbes.Where(x=>x.IsDeleted == false && x.Datum.Year == year).Include(x=>x.Nalog).ToList();
+
+            foreach(var narudzba in narudzbe)
+            {
+                kupci.Find(x => x.korisnik.KorisnikId == narudzba.KorisnikId)!.brojNarudzbi++;
+                if(narudzba.Nalog!=null && narudzba.Nalog.ZaposlenikId != null)
+                    radnici.Find(x => x.zaposlenik.ZaposlenikId == narudzba.Nalog!.ZaposlenikId)!.brojNarudzbi++;
+            }
+
+            return new StatisticsDTO
+            {
+                kupci = kupci.OrderByDescending(x=>x.brojNarudzbi).ToList(),
+                narudzbe = result,
+                workers = radnici.OrderByDescending(x=>x.brojNarudzbi).ToList(),
+                prihodi = prihod
+            };
+
         }
 
         public List<string> CheckOrderValidity(int orderId)
