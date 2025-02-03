@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/ponuda.dart';
@@ -12,10 +13,8 @@ import 'package:virtualgardens_admin/models/setovi_ponude.dart';
 import 'package:virtualgardens_admin/providers/ponude_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_ponude_provider.dart';
-import 'package:virtualgardens_admin/providers/setovi_proizvodi_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
-import 'package:virtualgardens_admin/screens/ponude_list_screen.dart';
 
 class ProizvodiSetDTO {
   int? proizvodId;
@@ -37,10 +36,9 @@ class ProizvodiSetDTO {
   }
 }
 
-// ignore: must_be_immutable
 class PonudeDetailsScreen extends StatefulWidget {
-  Ponuda? ponuda;
-  PonudeDetailsScreen({super.key, this.ponuda});
+  final Ponuda? ponuda;
+  const PonudeDetailsScreen({super.key, this.ponuda});
 
   @override
   State<PonudeDetailsScreen> createState() => _PonudeDetailsScreenState();
@@ -63,7 +61,6 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
   late SetoviPonudeProvider _setoviPonudeProvider;
   late ProductProvider _proizvodiProvider;
   late SetoviProvider _setoviProvider;
-  late SetProizvodProvider _proizvodiSet;
 
   List<ProizvodiSetDTO> productList = [];
 
@@ -90,10 +87,11 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
     _setoviPonudeProvider = context.read<SetoviPonudeProvider>();
     _proizvodiProvider = context.read<ProductProvider>();
     _setoviProvider = context.read<SetoviProvider>();
-    _proizvodiSet = context.read<SetProizvodProvider>();
-
+    initForm();
     super.initState();
+  }
 
+  Future initForm() async {
     _initialValue = {
       'ponudaId': widget.ponuda?.ponudaId,
       'naziv': widget.ponuda?.naziv,
@@ -114,11 +112,6 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
     _datumPonudeController.text = widget.ponuda != null
         ? formatDateString(widget.ponuda!.datumKreiranja.toIso8601String())
         : formatDateString(DateTime.now().toIso8601String());
-
-    initForm();
-  }
-
-  Future initForm() async {
     isDeleted = false;
     var filter = {
       'PonudaId': widget.ponuda?.ponudaId,
@@ -161,85 +154,70 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
     return MasterScreen(
         FullScreenLoader(
             isLoading: isLoading,
-            child: Container(
-              margin: const EdgeInsets.only(
-                  left: 40, right: 40, top: 20, bottom: 10),
-              color: const Color.fromRGBO(235, 241, 224, 1),
-              child: Column(
-                children: [_buildBanner(), _buildMain()],
+            child: Scaffold(
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+                actions: <Widget>[Container()],
+                iconTheme: const IconThemeData(color: Colors.white),
+                centerTitle: true,
+                title: Text(
+                  widget.ponuda != null ? "Detalji o ponudi" : "Nova ponuda",
+                  style: const TextStyle(color: Colors.white),
+                ),
+                backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+              ),
+              backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
+              body: Container(
+                margin: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(10),
+                color: const Color.fromRGBO(235, 241, 224, 1),
+                child: Column(
+                  children: [_buildMain()],
+                ),
               ),
             )),
         "Detalji");
   }
 
-  Widget _buildBanner() {
-    return Container(
-      margin: const EdgeInsets.only(top: 30),
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
-            const SizedBox(
-              width: 10,
-            ),
-            widget.ponuda == null
-                ? const Text("Nova ponuda",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "arial",
-                        color: Colors.white))
-                : const Text("Detalji o ponudi",
-                    style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        fontFamily: "arial",
-                        color: Colors.white))
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildMain() {
     return Expanded(
       child: Container(
-          height: 300,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: const Color.fromRGBO(32, 76, 56, 1),
-          ),
-          margin: const EdgeInsets.all(15),
-          child: Container(
-            margin: const EdgeInsets.all(15),
-            child: Row(
-              children: [
-                widget.ponuda != null
-                    ? Expanded(
-                        child: Container(
-                          color: const Color.fromRGBO(235, 241, 224, 1),
-                          child: Column(children: [
-                            _buildSetPonudeForm(),
-                            Expanded(
-                              child: _buildResultView(),
-                            )
-                          ]),
-                        ),
-                      )
-                    : Container(),
-                Expanded(
-                  child: Container(
+        margin: const EdgeInsets.all(15),
+        child: Row(
+          children: [
+            widget.ponuda != null
+                ? Expanded(
+                    child: Container(
+                      color: const Color.fromRGBO(32, 76, 56, 1),
+                      child: Column(children: [
+                        setoviPonudeResult != null &&
+                                setoviPonudeResult!.result.isNotEmpty
+                            ? Container()
+                            : _buildSetPonudeForm(),
+                        Expanded(
+                          child: _buildResultView(),
+                        )
+                      ]),
+                    ),
+                  )
+                : Container(),
+            Expanded(
+              child: Container(
+                color: const Color.fromRGBO(32, 76, 56, 1),
+                child: Container(
+                    margin: const EdgeInsets.all(15),
                     color: const Color.fromRGBO(235, 241, 224, 1),
-                    child: _buildNewForm(),
-                  ),
-                )
-              ],
-            ),
-          )),
+                    child: _buildNewForm()),
+              ),
+            )
+          ],
+        ),
+      ),
     );
   }
 
@@ -262,19 +240,31 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                         name: "naziv",
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
+                            return 'Unesite naziv ponude';
                           }
+
                           return null;
                         }),
+                  ),
+                  const SizedBox(
+                    width: 20,
                   ),
                   Expanded(
                     child: FormBuilderTextField(
                         decoration: const InputDecoration(labelText: "Popust"),
                         name: "popust",
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.digitsOnly
+                        ],
                         enabled: widget.ponuda != null ? false : true,
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter some text';
+                            return 'Unesite popust';
+                          }
+                          if (int.tryParse(value.toString())! > 100 ||
+                              int.tryParse(value.toString())! < 0) {
+                            return 'Morate unijeti broj između 0 i 100';
                           }
                           return null;
                         }),
@@ -356,19 +346,24 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                       ? SizedBox(
                           child: ElevatedButton(
                               onPressed: () async {
-                                isLoadingSave = true;
-                                setState(() {});
-
                                 await _ponudeProvider.ponudeState(
                                     action: "edit",
                                     id: widget.ponuda?.ponudaId);
 
-                                // ignore: use_build_context_synchronously
-                                Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PonudeListScreen()));
-                              }, // Define this function to handle the save action
+                                if (mounted) {
+                                  await QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Stanje ponude usješno promijenjeno",
+                                    confirmBtnText: "U redu",
+                                    text: "Ponuda je spremljena",
+                                    onConfirmBtnTap: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  );
+                                }
+                              },
                               child: const Text("Kreirana")))
                       : Container(),
                   allowedActions != null && allowedActions!.contains("activate")
@@ -376,23 +371,31 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                           width: 20,
                         )
                       : Container(),
-                  allowedActions != null && allowedActions!.contains("activate")
+                  allowedActions != null &&
+                          allowedActions!.contains("activate") &&
+                          setoviPonudeResult != null &&
+                          setoviPonudeResult!.result.isNotEmpty
                       ? SizedBox(
                           child: ElevatedButton(
                               onPressed: () async {
-                                isLoadingSave = true;
-                                setState(() {});
-
                                 await _ponudeProvider.ponudeState(
                                     action: "activate",
                                     id: widget.ponuda?.ponudaId);
 
-                                // ignore: use_build_context_synchronously
-                                Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PonudeListScreen()));
-                              }, // Define this function to handle the save action
+                                if (mounted) {
+                                  await QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Stanje ponude usješno promijenjeno",
+                                    confirmBtnText: "U redu",
+                                    text: "Ponuda je spremljena",
+                                    onConfirmBtnTap: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  );
+                                }
+                              },
                               child: const Text("Aktiviraj")))
                       : Container(),
                   allowedActions != null && allowedActions!.contains("finish")
@@ -404,19 +407,24 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                       ? SizedBox(
                           child: ElevatedButton(
                               onPressed: () async {
-                                isLoadingSave = true;
-                                setState(() {});
-
                                 await _ponudeProvider.ponudeState(
                                     action: "finish",
                                     id: widget.ponuda?.ponudaId);
 
-                                // ignore: use_build_context_synchronously
-                                Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            const PonudeListScreen()));
-                              }, // Define this function to handle the save action
+                                if (mounted) {
+                                  await QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Stanje ponude usješno promijenjeno",
+                                    confirmBtnText: "U redu",
+                                    text: "Ponuda je spremljena",
+                                    onConfirmBtnTap: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  );
+                                }
+                              },
                               child: const Text("Završena")))
                       : Container(),
                   widget.ponuda?.stateMachine == "created" ||
@@ -442,99 +450,70 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
 
                                           var request = Map.from(
                                               _formKey.currentState!.value);
-                                          isLoadingSave = true;
-                                          setState(() {});
                                           try {
                                             if (widget.ponuda != null) {
                                               await _ponudeProvider.update(
                                                   widget.ponuda!.ponudaId,
                                                   request);
+                                              if (mounted) {
+                                                await QuickAlert.show(
+                                                  context: context,
+                                                  type: QuickAlertType.success,
+                                                  title:
+                                                      "Uspješno ste spremili ponudu",
+                                                  confirmBtnText: "U redu",
+                                                  text: "Ponuda je spremljena",
+                                                  onConfirmBtnTap: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                );
+                                              }
                                             } else {
                                               await _ponudeProvider
                                                   .insert(request);
+                                              if (mounted) {
+                                                await QuickAlert.show(
+                                                  context: context,
+                                                  type: QuickAlertType.success,
+                                                  title:
+                                                      "Uspješno ste dodali ponudu",
+                                                  confirmBtnText: "U redu",
+                                                  text: "Ponuda je dodana",
+                                                  onConfirmBtnTap: () {
+                                                    Navigator.of(context).pop();
+                                                  },
+                                                );
+                                              }
                                             }
-
-                                            // ignore: use_build_context_synchronously
-                                            Navigator.of(context).pushReplacement(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        const PonudeListScreen()));
-                                            // ignore: empty_catches
+                                            if (mounted) {
+                                              Navigator.of(context).pop(true);
+                                            }
                                           } on Exception catch (e) {
-                                            isLoadingSave = false;
-                                            showDialog(
-                                                // ignore: use_build_context_synchronously
+                                            if (mounted) {
+                                              QuickAlert.show(
                                                 context: context,
-                                                builder: (context) =>
-                                                    AlertDialog(
-                                                      title:
-                                                          const Text("Error"),
-                                                      content:
-                                                          Text(e.toString()),
-                                                      actions: [
-                                                        TextButton(
-                                                            onPressed: () =>
-                                                                Navigator.pop(
-                                                                    context),
-                                                            child: const Text(
-                                                                "Ok"))
-                                                      ],
-                                                    ));
-                                            setState(() {});
+                                                type: QuickAlertType.error,
+                                                title: "Greška",
+                                                confirmBtnText: "U redu",
+                                                text:
+                                                    e.toString().split(': ')[1],
+                                                onConfirmBtnTap: () {
+                                                  Navigator.of(context).pop();
+                                                },
+                                              );
+                                            }
                                           }
                                         }
-                                      }, // Define this function to handle the save action
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.green,
-                                        shape:
-                                            const CircleBorder(), // Makes the button circular
-                                        padding: const EdgeInsets.all(
-                                            8), // Adjust padding for icon size // Background color
+                                        shape: const CircleBorder(),
+                                        padding: const EdgeInsets.all(8),
                                       ),
-
-                                      child: isLoadingSave
-                                          ? const CircularProgressIndicator()
-                                          : const Icon(
-                                              Icons.save,
-                                              color: Colors.white,
-                                            ), // Save icon inside
-                                    )
-                                  : Container(),
-                            ),
-                            const SizedBox(
-                              width: 20,
-                            ),
-                            SizedBox(
-                              width: 60,
-                              height: 60,
-                              child: widget.ponuda?.stateMachine == "created"
-                                  ? ElevatedButton(
-                                      onPressed: () async {
-                                        isLoadingSave = true;
-                                        setState(() {});
-
-                                        await _ponudeProvider
-                                            .delete(widget.ponuda!.ponudaId);
-
-                                        // ignore: use_build_context_synchronously
-                                        Navigator.of(context).pushReplacement(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    const PonudeListScreen()));
-                                      }, // Define this function to handle the save action
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors
-                                            .red, // Makes the button circular
-                                        padding: const EdgeInsets.all(
-                                            8), // Adjust padding for icon size // Background color
+                                      child: const Icon(
+                                        Icons.save,
+                                        color: Colors.white,
                                       ),
-
-                                      child: isLoadingSave
-                                          ? const CircularProgressIndicator()
-                                          : const Icon(
-                                              Icons.delete,
-                                              color: Colors.white,
-                                            ), // Save icon inside
                                     )
                                   : Container(),
                             ),
@@ -564,10 +543,7 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
               itemCount: setoviPonudeResult?.result.length,
               itemBuilder: (context, index) {
                 return setoviPonudeResult != null &&
-                        setoviPonudeResult?.result[index] != null &&
-                        setoviPonudeResult!
-                                .result[index].set!.proizvodiSets.length <=
-                            3
+                        setoviPonudeResult?.result[index] != null
                     ? _buildExpansionTile(index)
                     : Container();
               },
@@ -592,12 +568,35 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                   color: Colors.red,
                 ),
                 onPressed: () async {
-                  setState(() {
-                    isLoading = true;
-                  });
-                  await _setoviPonudeProvider
-                      .delete(setoviPonudeResult!.result[index].setoviPonudeId);
-                  initForm();
+                  if (context.mounted) {
+                    await QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.confirm,
+                      title: "Potvrda brisanja",
+                      text: "Jeste li sigurni da želite obrisati set?",
+                      confirmBtnText: "U redu",
+                      onConfirmBtnTap: () async {
+                        await _setoviPonudeProvider.delete(
+                            setoviPonudeResult!.result[index].setoviPonudeId);
+                        if (mounted) {
+                          await QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.success,
+                            title: "Uspješno ste obrisali set",
+                            confirmBtnText: "U redu",
+                            text: "Set je obrisan",
+                            onConfirmBtnTap: () {
+                              Navigator.of(context).pop();
+                            },
+                          );
+                        }
+                        if (mounted) {
+                          Navigator.of(context).pop();
+                        }
+                        initForm();
+                      },
+                    );
+                  }
                 },
               )
             : const SizedBox(
@@ -612,24 +611,14 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
         ),
         textColor: Colors.white,
         children: [
-          setoviPonudeResult?.result[index].set?.proizvodiSets.isEmpty == false
-              ? ListTile(
-                  title: Text(
-                      "${setoviPonudeResult?.result[index].set?.proizvodiSets[0].proizvod?.naziv}"),
-                )
-              : Container(),
-          setoviPonudeResult?.result[index].set?.proizvodiSets.isEmpty == false
-              ? ListTile(
-                  title: Text(
-                      "${setoviPonudeResult?.result[index].set?.proizvodiSets[1].proizvod?.naziv}"),
-                )
-              : Container(),
-          setoviPonudeResult?.result[index].set?.proizvodiSets.isEmpty == false
-              ? ListTile(
-                  title: Text(
-                      "${setoviPonudeResult?.result[index].set?.proizvodiSets[2].proizvod?.naziv}"),
-                )
-              : Container(),
+          if (setoviPonudeResult?.result[index].set?.proizvodiSets != null &&
+              setoviPonudeResult!.result[index].set!.proizvodiSets.isNotEmpty)
+            ...setoviPonudeResult!.result[index].set!.proizvodiSets
+                .map((proizvodSet) {
+              return ListTile(
+                title: Text(proizvodSet.proizvod?.naziv ?? "N/A"),
+              );
+            }),
         ],
       ),
     );
@@ -639,15 +628,26 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
     return FormBuilder(
       key: _formKey2,
       initialValue: _initialValue3,
-      child: Padding(
+      child: Container(
+        margin: const EdgeInsets.all(10),
         padding: const EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: const Color.fromRGBO(235, 241, 224, 1),
+          border:
+              Border.all(color: const Color.fromRGBO(32, 76, 56, 1), width: 2),
+          borderRadius: const BorderRadius.all(
+            Radius.circular(20),
+          ),
+        ),
         child: Row(
           children: [
             Expanded(
               child: FormBuilderTextField(
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                decoration: const InputDecoration(labelText: "Popust"),
+                decoration: const InputDecoration(
+                  labelText: "Popust",
+                ),
                 initialValue: widget.ponuda?.popust.toString(),
                 enabled: false,
                 name: "popust",
@@ -656,102 +656,15 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
             const SizedBox(
               width: 10,
             ),
-            Expanded(
-              child: Column(
-                children: [
-                  FormBuilderDropdown(
-                    name: "proizvodId1",
-                    decoration: const InputDecoration(labelText: "Tlo"),
-                    items: tlo
-                        .map((item) => DropdownMenuItem(
-                              value: item.proizvodId.toString(),
-                              child: Text(
-                                  "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
-                            ))
-                        .toList(),
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please choose some value';
-                      }
-                      return null;
-                    },
-                  ),
-                  FormBuilderTextField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration:
-                        const InputDecoration(labelText: "Količina Tlo"),
-                    name: "kolicinaTlo",
-                  ),
-                ],
-              ),
-            ),
+            buildSetPonudeField("proizvodId1", "Tlo", tlo),
             const SizedBox(
               width: 10,
             ),
-            Expanded(
-              child: Column(
-                children: [
-                  FormBuilderDropdown(
-                    name: "proizvodId2",
-                    decoration: const InputDecoration(labelText: "Sjeme"),
-                    items: sjeme
-                        .map((item) => DropdownMenuItem(
-                              value: item.proizvodId.toString(),
-                              child: Text(
-                                  "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
-                            ))
-                        .toList(),
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please choose some value';
-                      }
-                      return null;
-                    },
-                  ),
-                  FormBuilderTextField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration:
-                        const InputDecoration(labelText: "Količina Sjeme"),
-                    name: "kolicinaSjeme",
-                  ),
-                ],
-              ),
-            ),
+            buildSetPonudeField("proizvodId2", "Sjeme", sjeme),
             const SizedBox(
               width: 10,
             ),
-            Expanded(
-              child: Column(
-                children: [
-                  FormBuilderDropdown(
-                    name: "proizvodId3",
-                    decoration: const InputDecoration(labelText: "Prihrana"),
-                    items: prihrana
-                        .map((item) => DropdownMenuItem(
-                              value: item.proizvodId.toString(),
-                              child: Text(
-                                  "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
-                            ))
-                        .toList(),
-                    validator: (value) {
-                      if (value == null) {
-                        return 'Please choose some value';
-                      }
-                      return null;
-                    },
-                  ),
-                  FormBuilderTextField(
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    decoration:
-                        const InputDecoration(labelText: "Količina Prihrana"),
-                    name: "kolicinaPrihrana",
-                  ),
-                ],
-              ),
-            ),
+            buildSetPonudeField("proizvodId3", "Prihrana", prihrana),
             const SizedBox(
               width: 10,
             ),
@@ -785,13 +698,12 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                             'cijena': 0,
                             'cijenaSaPopustom': null,
                             'proizvodiSets':
-                                productList?.map((e) => e.toJson()).toList()
+                                productList.map((e) => e.toJson()).toList()
                           };
                           request['popust'] = request['popust'] ?? 0;
                           request['cijena'] = 0;
                           request['cijenaSaPopustom'] = 0;
 
-                          isLoadingSave = true;
                           setState(() {});
                           try {
                             if (widget.ponuda == null) {
@@ -805,6 +717,18 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                                 setPonuda = await _setoviPonudeProvider
                                     .insert(requestTwo);
                               }
+                              if (mounted) {
+                                await QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.success,
+                                  title: "Uspješno ste dodali set",
+                                  confirmBtnText: "U redu",
+                                  text: "Set je dodan",
+                                  onConfirmBtnTap: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                );
+                              }
                             }
 
                             _formKey2.currentState?.reset();
@@ -814,25 +738,61 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                             debugPrint(e.toString());
                           }
                         }
-                      }, // Define this function to handle the save action
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.green,
-                        shape:
-                            const CircleBorder(), // Makes the button circular
-                        padding: const EdgeInsets.all(
-                            8), // Adjust padding for icon size // Background color
+                        shape: const CircleBorder(),
+                        padding: const EdgeInsets.all(8),
                       ),
                       child: isLoadingSave
                           ? const CircularProgressIndicator()
                           : const Icon(
                               Icons.add,
                               color: Colors.white,
-                            ), // Save icon inside
+                            ),
                     ),
                   )
                 : Container()
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildSetPonudeField(name, label, List<dynamic> itemsSent) {
+    return Expanded(
+      child: Column(
+        children: [
+          FormBuilderDropdown(
+            name: name,
+            decoration: InputDecoration(labelText: label),
+            items: itemsSent
+                .map((item) => DropdownMenuItem(
+                      value: item.proizvodId.toString(),
+                      child: Text(
+                          "${item.naziv} (${item.jedinicaMjere?.skracenica})"),
+                    ))
+                .toList(),
+            validator: (value) {
+              if (value == null) {
+                return 'Morate odabrati \n$label';
+              }
+              return null;
+            },
+          ),
+          FormBuilderTextField(
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: InputDecoration(labelText: "Količina $label"),
+            name: "kolicina$label",
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Polje količina ne \nsmije biti prazno.';
+              }
+              return null;
+            },
+          ),
+        ],
       ),
     );
   }

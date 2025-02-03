@@ -1,5 +1,9 @@
+import 'package:advanced_datatable/advanced_datatable_source.dart';
+import 'package:advanced_datatable/datatable.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/ponuda.dart';
@@ -18,13 +22,21 @@ class PonudeListScreen extends StatefulWidget {
 class _PonudeListScreenState extends State<PonudeListScreen> {
   late PonudeProvider _ponudeProvider;
 
+  late PonudeDataSource dataSource;
   SearchResult<Ponuda>? result;
+  Map<String, dynamic> stateMachineValues = {
+    "all": "Svi",
+    "created": "Kreirana",
+    "active": "Aktivna",
+    "finished": "Završena"
+  };
 
   bool isLoading = true;
-  String? stateMachine = null;
+  String? stateMachineName;
+  String? stateMachine;
   bool? jeObrisan;
 
-  RangeValues selectedRange = RangeValues(0, 100);
+  late RangeValues selectedRange;
 
   String datumOdString = "";
   String datumDoString = "";
@@ -41,8 +53,13 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
   @override
   void initState() {
     _ponudeProvider = context.read<PonudeProvider>();
-    super.initState();
+    selectedRange = const RangeValues(0, 100);
+    dataSource = PonudeDataSource(
+      provider: _ponudeProvider,
+      context: context,
+    );
     initScreen();
+    super.initState();
   }
 
   Future initScreen() async {
@@ -56,7 +73,6 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
     _ftsEditingController.text = "";
     _datumDoEditingController.text = "";
     _popustEditingController.text = "";
-    selectedRange = RangeValues(0, 100);
 
     setState(() {
       isLoading = false;
@@ -67,17 +83,36 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
   Widget build(BuildContext context) {
     return MasterScreen(
       FullScreenLoader(
-        isLoading: isLoading, // Your loading state
-        child: Container(
-          margin:
-              const EdgeInsets.only(left: 40, right: 40, top: 20, bottom: 10),
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
-            children: [
-              _buildBanner(),
-              _buildSearch(),
-              _buildResultView(),
-            ],
+        isLoading: isLoading,
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+            actions: <Widget>[Container()],
+            iconTheme: const IconThemeData(color: Colors.white),
+            centerTitle: true,
+            title: const Text(
+              "Ponude",
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+          ),
+          backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
+          body: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(10),
+            color: const Color.fromRGBO(235, 241, 224, 1),
+            child: Column(
+              children: [
+                _buildSearch(),
+                _buildResultView(),
+              ],
+            ),
           ),
         ),
       ),
@@ -85,44 +120,27 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
     );
   }
 
-  Widget _buildBanner() {
-    return Container(
-      margin: const EdgeInsets.only(top: 30),
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      child: const Padding(
-        padding: EdgeInsets.all(15.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(size: 45, color: Colors.white, Icons.local_offer),
-            SizedBox(
-              width: 10,
-            ),
-            Text("Ponude",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "arial",
-                    color: Colors.white)),
-            SizedBox(
-              width: 10,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildSearch() {
-    return Padding(
-        padding: const EdgeInsets.all(8.0),
+    return Container(
+        margin: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(12.0),
+        color: const Color.fromRGBO(32, 76, 56, 1),
         child: Row(
           children: [
             Expanded(
                 child: TextField(
               controller: _ftsEditingController,
-              decoration: const InputDecoration(labelText: "Naziv"),
+              decoration:
+                  const InputDecoration(labelText: "Naziv", filled: true),
+              onChanged: (value) {
+                dataSource.filterServerSide(
+                    value,
+                    datumOdString,
+                    datumDoString,
+                    selectedRange.start.toInt(),
+                    selectedRange.end.toInt(),
+                    stateMachine);
+              },
             )),
             const SizedBox(
               width: 8,
@@ -130,7 +148,8 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
             Expanded(
                 child: TextField(
               controller: _datumOdEditingController,
-              decoration: const InputDecoration(labelText: "Datum od:"),
+              decoration:
+                  const InputDecoration(labelText: "Datum od:", filled: true),
               readOnly: true,
               onTap: () async {
                 DateTime? pickedDate = await showDatePicker(
@@ -141,14 +160,28 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
                   datumOdString = pickedDate.toIso8601String();
                   _datumOdEditingController.text =
                       formatDateString(pickedDate.toIso8601String());
+                  dataSource.filterServerSide(
+                      _ftsEditingController.text,
+                      datumOdString,
+                      datumDoString,
+                      selectedRange.start.toInt(),
+                      selectedRange.end.toInt(),
+                      stateMachine);
                 }
               },
             )),
             IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const Icon(Icons.clear, color: Colors.white),
               onPressed: () {
                 _datumOdEditingController.clear();
                 datumOdString = "";
+                dataSource.filterServerSide(
+                    _ftsEditingController.text,
+                    datumOdString,
+                    datumDoString,
+                    selectedRange.start.toInt(),
+                    selectedRange.end.toInt(),
+                    stateMachine);
               },
             ),
             const SizedBox(
@@ -157,7 +190,8 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
             Expanded(
                 child: TextField(
               controller: _datumDoEditingController,
-              decoration: const InputDecoration(labelText: "Datum do:"),
+              decoration:
+                  const InputDecoration(labelText: "Datum do:", filled: true),
               readOnly: true,
               onTap: () async {
                 DateTime? pickedDate = await showDatePicker(
@@ -170,159 +204,120 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
                   datumDoString = pickedDate.toIso8601String();
                   _datumDoEditingController.text =
                       formatDateString(pickedDate.toIso8601String());
+                  dataSource.filterServerSide(
+                      _ftsEditingController.text,
+                      datumOdString,
+                      datumDoString,
+                      selectedRange.start.toInt(),
+                      selectedRange.end.toInt(),
+                      stateMachine);
                 }
               },
             )),
             IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const Icon(Icons.clear, color: Colors.white),
               onPressed: () {
                 _datumDoEditingController.clear();
                 datumDoString = "";
+                dataSource.filterServerSide(
+                    _ftsEditingController.text,
+                    datumOdString,
+                    datumDoString,
+                    selectedRange.start.toInt(),
+                    selectedRange.end.toInt(),
+                    stateMachine);
               },
             ),
             const SizedBox(
               width: 8,
             ),
-            const Text("Popust:"),
+            const Text("Popust:", style: TextStyle(color: Colors.white)),
             RangeSlider(
-                values: selectedRange,
-                min: 0,
-                max: 100,
-                divisions: 100,
-                labels: RangeLabels(selectedRange.start.round().toString(),
-                    selectedRange.end.round().toString()),
-                onChanged: (values) {
-                  setState(() {
-                    selectedRange = values;
-                  });
-                }),
-            const SizedBox(
-              width: 8,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade400)),
-              child: DropdownMenu(
-                initialSelection: stateMachine == "created"
-                    ? "created"
-                    : stateMachine == "active"
-                        ? "active"
-                        : stateMachine == "finished"
-                            ? "finished"
-                            : "all",
-                enableFilter: false,
-                label: const Text("Završen"),
-                dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: "all", label: "Svi"),
-                  DropdownMenuEntry(value: "created", label: "Kreirana"),
-                  DropdownMenuEntry(value: "active", label: "Aktivna"),
-                  DropdownMenuEntry(value: "finished", label: "Završena"),
-                ],
-                menuStyle: MenuStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                    elevation: MaterialStateProperty.all(4),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.grey.shade300)))),
-                textStyle: const TextStyle(color: Colors.black, fontSize: 16),
-                onSelected: (value) {
-                  if (value != null) {
-                    if (value == "all") {
-                      stateMachine = null;
-                    } else if (value == "created") {
-                      stateMachine = "created";
-                    } else if (value == "active") {
-                      stateMachine = "active";
-                    } else {
-                      stateMachine = "finished";
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Odaberite neku od ponuđenih"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-              ),
+              activeColor: Colors.white,
+              inactiveColor: Colors.grey,
+              values: selectedRange,
+              min: 0,
+              max: 100,
+              divisions: 100,
+              labels: RangeLabels(selectedRange.start.round().toString(),
+                  selectedRange.end.round().toString()),
+              onChangeEnd: (values) {
+                selectedRange = RangeValues(values.start.round().toDouble(),
+                    values.end.round().toDouble());
+                dataSource.filterServerSide(
+                    _ftsEditingController.text,
+                    datumOdString,
+                    datumDoString,
+                    selectedRange.start.toInt(),
+                    selectedRange.end.toInt(),
+                    stateMachine);
+                setState(() {});
+              },
+              onChanged: (value) {
+                selectedRange = value;
+                setState(() {});
+              },
             ),
             const SizedBox(
               width: 8,
             ),
             Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade400)),
-              child: DropdownMenu(
-                label: const Text("Obrisan"),
-                initialSelection: jeObrisan == true
-                    ? 1
-                    : jeObrisan == false
-                        ? 2
-                        : 0,
-                enableFilter: false,
-                dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: 0, label: "Svi"),
-                  DropdownMenuEntry(value: 1, label: "Da"),
-                  DropdownMenuEntry(value: 2, label: "Ne"),
-                ],
-                menuStyle: MenuStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                    elevation: MaterialStateProperty.all(4),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade400)),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton2(
+                    value: stateMachine ?? stateMachineValues.entries.first.key,
+                    buttonStyleData: ButtonStyleData(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.grey.shade300)))),
-                textStyle: const TextStyle(color: Colors.black, fontSize: 16),
-                onSelected: (value) {
-                  if (value != null) {
-                    if (value == 0) {
-                      jeObrisan = null;
-                    } else if (value == 1) {
-                      jeObrisan = true;
-                    } else {
-                      jeObrisan = false;
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content:
-                            Text("Odaberite neku od ponuđenih vrijednosti"),
-                        backgroundColor: Colors.red,
+                        border: Border.all(color: Colors.grey.shade400),
                       ),
-                    );
-                  }
-                },
-              ),
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  isLoading = true;
-                  setState(() {});
-                  var filter = {
-                    'NazivContains': _ftsEditingController.text,
-                    'PopustFrom': selectedRange.start.toInt(),
-                    'PopustTo': selectedRange.end.toInt(),
-                    'DatumFrom': datumOdString,
-                    'DatumTo': datumDoString,
-                    'isDeleted': jeObrisan,
-                    'StateMachine': stateMachine
-                  };
-                  result = await _ponudeProvider.get(filter: filter);
-                  isLoading = false;
-                  setState(() {});
-                },
-                child: const Text("Pretraga")),
+                    ),
+                    items: stateMachineValues.entries
+                        .map((item) => DropdownMenuItem(
+                              value: item.key,
+                              child: Text(item.value ?? "",
+                                  style: const TextStyle(color: Colors.black)),
+                            ))
+                        .toList(),
+                    onChanged: (value) async {
+                      if (value != null) {
+                        stateMachine = value;
+                        dataSource.filterServerSide(
+                            _ftsEditingController.text,
+                            datumOdString,
+                            datumDoString,
+                            selectedRange.start.toInt(),
+                            selectedRange.end.toInt(),
+                            stateMachine == "all" ? null : stateMachine);
+                        setState(() {});
+                      } else {}
+                    },
+                  ),
+                )),
             const SizedBox(
               width: 8,
             ),
             ElevatedButton(
                 onPressed: () async {
-                  Navigator.of(context).pushReplacement(MaterialPageRoute(
-                      builder: (context) => PonudeDetailsScreen()));
+                  bool response = await Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const PonudeDetailsScreen()));
+
+                  if (response == true) {
+                    dataSource.filterServerSide(
+                        _ftsEditingController.text,
+                        datumOdString,
+                        datumDoString,
+                        selectedRange.start.toInt(),
+                        selectedRange.end.toInt(),
+                        stateMachine);
+
+                    setState(() {});
+                  }
                 },
                 child: const Text("Dodaj")),
           ],
@@ -332,80 +327,216 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
   Widget _buildResultView() {
     return Expanded(
       child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: const Color.fromRGBO(32, 76, 56, 1),
+          decoration: const BoxDecoration(
+            color: Color.fromRGBO(32, 76, 56, 1),
           ),
           margin: const EdgeInsets.all(15),
           width: double.infinity,
           child: SingleChildScrollView(
-              child: DataTable(
-                  columns: const [
-                DataColumn(
-                    label: Text(
-                  "Naziv ponude",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Datum",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Status",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Popust",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                )),
-              ],
-                  rows: result?.result
-                          .map((e) => DataRow(
-                                  onSelectChanged: (selected) => {
-                                        if (selected == true)
-                                          {
-                                            Navigator.of(context)
-                                                .pushReplacement(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            PonudeDetailsScreen(
-                                                              ponuda: e,
-                                                            )))
-                                          }
-                                      },
-                                  cells: [
-                                    DataCell(Text(e.naziv,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                    DataCell(Text(
-                                        formatDateString(
-                                            e.datumKreiranja.toIso8601String()),
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                    DataCell(Text(
-                                        e.stateMachine == "created"
-                                            ? "Kreirana"
-                                            : e.stateMachine == "active"
-                                                ? "Aktivna"
-                                                : e.stateMachine == "finished"
-                                                    ? "Završena"
-                                                    : "Greška",
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                    DataCell(Text("${e.popust} %",
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                  ]))
-                          .toList()
-                          .cast<DataRow>() ??
-                      []))),
+              child: AdvancedPaginatedDataTable(
+            showCheckboxColumn: false,
+            rowsPerPage: 10,
+            source: dataSource,
+            columns: const [
+              DataColumn(
+                  label: Text(
+                "Naziv ponude",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Datum",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Status",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Popust",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Akcija",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              ))
+            ],
+            addEmptyRows: false,
+          ))),
     );
+  }
+}
+
+class PonudeDataSource extends AdvancedDataTableSource<Ponuda> {
+  List<Ponuda>? data = [];
+  final PonudeProvider provider;
+  int count = 10;
+  int page = 1;
+  int pageSize = 10;
+  String? _nazivGTE;
+  String? _datumOd;
+  String? _datumDo;
+  int? _popustOd;
+  int? _popustDo;
+  String? _stateMachine;
+
+  dynamic filter;
+  BuildContext context;
+  PonudeDataSource({required this.provider, required this.context});
+
+  @override
+  DataRow? getRow(int index) {
+    if (index >= data!.length) {
+      return null;
+    }
+
+    final item = data?[index];
+
+    return DataRow(
+        onSelectChanged: (selected) async {
+          if (selected == true) {
+            bool response = await Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => PonudeDetailsScreen(
+                      ponuda: item,
+                    )));
+
+            if (response == true) {
+              filterServerSide(_nazivGTE, _datumOd, _datumDo, _popustOd,
+                  _popustDo, _stateMachine);
+            }
+          }
+        },
+        cells: [
+          DataCell(Text(item!.naziv,
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(Text(formatDateString(item.datumKreiranja.toIso8601String()),
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(Text(
+              item.stateMachine == "created"
+                  ? "Kreirana"
+                  : item.stateMachine == "active"
+                      ? "Aktivna"
+                      : item.stateMachine == "finished"
+                          ? "Završena"
+                          : "Greška",
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(Text("${item.popust} %",
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(ElevatedButton(
+            onPressed: () async {
+              if (context.mounted) {
+                QuickAlert.show(
+                    context: context,
+                    type: QuickAlertType.confirm,
+                    title: "Potvrda brisanja",
+                    text: "Jeste li sigurni da želite obrisati ulaz?",
+                    confirmBtnText: "U redu",
+                    onConfirmBtnTap: () async {
+                      try {
+                        await provider.delete(item.ponudaId);
+                        if (context.mounted) {
+                          await QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.success,
+                            title: "Uspješno ste obrisali ponudu",
+                            confirmBtnText: "U redu",
+                            text: "Ponuda je obrisana",
+                            onConfirmBtnTap: () {
+                              Navigator.of(context).pop();
+                            },
+                          );
+                        }
+
+                        filterServerSide(_nazivGTE, _datumOd, _datumDo,
+                            _popustOd, _popustDo, _stateMachine);
+                      } on Exception catch (e) {
+                        if (context.mounted) {
+                          await QuickAlert.show(
+                              title: "Greška",
+                              confirmBtnText: "U redu",
+                              context: context,
+                              type: QuickAlertType.error,
+                              text: e.toString().split(': ')[1],
+                              onConfirmBtnTap: Navigator.of(context).pop);
+                        }
+                      }
+                      if (context.mounted) {
+                        Navigator.of(context).pop();
+                      }
+                    });
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.all(8),
+            ),
+            child: const Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+          )),
+        ]);
+  }
+
+  void filterServerSide(
+    naziv,
+    datumOd,
+    datumDo,
+    popustOd,
+    popustDo,
+    stateMachine,
+  ) {
+    _nazivGTE = naziv;
+    _datumOd = datumOd;
+    _datumDo = datumDo;
+    _popustOd = popustOd;
+    _popustDo = popustDo;
+
+    _stateMachine = stateMachine;
+    setNextView();
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get selectedRowCount => 0;
+
+  @override
+  Future<RemoteDataSourceDetails<Ponuda>> getNextPage(
+      NextPageRequest pageRequest) async {
+    page = (pageRequest.offset ~/ pageSize).toInt() + 1;
+
+    var filter = {
+      'NazivContains': _nazivGTE,
+      'PopustFrom': _popustOd,
+      'PopustTo': _popustDo,
+      'DatumFrom': _datumOd,
+      'DatumTo': _datumDo,
+      'isDeleted': false,
+      'StateMachine': _stateMachine,
+      'Page': page,
+      'PageSize': pageSize
+    };
+
+    try {
+      var result = await provider.get(filter: filter);
+      data = result.result;
+      count = result.count;
+
+      notifyListeners();
+    } on Exception catch (e) {
+      if (context.mounted) {
+        QuickAlert.show(
+            context: context,
+            type: QuickAlertType.error,
+            text: e.toString().split(': ')[1]);
+      }
+    }
+
+    return RemoteDataSourceDetails(count, data!);
   }
 }

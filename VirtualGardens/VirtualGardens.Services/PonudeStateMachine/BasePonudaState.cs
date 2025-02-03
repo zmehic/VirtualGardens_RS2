@@ -63,7 +63,7 @@ namespace VirtualGardens.Services.PonudeStateMachine
 
         public virtual void Delete(int id)
         {
-            throw new UserException("Method not allowed");
+            throw new UserException("Da biste obrisali ponudu, morate je vratiti u stanje 'Kreirana'");
         }
 
         public virtual List<string> AllowedActions(Database.Ponude entity)
