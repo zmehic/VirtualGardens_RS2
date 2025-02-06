@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.Exceptions;
 using VirtualGardens.Models.Requests.VrsteProizvoda;
 using VirtualGardens.Models.SearchObjects;
 using VirtualGardens.Services.BaseServices;
@@ -29,6 +31,40 @@ namespace VirtualGardens.Services.AllServices.VrsteProizvoda
                 query = query.Where(x => x.IsDeleted == search.isDeleted);
             }
             return query;
+        }
+
+        public override VrsteProizvodaDTO Update(int id, VrsteProizvodaUpsertRequest request)
+        {
+            var set = context.Set<VrsteProizvodum>();
+            var entity = set.Find(id);
+
+            BeforeUpdate(request, entity);
+
+            mapper.Map(request, entity);
+
+            context.SaveChanges();
+
+            AfterUpdate(request, entity);
+
+            return mapper.Map<VrsteProizvodaDTO>(entity);
+        }
+
+        public override void BeforeUpdate(VrsteProizvodaUpsertRequest request, VrsteProizvodum entity)
+        {
+            if (entity.Naziv == "Tlo" || entity.Naziv == "Sjeme" || entity.Naziv == "Prihrana")
+            {
+                throw new UserException("Ovo je bazna vrsta proizvoda i nije je moguće uređivati");
+            }
+            base.BeforeUpdate(request, entity);
+        }
+
+        public override void BeforeDelete(int id, VrsteProizvodum entity)
+        {
+            if (entity.Naziv == "Tlo" || entity.Naziv == "Sjeme" || entity.Naziv == "Prihrana")
+            {
+                throw new UserException("Ovo je bazna vrsta proizvoda i nije je moguće brisati");
+            }
+            base.BeforeDelete(id, entity);
         }
     }
 }

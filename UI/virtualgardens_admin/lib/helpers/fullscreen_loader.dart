@@ -14,8 +14,7 @@ class FullScreenLoader extends StatelessWidget {
         isLoading == false
             ? child
             : Container(
-                color: const Color.fromRGBO(
-                    32, 76, 56, 1), // Optional: Semi-transparent background
+                color: const Color.fromRGBO(32, 76, 56, 1),
                 child: const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

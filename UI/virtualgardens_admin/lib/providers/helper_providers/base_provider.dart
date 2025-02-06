@@ -112,7 +112,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
       if (decodedResponse['errors'] != null &&
           decodedResponse['errors']['userError'] != null) {
         final userError = decodedResponse['errors']['userError'];
-        debugPrint(userError);
         throw Exception(userError[0]);
       } else {
         debugPrint(response.body);

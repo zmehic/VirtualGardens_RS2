@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_admin/screens/home_screen.dart';
+import 'package:virtualgardens_admin/screens/jedinice_mjere_list_screen.dart';
 import 'package:virtualgardens_admin/screens/nalozi_list_screen.dart';
 import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
 import 'package:virtualgardens_admin/screens/ponude_list_screen.dart';
 import 'package:virtualgardens_admin/screens/product_list_screen.dart';
 import 'package:virtualgardens_admin/screens/profile_screen.dart';
 import 'package:virtualgardens_admin/screens/statistics_screen.dart';
+import 'package:virtualgardens_admin/screens/vrste_proizvoda_list_screen.dart';
 import 'package:virtualgardens_admin/screens/zaposlenici_list_screen.dart';
 
 // ignore: must_be_immutable
@@ -76,7 +78,8 @@ class _MasterScreenState extends State<MasterScreen> {
                   label: "Profil",
                   onTap: () {
                     Navigator.of(context).push(
-                      MaterialPageRoute(builder: (context) => ProfileScreen()),
+                      MaterialPageRoute(
+                          builder: (context) => const ProfileScreen()),
                     );
                   },
                 ),
@@ -140,6 +143,22 @@ class _MasterScreenState extends State<MasterScreen> {
                     );
                   },
                 ),
+                _buildDrawerItem(
+                    icon: Icons.height_sharp,
+                    label: "Jedinice mjere",
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              const JediniceMjereListScreen()));
+                    }),
+                _buildDrawerItem(
+                    icon: Icons.type_specimen,
+                    label: "Vrste proizvoda",
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) =>
+                              const VrsteProizvodaListScreen()));
+                    })
               ],
             ),
           ),

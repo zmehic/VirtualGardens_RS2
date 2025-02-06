@@ -66,35 +66,12 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
     return MasterScreen(
       FullScreenLoader(
         isLoading: isLoading,
-        child: Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-            ),
-            actions: <Widget>[Container()],
-            iconTheme: const IconThemeData(color: Colors.white),
-            centerTitle: true,
-            title: const Text(
-              "Nalozi",
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-          ),
-          backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
-          body: Container(
-            margin: const EdgeInsets.all(20),
-            padding: const EdgeInsets.all(10),
-            color: const Color.fromRGBO(235, 241, 224, 1),
-            child: Column(
-              children: [
-                _buildSearch(),
-                _buildResultView(),
-              ],
-            ),
+        child: Expanded(
+          child: Column(
+            children: [
+              _buildSearch(),
+              _buildResultView(),
+            ],
           ),
         ),
       ),
@@ -230,7 +207,7 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
                 onPressed: () async {
                   var response = await Navigator.of(context).push(
                       MaterialPageRoute(
-                          builder: (context) => NaloziDetailsScreen()));
+                          builder: (context) => const NaloziDetailsScreen()));
 
                   if (response) {
                     dataSource.filterServerSide(_ftsEditingController.text,
