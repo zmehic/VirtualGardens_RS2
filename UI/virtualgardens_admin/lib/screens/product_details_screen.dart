@@ -37,7 +37,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   SearchResult<VrstaProizvoda>? vrsteProizvodaResult;
 
   bool isLoading = true;
-  bool isLoadingSave = false;
 
   String? _base64Image;
   dynamic image;

@@ -9,10 +9,9 @@ import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.da
 import 'package:virtualgardens_admin/providers/pitanja_odgovori_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 
-// ignore: must_be_immutable
 class PitanjaOdgovoriListScreen extends StatefulWidget {
-  Narudzba? narudzba;
-  PitanjaOdgovoriListScreen({super.key, this.narudzba});
+  final Narudzba? narudzba;
+  const PitanjaOdgovoriListScreen({super.key, this.narudzba});
 
   @override
   State<PitanjaOdgovoriListScreen> createState() =>
@@ -57,16 +56,34 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
   Widget build(BuildContext context) {
     return MasterScreen(
       FullScreenLoader(
-        isLoading: isLoading, // Your loading state
-        child: Container(
-          margin:
-              const EdgeInsets.only(left: 40, right: 40, top: 20, bottom: 10),
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
-            children: [
-              _buildBanner(),
-              _buildResultView(),
-            ],
+        isLoading: isLoading,
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            actions: <Widget>[Container()],
+            iconTheme: const IconThemeData(color: Colors.white),
+            centerTitle: true,
+            title: Text(
+              "Pitanja za narudžbu - ${widget.narudzba?.brojNarudzbe}",
+              style: const TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+          ),
+          backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
+          body: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(10),
+            color: const Color.fromRGBO(235, 241, 224, 1),
+            child: Column(
+              children: [
+                _buildResultView(),
+              ],
+            ),
           ),
         ),
       ),
@@ -85,6 +102,7 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
           color: const Color.fromRGBO(32, 76, 56, 1),
         ),
         margin: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             Expanded(
@@ -116,13 +134,10 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                                         'assets/images/user.png',
                                         fit: BoxFit.cover,
                                         width: 24,
-                                        height:
-                                            24, // Cover the whole area of the circle
+                                        height: 24,
                                       )),
                           ),
                         if (!isLoggedInUser) const SizedBox(width: 10),
-
-                        // Message bubble
                         Flexible(
                           child: Container(
                             padding: const EdgeInsets.all(10),
@@ -152,8 +167,6 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                             ),
                           ),
                         ),
-
-                        // Show profile picture for logged-in user
                         if (isLoggedInUser) const SizedBox(width: 10),
                         if (isLoggedInUser)
                           ClipOval(
@@ -167,8 +180,7 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                                         'assets/images/user.png',
                                         fit: BoxFit.cover,
                                         width: 24,
-                                        height:
-                                            24, // Cover the whole area of the circle
+                                        height: 24,
                                       )),
                           ),
                       ],
@@ -177,7 +189,6 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                 },
               ),
             ),
-            // Input field for new messages
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
@@ -208,32 +219,6 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                 ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBanner() {
-    return Container(
-      margin: const EdgeInsets.only(top: 30),
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      child: Padding(
-        padding: const EdgeInsets.all(15.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(size: 45, color: Colors.white, Icons.question_answer),
-            const SizedBox(
-              width: 10,
-            ),
-            Text("Pitanja za narudžbu - ${widget.narudzba?.brojNarudzbe}",
-                style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "arial",
-                    color: Colors.white)),
           ],
         ),
       ),

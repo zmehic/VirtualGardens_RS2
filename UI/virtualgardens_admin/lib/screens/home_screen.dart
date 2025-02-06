@@ -304,14 +304,6 @@ class _HomeScreenState extends State<HomeScreen> {
             selectedVrstaProizvoda = int.tryParse(value.toString());
             await fetchProducts(selectedVrstaProizvoda);
             setState(() {});
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content:
-                    Text("Vrijednost može biti 'Tlo', 'Sjeme' ili 'Prihrana'!"),
-                backgroundColor: Colors.red,
-              ),
-            );
           }
         },
       ),

@@ -12,6 +12,7 @@ import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/models/set.dart';
+import 'package:virtualgardens_admin/screens/pitanja_list_screen.dart';
 
 class NarudzbeDetailsScreen extends StatefulWidget {
   final Narudzba? narudzba;
@@ -129,7 +130,30 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                     Navigator.of(context).pop(true);
                   },
                 ),
-                actions: <Widget>[Container()],
+                actions: <Widget>[
+                  widget.narudzba != null
+                      ? Container(
+                          margin: const EdgeInsets.only(right: 10),
+                          child: ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) =>
+                                        PitanjaOdgovoriListScreen(
+                                            narudzba: widget.narudzba)));
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor:
+                                    const Color.fromRGBO(235, 241, 224, 1),
+                              ),
+                              child: const Text(
+                                "Pitanja",
+                                style: TextStyle(
+                                  color: Color.fromRGBO(32, 76, 56, 1),
+                                ),
+                              )),
+                        )
+                      : Container(),
+                ],
                 iconTheme: const IconThemeData(color: Colors.white),
                 centerTitle: true,
                 title: const Text(

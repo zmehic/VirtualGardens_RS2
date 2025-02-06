@@ -228,7 +228,7 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
             ),
             ElevatedButton(
                 onPressed: () async {
-                  bool response = await Navigator.of(context).push(
+                  var response = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (context) => NaloziDetailsScreen()));
 
@@ -311,7 +311,7 @@ class NaloziDataSource extends AdvancedDataTableSource<Nalog> {
     return DataRow(
         onSelectChanged: (selected) async {
           if (selected == true) {
-            bool response = await Navigator.of(context).push(MaterialPageRoute(
+            var response = await Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => NaloziDetailsScreen(
                       nalog: item,
                     )));

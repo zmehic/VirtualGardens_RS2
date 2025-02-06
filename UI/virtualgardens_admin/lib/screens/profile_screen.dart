@@ -29,7 +29,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String? _base64Image;
 
   bool isLoading = true;
-  bool isLoadingSave = false;
   bool changePassword = false;
 
   final TextEditingController _datumRodjenjaController =
@@ -522,12 +521,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               shape: const CircleBorder(),
                               padding: const EdgeInsets.all(8),
                             ),
-                            child: isLoadingSave
-                                ? const CircularProgressIndicator()
-                                : const Icon(
-                                    Icons.save,
-                                    color: Colors.white,
-                                  ),
+                            child: const Icon(
+                              Icons.save,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ],

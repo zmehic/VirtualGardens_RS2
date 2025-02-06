@@ -66,7 +66,6 @@ void main() async {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -161,6 +160,8 @@ class LoginPage extends StatelessWidget {
                     await provider.login(
                         username: AuthProvider.username,
                         password: AuthProvider.password);
+                    _usernameController.clear();
+                    _passwordController.clear();
                     if (context.mounted) {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => const HomeScreen()));

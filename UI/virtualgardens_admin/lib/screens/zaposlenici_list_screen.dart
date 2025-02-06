@@ -223,7 +223,7 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             ),
             ElevatedButton(
                 onPressed: () async {
-                  bool response = await Navigator.of(context).push(
+                  var response = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (context) =>
                               const ZaposleniciDetailsScreen()));
@@ -327,7 +327,7 @@ class ZaposleniciDataSource extends AdvancedDataTableSource<Zaposlenik> {
     return DataRow(
         onSelectChanged: (selected) async {
           if (selected == true) {
-            bool response = await Navigator.push(
+            var response = await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: ((context) =>

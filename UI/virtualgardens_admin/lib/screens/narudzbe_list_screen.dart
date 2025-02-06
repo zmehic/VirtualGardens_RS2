@@ -629,7 +629,7 @@ class NarudzbeDataSource extends AdvancedDataTableSource<Narudzba> {
     return DataRow(
         onSelectChanged: (selected) async {
           if (selected == true) {
-            bool response = await Navigator.push(
+            var response = await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: ((context) =>
