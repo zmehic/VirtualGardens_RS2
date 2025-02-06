@@ -32,7 +32,6 @@ abstract class BaseProvider<T> with ChangeNotifier {
       var data = jsonDecode(response.body);
       var result = SearchResult<T>();
       result.count = data['count'];
-
       for (var item in data['resultList']) {
         result.result.add(fromJson(item));
       }
@@ -53,7 +52,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       var data = jsonDecode(response.body);
       return fromJson(data);
     } else {
-      throw new Exception("Unknown error");
+      throw Exception("Unknown error");
     }
   }
 
@@ -68,7 +67,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       var data = jsonDecode(response.body);
       return fromJson(data);
     } else {
-      throw new Exception("Unknown error");
+      throw Exception("Unknown error");
     }
   }
 
@@ -83,7 +82,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
       var data = jsonDecode(response.body);
       return fromJson(data);
     } else {
-      throw new Exception("Unknown error");
+      throw Exception("Unknown error");
     }
   }
 
@@ -94,7 +93,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     var response = await http.delete(uri, headers: headers);
 
     if (!isValidResponse(response)) {
-      throw new Exception("Greška sa brisanjem");
+      throw Exception("Greška sa brisanjem");
     }
   }
 
@@ -106,17 +105,17 @@ abstract class BaseProvider<T> with ChangeNotifier {
     if (response.statusCode < 299) {
       return true;
     } else if (response.statusCode == 401) {
-      throw new Exception("Unauthorized");
+      throw Exception("Unauthorized");
     } else {
       var decodedResponse = jsonDecode(response.body);
 
       if (decodedResponse['errors'] != null &&
           decodedResponse['errors']['userError'] != null) {
         final userError = decodedResponse['errors']['userError'];
-        print(userError);
-        throw new Exception(userError[0]);
+        debugPrint(userError);
+        throw Exception(userError[0]);
       } else {
-        print(response.body);
+        debugPrint(response.body);
         throw Exception("Something bad happened, please try again later!");
       }
     }
@@ -126,7 +125,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
     String username = AuthProvider.username ?? "";
     String password = AuthProvider.password ?? "";
 
-    print("passed creds: $username, $password");
+    debugPrint("passed creds: $username, $password");
 
     String basicAuth =
         "Basic ${base64Encode(utf8.encode('$username:$password'))}";
@@ -159,7 +158,7 @@ abstract class BaseProvider<T> with ChangeNotifier {
         }
         query += '$prefix$key=$encoded';
       } else if (value is DateTime) {
-        query += '$prefix$key=${(value as DateTime).toIso8601String()}';
+        query += '$prefix$key=${(value).toIso8601String()}';
       } else if (value is List || value is Map) {
         if (value is List) value = value.asMap();
         value.forEach((k, v) {

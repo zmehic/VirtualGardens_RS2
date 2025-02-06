@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:virtualgardens_admin/models/narudzbe.dart';
 import 'package:virtualgardens_admin/models/statistics_dtos/statistics.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/base_provider.dart';
@@ -13,10 +12,9 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
     return Narudzba.fromJson(data);
   }
 
-  Future AllowedActions({int? id}) async {
+  Future allowedActions({int? id}) async {
     var endpoint = "api/Narudzbe/$id/allowedActions";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:7011/");
+    var baseUrl = BaseProvider.baseUrl;
 
     var url = "$baseUrl$endpoint";
 
@@ -37,10 +35,9 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
     }
   }
 
-  Future MonthlyStatistics({int year = 2024}) async {
-    var endpoint = "api/Narudzbe/MonthlyStatistics?year=${year}";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:7011/");
+  Future monthlyStatistics({int year = 2024}) async {
+    var endpoint = "api/Narudzbe/MonthlyStatistics?year=$year";
+    var baseUrl = BaseProvider.baseUrl;
 
     var url = "$baseUrl$endpoint";
 
@@ -48,7 +45,6 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
     var headers = createHeaders();
 
     var response = await http.get(uri, headers: headers);
-    List<int> lista = [];
     if (isValidResponse(response)) {
       var data = jsonDecode(response.body);
       StatisticsDTO statisticsDTO = StatisticsDTO.fromJson(data);
@@ -61,8 +57,7 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
 
   Future narudzbeState({String? action, int? id}) async {
     var endpoint = "api/Narudzbe/$id/$action";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:7011/");
+    var baseUrl = BaseProvider.baseUrl;
 
     var url = "$baseUrl$endpoint";
 

@@ -104,7 +104,7 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
                 leading: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(context).pop(true);
                   },
                 ),
                 actions: <Widget>[Container()],

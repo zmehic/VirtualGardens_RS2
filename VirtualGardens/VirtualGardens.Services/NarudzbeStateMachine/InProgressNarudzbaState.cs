@@ -36,6 +36,7 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
 
             return mapper.Map<Models.DTOs.NarudzbeDTO>(entity!);
         }
+
         public override List<string> AllowedActions(Narudzbe? entity)
         {
             return new List<string>() { "finish" };

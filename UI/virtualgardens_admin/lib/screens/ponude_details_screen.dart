@@ -121,7 +121,7 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
 
     if (widget.ponuda != null) {
       allowedActions =
-          await _ponudeProvider.AllowedActions(id: widget.ponuda?.ponudaId);
+          await _ponudeProvider.allowedActions(id: widget.ponuda?.ponudaId);
       setoviPonudeResult = await _setoviPonudeProvider.get(filter: filter);
       if (setoviPonudeResult != null) {}
 

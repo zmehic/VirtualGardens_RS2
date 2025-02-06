@@ -21,7 +21,7 @@ class RecenzijeListScreen extends StatefulWidget {
 
 class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
   late Map<int, String> korisnici = {};
-  static const _pageSize = 10;
+  static const _pageSize = 1;
 
   late RecenzijeProvider _recenzijeProvider;
 
@@ -56,6 +56,9 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
     _recenzijeProvider = context.read<RecenzijeProvider>();
     korisnici[0] = "Svi";
     super.initState();
+    _pagingController.addPageRequestListener((pageKey) {
+      _fetchPage(pageKey, false);
+    });
     initForm();
   }
 
@@ -107,7 +110,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
         if (reload == true && _pagingController.itemList != null) {
           _pagingController.itemList!.clear();
         }
-        final nextPageKey = pageKey + recenzijeResult!.result.length;
+        final nextPageKey = pageKey + 1;
         _pagingController.appendPage(recenzijeResult!.result, nextPageKey);
       }
     } catch (error) {
@@ -318,7 +321,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
           pagingController: _pagingController,
           builderDelegate: PagedChildBuilderDelegate<Recenzija?>(
             itemBuilder: (context, item, index) {
-              return item != null ? _buildExpansionTile(index) : Container();
+              return item != null ? _buildExpansionTile(item) : Container();
             },
             noItemsFoundIndicatorBuilder: (context) => const Center(
               child: Text(
@@ -334,7 +337,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
         ));
   }
 
-  Widget _buildExpansionTile(int index) {
+  Widget _buildExpansionTile(Recenzija item) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       color: Colors.white,
@@ -351,9 +354,8 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
               child: SizedBox(
                   width: 40,
                   height: 40,
-                  child: recenzijeResult?.result[index].korisnik?.slika != null
-                      ? imageFromString(
-                          recenzijeResult?.result[index].korisnik?.slika ?? "")
+                  child: item.korisnik?.slika != null
+                      ? imageFromString(item.korisnik?.slika ?? "")
                       : Image.asset(
                           'assets/images/user.png',
                           fit: BoxFit.cover,
@@ -363,7 +365,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
             ),
             const SizedBox(width: 10),
             Text(
-              "${recenzijeResult?.result[index].korisnik?.ime} ${recenzijeResult?.result[index].korisnik?.prezime} - ${formatDateString(recenzijeResult?.result[index].datum.toIso8601String())}",
+              "${item.korisnik?.ime} ${item.korisnik?.prezime} - ${formatDateString(item.datum.toIso8601String())}",
               style: const TextStyle(color: Colors.black),
             ),
             const Spacer(),
@@ -372,8 +374,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
               allowHalfRating: false,
               minRating: 1,
               maxRating: 5,
-              initialRating: recenzijeResult?.result[index].ocjena.toDouble() ??
-                  1.toDouble(),
+              initialRating: item.ocjena.toDouble(),
               ratingWidget: RatingWidget(
                   full: const Icon(
                     Icons.star,
@@ -388,7 +389,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
         textColor: Colors.white,
         children: [
           ListTile(
-              title: Text(recenzijeResult?.result[index].komentar ?? "",
+              title: Text(item.komentar ?? "",
                   style: const TextStyle(color: Colors.black))),
         ],
       ),

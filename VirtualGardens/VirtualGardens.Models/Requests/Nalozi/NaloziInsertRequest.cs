@@ -6,7 +6,7 @@ namespace VirtualGardens.Models.Requests.Nalozi
 {
     public class NaloziInsertRequest
     {
-        public string BrojNaloga { get; set; } = null!;
+        public string? BrojNaloga { get; set; }
 
         public int ZaposlenikId { get; set; }
 

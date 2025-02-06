@@ -14,8 +14,7 @@ class KorisnikProvider extends BaseProvider<Korisnik> {
 
   Future login({dynamic filter, String? username, String? password}) async {
     var endpoint = "api/Korisnici/login?username=$username&password=$password";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:7011/");
+    var baseUrl = BaseProvider.baseUrl;
 
     var url = "$baseUrl$endpoint";
 

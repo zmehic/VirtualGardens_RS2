@@ -65,7 +65,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   }
 
   _fetchStatistic(int year) async {
-    monthlyStatistic = await _narudzbaProvider.MonthlyStatistics(year: year);
+    monthlyStatistic = await _narudzbaProvider.monthlyStatistics(year: year);
 
     spots = monthlyStatistic!.narudzbe.asMap().entries.map((e) {
       return FlSpot(e.key.toInt() + 1, e.value.toDouble());

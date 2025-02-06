@@ -296,13 +296,15 @@ class UlazDataSource extends AdvancedDataTableSource<Ulaz> {
     final item = data?[index];
 
     return DataRow(
-        onSelectChanged: (selected) => {
-              if (selected == true)
-                {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => UlaziDetailsScreen(ulaz: item)))
-                }
-            },
+        onSelectChanged: (selected) async {
+          if (selected == true) {
+            bool response = await Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => UlaziDetailsScreen(ulaz: item)));
+            if (response == true) {
+              filterServerSide(_nazivGTE, _datumOd, _datumDo);
+            }
+          }
+        },
         cells: [
           DataCell(Text(item!.brojUlaza,
               style: const TextStyle(color: Colors.black, fontSize: 18))),

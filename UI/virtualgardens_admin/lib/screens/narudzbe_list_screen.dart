@@ -1,5 +1,10 @@
+import 'package:advanced_datatable/advanced_datatable_source.dart';
+import 'package:advanced_datatable/datatable.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/narudzbe.dart';
@@ -16,6 +21,7 @@ class NarduzbeListScreen extends StatefulWidget {
 }
 
 class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
+  late NarudzbeDataSource _dataSource;
   late NarudzbaProvider _narudzbaProvider;
 
   SearchResult<Narudzba>? result;
@@ -23,10 +29,10 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
 
   bool isLoading = true;
 
-  bool? jeOtkazan = null;
-  bool? jePlacen = null;
-  String? created = null;
-  int? korisnik = null;
+  bool? jeOtkazan;
+  bool? jePlacen;
+  String? created = "";
+  int? korisnik;
 
   String datumOdString = "";
   String datumDoString = "";
@@ -44,9 +50,13 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
 
   @override
   void initState() {
+    korisnici[0] = "Svi kupci";
     _narudzbaProvider = context.read<NarudzbaProvider>();
-    super.initState();
     initScreen();
+    _dataSource =
+        NarudzbeDataSource(provider: _narudzbaProvider, context: context);
+
+    super.initState();
   }
 
   Future initScreen() async {
@@ -57,8 +67,6 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
     };
 
     result = await _narudzbaProvider.get(filter: filter);
-
-    korisnici[0] = "Svi";
 
     if (result != null) {
       for (var element in result!.result) {
@@ -85,17 +93,40 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
   Widget build(BuildContext context) {
     return MasterScreen(
       FullScreenLoader(
-        isLoading: isLoading, // Your loading state
-        child: Container(
-          margin:
-              const EdgeInsets.only(left: 40, right: 40, top: 20, bottom: 10),
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          child: Column(
-            children: [
-              _buildBanner(),
-              _buildSearch(),
-              _buildResultView(),
-            ],
+        isLoading: isLoading,
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+            actions: <Widget>[Container()],
+            iconTheme: const IconThemeData(color: Colors.white),
+            centerTitle: true,
+            title: const Text(
+              "Narudžbe",
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+          ),
+          backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
+          body: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(10),
+            color: const Color.fromRGBO(235, 241, 224, 1),
+            child: Column(
+              children: [
+                _buildSearch(),
+                Expanded(
+                  child: Row(
+                    children: [_buildResultView(), _buildSearchDropdowns()],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -103,44 +134,30 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
     );
   }
 
-  Widget _buildBanner() {
-    return Container(
-      margin: const EdgeInsets.only(top: 30),
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      child: const Padding(
-        padding: EdgeInsets.all(15.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(size: 45, color: Colors.white, Icons.shopping_cart),
-            SizedBox(
-              width: 10,
-            ),
-            Text("Narudžbe",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "arial",
-                    color: Colors.white)),
-            SizedBox(
-              width: 10,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildSearch() {
-    return Padding(
-        padding: const EdgeInsets.all(8.0),
+    return Container(
+        margin: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(12.0),
+        color: const Color.fromRGBO(32, 76, 56, 1),
         child: Row(
           children: [
             Expanded(
                 child: TextField(
               controller: _brojNarudzbeEditingController,
-              decoration: const InputDecoration(labelText: "Broj narudzbe"),
+              decoration: const InputDecoration(
+                  labelText: "Broj narudzbe", filled: true),
+              onChanged: (value) {
+                _dataSource.filterServerSide(
+                    value,
+                    jeOtkazan,
+                    datumOdString,
+                    datumDoString,
+                    jePlacen,
+                    created,
+                    _cijenaOdEditingController.text,
+                    _cijenaDoEditingController.text,
+                    korisnik);
+              },
             )),
             const SizedBox(
               width: 8,
@@ -148,7 +165,8 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
             Expanded(
                 child: TextField(
               controller: _datumOdEditingController,
-              decoration: const InputDecoration(labelText: "Datum od:"),
+              decoration:
+                  const InputDecoration(labelText: "Datum od:", filled: true),
               readOnly: true,
               onTap: () async {
                 DateTime? pickedDate = await showDatePicker(
@@ -159,6 +177,16 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                   datumOdString = pickedDate.toIso8601String();
                   _datumOdEditingController.text =
                       formatDateString(pickedDate.toIso8601String());
+                  _dataSource.filterServerSide(
+                      _brojNarudzbeEditingController.text,
+                      jeOtkazan,
+                      datumOdString,
+                      datumDoString,
+                      jePlacen,
+                      created,
+                      _cijenaOdEditingController.text,
+                      _cijenaDoEditingController.text,
+                      korisnik);
                 }
               },
             )),
@@ -168,7 +196,8 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
             Expanded(
                 child: TextField(
               controller: _datumDoEditingController,
-              decoration: const InputDecoration(labelText: "Datum do:"),
+              decoration:
+                  const InputDecoration(labelText: "Datum do:", filled: true),
               readOnly: true,
               onTap: () async {
                 DateTime? pickedDate = await showDatePicker(
@@ -179,16 +208,39 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                   datumDoString = pickedDate.toIso8601String();
                   _datumDoEditingController.text =
                       formatDateString(pickedDate.toIso8601String());
+                  _dataSource.filterServerSide(
+                      _brojNarudzbeEditingController.text,
+                      jeOtkazan,
+                      datumOdString,
+                      datumDoString,
+                      jePlacen,
+                      created,
+                      _cijenaOdEditingController.text,
+                      _cijenaDoEditingController.text,
+                      korisnik);
                 }
               },
             )),
             IconButton(
-              icon: const Icon(Icons.clear),
+              icon: const Icon(
+                Icons.clear,
+                color: Colors.white,
+              ),
               onPressed: () {
                 _datumOdEditingController.clear();
                 _datumDoEditingController.clear();
                 datumDoString = "";
                 datumOdString = "";
+                _dataSource.filterServerSide(
+                    _brojNarudzbeEditingController.text,
+                    jeOtkazan,
+                    datumOdString,
+                    datumDoString,
+                    jePlacen,
+                    created,
+                    _cijenaOdEditingController.text,
+                    _cijenaDoEditingController.text,
+                    korisnik);
               },
             ),
             const SizedBox(
@@ -197,7 +249,24 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
             Expanded(
                 child: TextField(
               controller: _cijenaOdEditingController,
-              decoration: const InputDecoration(labelText: "Cijena od"),
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              decoration:
+                  const InputDecoration(labelText: "Cijena od", filled: true),
+              onChanged: (value) {
+                _dataSource.filterServerSide(
+                    _brojNarudzbeEditingController.text,
+                    jeOtkazan,
+                    datumOdString,
+                    datumDoString,
+                    jePlacen,
+                    created,
+                    _cijenaOdEditingController.text,
+                    _cijenaDoEditingController.text,
+                    korisnik);
+              },
             )),
             const SizedBox(
               width: 8,
@@ -205,206 +274,28 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
             Expanded(
                 child: TextField(
               controller: _cijenaDoEditingController,
-              decoration: const InputDecoration(labelText: "Cijena do"),
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              decoration:
+                  const InputDecoration(labelText: "Cijena do", filled: true),
+              onChanged: (value) {
+                _dataSource.filterServerSide(
+                    _brojNarudzbeEditingController.text,
+                    jeOtkazan,
+                    datumOdString,
+                    datumDoString,
+                    jePlacen,
+                    created,
+                    _cijenaOdEditingController.text,
+                    _cijenaDoEditingController.text,
+                    korisnik);
+              },
             )),
             const SizedBox(
               width: 8,
             ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade400)),
-              child: DropdownMenu(
-                initialSelection: 0,
-                enableFilter: false,
-                dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: 0, label: "Svi"),
-                  DropdownMenuEntry(value: 1, label: "Otkazano"),
-                  DropdownMenuEntry(value: 2, label: "Neotkazano"),
-                ],
-                menuStyle: MenuStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                    elevation: MaterialStateProperty.all(4),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.grey.shade300)))),
-                textStyle: const TextStyle(color: Colors.black, fontSize: 16),
-                onSelected: (value) {
-                  if (value != null) {
-                    if (value == 0) {
-                      jeOtkazan = null;
-                    } else if (value == 1) {
-                      jeOtkazan = true;
-                    } else {
-                      jeOtkazan = false;
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            "Vrijednost može biti 'Otkazano' ili 'Neotkazano'"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
-            const SizedBox(
-              width: 8,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade400)),
-              child: DropdownMenu(
-                initialSelection: 0,
-                enableFilter: false,
-                dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: 0, label: "Svi"),
-                  DropdownMenuEntry(value: 1, label: "Plaćeno"),
-                  DropdownMenuEntry(value: 2, label: "Neplaćeno"),
-                ],
-                menuStyle: MenuStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                    elevation: MaterialStateProperty.all(4),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.grey.shade300)))),
-                textStyle: const TextStyle(color: Colors.black, fontSize: 16),
-                onSelected: (value) {
-                  if (value != null) {
-                    if (value == 0) {
-                      jePlacen = null;
-                    } else if (value == 1) {
-                      jePlacen = true;
-                    } else {
-                      jePlacen = false;
-                    }
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            "Vrijednost može biti 'Plaćeno' ili 'Neplaćeno'"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
-            const SizedBox(
-              width: 8,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade400)),
-              child: DropdownMenu(
-                initialSelection: "",
-                enableFilter: false,
-                dropdownMenuEntries: const [
-                  DropdownMenuEntry(value: "", label: "Svi"),
-                  DropdownMenuEntry(value: "created", label: "Kreirana"),
-                  DropdownMenuEntry(value: "inprogress", label: "U procesu"),
-                  DropdownMenuEntry(value: "finished", label: "Završena"),
-                ],
-                menuStyle: MenuStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                    elevation: MaterialStateProperty.all(4),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.grey.shade300)))),
-                textStyle: const TextStyle(color: Colors.black, fontSize: 16),
-                onSelected: (value) {
-                  if (value != null) {
-                    created = value;
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                            "Vrijednost može biti 'Plaćeno' ili 'Neplaćeno'"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
-            const SizedBox(
-              width: 8,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade400)),
-              child: DropdownMenu(
-                initialSelection: 0,
-                enableFilter: false,
-                dropdownMenuEntries: korisnici.keys
-                    .map((e) =>
-                        DropdownMenuEntry(value: e, label: korisnici[e]!))
-                    .toList(),
-                menuStyle: MenuStyle(
-                    backgroundColor: MaterialStateProperty.all(Colors.white),
-                    elevation: MaterialStateProperty.all(4),
-                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(color: Colors.grey.shade300)))),
-                textStyle: const TextStyle(color: Colors.black, fontSize: 16),
-                onSelected: (value) {
-                  if (value != null) {
-                    korisnik = int.tryParse(value.toString());
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Odaberite validnu vrijednost"),
-                        backgroundColor: Colors.red,
-                      ),
-                    );
-                  }
-                },
-              ),
-            ),
-            const SizedBox(
-              width: 8,
-            ),
-            Container(
-              decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.grey.shade400)),
-            ),
-            const SizedBox(
-              width: 8,
-            ),
-            ElevatedButton(
-                onPressed: () async {
-                  setState(() {});
-                  var filter = {
-                    'BrojNarudzbeGTE': _brojNarudzbeEditingController.text,
-                    'Otkazana': jeOtkazan,
-                    'DatumFrom': datumOdString,
-                    'DatumTo': datumDoString,
-                    'Placeno': jePlacen,
-                    'StateMachine': created,
-                    'UkupnaCijenaFrom': _cijenaOdEditingController.text,
-                    'UkupnaCijenaTo': _cijenaDoEditingController.text,
-                    'KorisnikId': korisnik,
-                    'isDeleted': false,
-                    'IncludeTables': "Korisnik"
-                  };
-                  result = await _narudzbaProvider.get(filter: filter);
-                  setState(() {});
-                },
-                child: const Text("Pretraga")),
-            const SizedBox(
-              width: 8,
-            )
           ],
         ));
   }
@@ -412,93 +303,493 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
   Widget _buildResultView() {
     return Expanded(
       child: Container(
+          alignment: Alignment.topCenter,
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
             color: const Color.fromRGBO(32, 76, 56, 1),
+            border: Border.all(color: Colors.white, width: 3),
           ),
           margin: const EdgeInsets.all(15),
           width: double.infinity,
           child: SingleChildScrollView(
-              child: DataTable(
-                  columns: const [
-                DataColumn(
-                    label: Text(
-                  "Broj nardužbe",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Otkazana",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Plaćeno",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Datum",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Cijena",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                )),
-                DataColumn(
-                    label: Text(
-                  "Kupac",
-                  style: TextStyle(color: Colors.white, fontSize: 18),
-                ))
-              ],
-                  rows: result?.result
-                          .map((e) => DataRow(
-                                  onSelectChanged: (selected) => {
-                                        if (selected == true)
-                                          {
-                                            Navigator.of(context).pushReplacement(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        NarudzbeDetailsScreen(
-                                                          narudzba: e,
-                                                        )))
-                                          }
-                                      },
-                                  cells: [
-                                    DataCell(Text(e.brojNarudzbe,
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                    DataCell(Text(
-                                        e.otkazana == true ? "Da" : "Ne",
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                    DataCell(Text(
-                                        e.placeno == true ? "Da" : "Ne",
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                    DataCell(Text(
-                                        formatDateString(
-                                            e.datum.toIso8601String()),
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                    DataCell(Text(e.ukupnaCijena.toString(),
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                    DataCell(Text(
-                                        "${e.korisnik?.ime} ${e.korisnik?.prezime}",
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18))),
-                                  ]))
-                          .toList()
-                          .cast<DataRow>() ??
-                      []))),
+              child: AdvancedPaginatedDataTable(
+            source: _dataSource,
+            addEmptyRows: false,
+            rowsPerPage: 10,
+            showCheckboxColumn: false,
+            columns: const [
+              DataColumn(
+                  label: Text(
+                "Broj nardužbe",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Otkazana",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Plaćeno",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Datum",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Cijena",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Kupac",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Akcija",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+            ],
+          ))),
     );
+  }
+
+  Widget _buildSearchDropdowns() {
+    return Column(
+      children: [
+        Expanded(
+          child: Row(children: [
+            Container(
+                width: 200,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade400)),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton2(
+                    value: jeOtkazan == null
+                        ? 0.toString()
+                        : jeOtkazan == true
+                            ? 1.toString()
+                            : 2.toString(),
+                    buttonStyleData: ButtonStyleData(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade400),
+                      ),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                          value: 0.toString(),
+                          child: const Text("Svi statusi",
+                              style: TextStyle(color: Colors.black))),
+                      DropdownMenuItem(
+                          value: 1.toString(),
+                          child: const Text("Otkazano",
+                              style: TextStyle(color: Colors.black))),
+                      DropdownMenuItem(
+                          value: 2.toString(),
+                          child: const Text("Neotkazano",
+                              style: TextStyle(color: Colors.black))),
+                    ],
+                    onChanged: (value) async {
+                      if (value != null) {
+                        jeOtkazan = int.tryParse(value) == 0
+                            ? null
+                            : int.tryParse(value) == 1
+                                ? true
+                                : false;
+                        _dataSource.filterServerSide(
+                            _brojNarudzbeEditingController.text,
+                            jeOtkazan,
+                            datumOdString,
+                            datumDoString,
+                            jePlacen,
+                            created,
+                            _cijenaOdEditingController.text,
+                            _cijenaDoEditingController.text,
+                            korisnik);
+                        setState(() {});
+                      }
+                    },
+                  ),
+                )),
+          ]),
+        ),
+        Expanded(
+          child: Row(
+            children: [
+              Container(
+                width: 200,
+                decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.grey.shade400)),
+                child: DropdownButtonHideUnderline(
+                  child: DropdownButton2(
+                    value: jePlacen == null
+                        ? 0.toString()
+                        : jePlacen == true
+                            ? 1.toString()
+                            : 2.toString(),
+                    buttonStyleData: ButtonStyleData(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.grey.shade400),
+                      ),
+                    ),
+                    items: [
+                      DropdownMenuItem(
+                          value: 0.toString(),
+                          child: const Text("Sva plaćanja",
+                              style: TextStyle(color: Colors.black))),
+                      DropdownMenuItem(
+                          value: 1.toString(),
+                          child: const Text("Plaćeno",
+                              style: TextStyle(color: Colors.black))),
+                      DropdownMenuItem(
+                          value: 2.toString(),
+                          child: const Text("Neplaćeno",
+                              style: TextStyle(color: Colors.black))),
+                    ],
+                    onChanged: (value) async {
+                      if (value != null) {
+                        jePlacen = int.tryParse(value) == 0
+                            ? null
+                            : int.tryParse(value) == 1
+                                ? true
+                                : false;
+                        _dataSource.filterServerSide(
+                            _brojNarudzbeEditingController.text,
+                            jeOtkazan,
+                            datumOdString,
+                            datumDoString,
+                            jePlacen,
+                            created,
+                            _cijenaOdEditingController.text,
+                            _cijenaDoEditingController.text,
+                            korisnik);
+                        setState(() {});
+                      }
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Row(
+            children: [
+              Container(
+                  width: 200,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade400)),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton2(
+                      value: created,
+                      buttonStyleData: ButtonStyleData(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade400),
+                        ),
+                      ),
+                      items: const [
+                        DropdownMenuItem(
+                            value: "",
+                            child: Text("Sve narudžbe",
+                                style: TextStyle(color: Colors.black))),
+                        DropdownMenuItem(
+                            value: "created",
+                            child: Text("Kreirana",
+                                style: TextStyle(color: Colors.black))),
+                        DropdownMenuItem(
+                            value: "inprogress",
+                            child: Text("U procesu",
+                                style: TextStyle(color: Colors.black))),
+                        DropdownMenuItem(
+                            value: "finished",
+                            child: Text("Završena",
+                                style: TextStyle(color: Colors.black))),
+                      ],
+                      onChanged: (value) async {
+                        if (value != null) {
+                          created = value;
+                          _dataSource.filterServerSide(
+                              _brojNarudzbeEditingController.text,
+                              jeOtkazan,
+                              datumOdString,
+                              datumDoString,
+                              jePlacen,
+                              created,
+                              _cijenaOdEditingController.text,
+                              _cijenaDoEditingController.text,
+                              korisnik);
+                          setState(() {});
+                        }
+                      },
+                    ),
+                  )),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Row(
+            children: [
+              Container(
+                  width: 200,
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.grey.shade400)),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton2(
+                      value: korisnik != null
+                          ? korisnik.toString()
+                          : korisnici.entries.first.key.toString(),
+                      buttonStyleData: ButtonStyleData(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.grey.shade400),
+                        ),
+                      ),
+                      items: korisnici.entries
+                          .map((item) => DropdownMenuItem(
+                                value: item.key.toString(),
+                                child: Text(item.value,
+                                    style:
+                                        const TextStyle(color: Colors.black)),
+                              ))
+                          .toList(),
+                      onChanged: (value) async {
+                        if (value != null) {
+                          korisnik = int.tryParse(value) == 0
+                              ? null
+                              : int.tryParse(value.toString());
+                          _dataSource.filterServerSide(
+                              _brojNarudzbeEditingController.text,
+                              jeOtkazan,
+                              datumOdString,
+                              datumDoString,
+                              jePlacen,
+                              created,
+                              _cijenaOdEditingController.text,
+                              _cijenaDoEditingController.text,
+                              korisnik);
+                          setState(() {});
+                        }
+                      },
+                    ),
+                  )),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class NarudzbeDataSource extends AdvancedDataTableSource<Narudzba> {
+  List<Narudzba>? data = [];
+  final NarudzbaProvider provider;
+  int count = 10;
+  int page = 1;
+  int pageSize = 10;
+  String? _brojGTE;
+  bool? _jeOtkazana;
+  String? _datumOd;
+  String? _datumDo;
+  bool? _jePlacena;
+  String? _stateMachine;
+  String? _cijenaFrom;
+  String? _cijenaTo;
+  int? _korisnikId;
+  dynamic filter;
+  BuildContext context;
+  NarudzbeDataSource({required this.provider, required this.context});
+
+  @override
+  DataRow? getRow(int index) {
+    if (index >= data!.length) {
+      return null;
+    }
+
+    final item = data?[index];
+
+    return DataRow(
+        onSelectChanged: (selected) async {
+          if (selected == true) {
+            bool response = await Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: ((context) =>
+                        NarudzbeDetailsScreen(narudzba: item))));
+            if (response == true) {
+              filterServerSide(
+                  _brojGTE,
+                  _jeOtkazana,
+                  _datumOd,
+                  _datumDo,
+                  _jePlacena,
+                  _stateMachine,
+                  _cijenaFrom,
+                  _cijenaTo,
+                  _korisnikId);
+            }
+          }
+        },
+        cells: [
+          DataCell(Text(item!.brojNarudzbe,
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(Text(
+              item.otkazana == true
+                  ? "Da"
+                  : item.otkazana == false
+                      ? "Ne"
+                      : "",
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(Text(
+              item.placeno == true
+                  ? "Da"
+                  : item.placeno == false
+                      ? "Ne"
+                      : "",
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(Text(formatDateString(item.datum.toIso8601String()),
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(Text(item.ukupnaCijena.toString(),
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(Text(item.korisnik!.korisnickoIme,
+              style: const TextStyle(color: Colors.black, fontSize: 18))),
+          DataCell(ElevatedButton(
+            onPressed: () async {
+              if (context.mounted) {
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.confirm,
+                  title: "Potvrda brisanja",
+                  text: "Jeste li sigurni da želite obrisati narudžbu?",
+                  confirmBtnText: "U redu",
+                  onConfirmBtnTap: () async {
+                    try {
+                      await provider.delete(item.narudzbaId);
+                      if (context.mounted) {
+                        await QuickAlert.show(
+                          context: context,
+                          type: QuickAlertType.success,
+                          title: "Uspješno ste obrisali narudžbu",
+                          confirmBtnText: "U redu",
+                          text: "Narudžba je obrisana",
+                          onConfirmBtnTap: () {
+                            Navigator.of(context).pop();
+                          },
+                        );
+                      }
+                    } on Exception {
+                      if (context.mounted) {
+                        await QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.error,
+                            title: "Greška!",
+                            text:
+                                "Moguće je obrisati samo narudžbe koje su u stanju 'kreirana'",
+                            confirmBtnText: "U redu");
+                      }
+                    }
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                      filterServerSide(
+                          _brojGTE,
+                          _jeOtkazana,
+                          _datumOd,
+                          _datumDo,
+                          _jePlacena,
+                          _stateMachine,
+                          _cijenaFrom,
+                          _cijenaTo,
+                          _korisnikId);
+                    }
+                  },
+                );
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.all(8),
+            ),
+            child: const Icon(
+              Icons.delete,
+              color: Colors.white,
+            ),
+          )),
+        ]);
+  }
+
+  void filterServerSide(brojGTE, jeOtkazan, datumOd, datumDo, jePlacen,
+      stateMachine, cijenaOd, cijenaDo, korisnikId) {
+    _brojGTE = brojGTE;
+    _jeOtkazana = jeOtkazan;
+    _datumOd = datumOd;
+    _datumDo = datumDo;
+    _jePlacena = jePlacen;
+    _stateMachine = stateMachine;
+    _cijenaFrom = cijenaOd;
+    _cijenaTo = cijenaDo;
+    _korisnikId = korisnikId;
+    setNextView();
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get selectedRowCount => 0;
+
+  @override
+  Future<RemoteDataSourceDetails<Narudzba>> getNextPage(
+      NextPageRequest pageRequest) async {
+    page = (pageRequest.offset ~/ pageSize).toInt() + 1;
+
+    var filter = {
+      'BrojNarudzbeGTE': _brojGTE,
+      'Otkazana': _jeOtkazana,
+      'DatumFrom': _datumOd,
+      'DatumTo': _datumDo,
+      'Placeno': _jePlacena,
+      'StateMachine': _stateMachine,
+      'UkupnaCijenaFrom': _cijenaFrom,
+      'UkupnaCijenaTo': _cijenaTo,
+      'KorisnikId': _korisnikId,
+      'isDeleted': false,
+      'IncludeTables': "Korisnik",
+      'Page': page,
+      'PageSize': pageSize
+    };
+    try {
+      var result = await provider.get(filter: filter);
+      data = result.result;
+      count = result.count;
+
+      notifyListeners();
+    } on Exception catch (e) {
+      if (context.mounted) {
+        QuickAlert.show(
+            context: context,
+            type: QuickAlertType.error,
+            text: e.toString().split(': ')[1]);
+      }
+    }
+
+    return RemoteDataSourceDetails(count, data!);
   }
 }

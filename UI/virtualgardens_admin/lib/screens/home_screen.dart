@@ -13,8 +13,6 @@ import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
-import 'package:virtualgardens_admin/screens/product_list_screen.dart';
-import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -261,24 +259,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       _buildDropdown(),
                     ],
                   ),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Expanded(child: Container()),
-                        IconButton(
-                          alignment: Alignment.centerRight,
-                          onPressed: () {
-                            Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        const ProductListScreen()));
-                          },
-                          icon: const Icon(
-                              size: 45, color: Colors.white, Icons.search),
-                        ),
-                      ],
-                    ),
-                  ),
                 ],
               ),
               Expanded(
@@ -350,10 +330,10 @@ class _HomeScreenState extends State<HomeScreen> {
         padding: const EdgeInsets.all(10.0),
         child: Column(
           children: [
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Row(
+                Row(
                   children: [
                     Icon(size: 45, color: Colors.white, Icons.shopping_cart),
                     Text(
@@ -365,13 +345,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       "Narudžbe",
                     ),
                   ],
-                ),
-                IconButton(
-                  onPressed: () {
-                    Navigator.of(context).pushReplacement(MaterialPageRoute(
-                        builder: (context) => const NarduzbeListScreen()));
-                  },
-                  icon: const Icon(size: 45, color: Colors.white, Icons.search),
                 ),
               ],
             ),

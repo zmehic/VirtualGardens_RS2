@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
+import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/narudzbe.dart';
@@ -9,15 +11,11 @@ import 'package:virtualgardens_admin/models/ulazi_proizvodi.dart';
 import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
-import 'package:virtualgardens_admin/screens/narudzbe_list_screen.dart';
-import 'package:virtualgardens_admin/screens/pitanja_list_screen.dart';
-import 'package:virtualgardens_admin/screens/zaposlenici_list_screen.dart';
 import 'package:virtualgardens_admin/models/set.dart';
 
-// ignore: must_be_immutable
 class NarudzbeDetailsScreen extends StatefulWidget {
-  Narudzba? narudzba;
-  NarudzbeDetailsScreen({super.key, this.narudzba});
+  final Narudzba? narudzba;
+  const NarudzbeDetailsScreen({super.key, this.narudzba});
 
   @override
   State<NarudzbeDetailsScreen> createState() => _NarudzbeDetailsScreenState();
@@ -25,6 +23,7 @@ class NarudzbeDetailsScreen extends StatefulWidget {
 
 class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
+  final int _pageSize = 5;
 
   Map<String, dynamic> _initialValue = {};
 
@@ -39,10 +38,12 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
   String? korisnik;
 
   bool isLoading = true;
-  bool isLoadingSave = false;
 
   final TextEditingController _datumNarudzbeController =
       TextEditingController();
+
+  final PagingController<int, Set?> _pagingController =
+      PagingController(firstPageKey: 0);
 
   @override
   void didChangeDependencies() {
@@ -55,7 +56,13 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
     _setoviProvider = context.read<SetoviProvider>();
 
     super.initState();
+    _pagingController.addPageRequestListener((pageKey) {
+      _fetchPage(pageKey, false);
+    });
+    initForm();
+  }
 
+  Future initForm() async {
     _initialValue = {
       "narudzbaId": widget.narudzba?.narudzbaId,
       "brojNarudzbe": widget.narudzba?.brojNarudzbe,
@@ -67,28 +74,46 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
       "ukupnaCijena": widget.narudzba?.ukupnaCijena,
       "korisnikId": widget.narudzba?.korisnikId,
     };
-
+    await _fetchPage(0, true);
     korisnik = "${widget.narudzba?.korisnik?.korisnickoIme}";
     _datumNarudzbeController.text = widget.narudzba != null
         ? formatDateString(widget.narudzba!.datum.toIso8601String())
         : "";
 
-    initForm();
+    allowedActions =
+        await _narudzbaProvider.allowedActions(id: widget.narudzba?.narudzbaId);
+    setState(() {
+      isLoading = false;
+    });
   }
 
-  Future initForm() async {
+  Future<void> _fetchPage(int pageKey, bool reload) async {
     var filter = {
       'NarudzbaId': widget.narudzba?.narudzbaId,
       'isDeleted': false,
-      'IncludeTables': "ProizvodiSets"
+      'IncludeTables': "ProizvodiSets",
+      'PageSize': _pageSize,
+      'Page': pageKey + 1,
     };
-    setoviResult = await _setoviProvider.get(filter: filter);
-    allowedActions =
-        await _narudzbaProvider.AllowedActions(id: widget.narudzba?.narudzbaId);
-    setState(() {
-      isLoading = false;
-      isLoadingSave = false;
-    });
+
+    try {
+      setoviResult = await _setoviProvider.get(filter: filter);
+      final isLastPage = setoviResult!.result.length < _pageSize;
+      if (isLastPage) {
+        if (reload == true && _pagingController.itemList != null) {
+          _pagingController.itemList!.clear();
+        }
+        _pagingController.appendLastPage(setoviResult!.result);
+      } else {
+        if (reload == true && _pagingController.itemList != null) {
+          _pagingController.itemList!.clear();
+        }
+        final nextPageKey = pageKey + 1;
+        _pagingController.appendPage(setoviResult!.result, nextPageKey);
+      }
+    } catch (error) {
+      _pagingController.error = error;
+    }
   }
 
   @override
@@ -96,117 +121,92 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
     return MasterScreen(
         FullScreenLoader(
             isLoading: isLoading,
-            child: Container(
-              margin: const EdgeInsets.only(
-                  left: 40, right: 40, top: 20, bottom: 10),
-              color: const Color.fromRGBO(235, 241, 224, 1),
-              child: Column(
-                children: [_buildBanner(), _buildMain()],
+            child: Scaffold(
+              appBar: AppBar(
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                ),
+                actions: <Widget>[Container()],
+                iconTheme: const IconThemeData(color: Colors.white),
+                centerTitle: true,
+                title: const Text(
+                  "Detalji o narudžbi",
+                  style: TextStyle(color: Colors.white),
+                ),
+                backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+              ),
+              backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
+              body: Container(
+                margin: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(10),
+                color: const Color.fromRGBO(235, 241, 224, 1),
+                child: Column(
+                  children: [_buildMain()],
+                ),
               ),
             )),
         "Detalji o narudžbi");
   }
 
-  Widget _buildBanner() {
-    return Container(
-      margin: const EdgeInsets.only(top: 30),
-      color: const Color.fromRGBO(32, 76, 56, 1),
-      width: double.infinity,
-      child: Padding(
-        padding: EdgeInsets.all(15.0),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(size: 45, color: Colors.white, Icons.edit_note_rounded),
-            const SizedBox(
-              width: 10,
-            ),
-            const Text("Detalji o narudžbi",
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    fontFamily: "arial",
-                    color: Colors.white)),
-            const SizedBox(
-              width: 10,
-            ),
-            IconButton(
-              icon: const Icon(
-                Icons.question_answer,
-                color: Colors.white,
-              ),
-              onPressed: () {
-                Navigator.of(context).pushReplacement(MaterialPageRoute(
-                    builder: (context) => PitanjaOdgovoriListScreen(
-                          narudzba: widget.narudzba,
-                        )));
-              },
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildMain() {
     return Expanded(
-      child: Container(
-          height: 300,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: const Color.fromRGBO(32, 76, 56, 1),
-          ),
-          margin: const EdgeInsets.all(15),
-          child: Container(
-            margin: const EdgeInsets.all(15),
-            child: Row(
-              children: [
+      child: Row(
+        children: [
+          Expanded(
+            child: Container(
+              color: const Color.fromRGBO(32, 76, 56, 1),
+              child: Column(children: [
                 Expanded(
-                  child: Container(
-                    color: const Color.fromRGBO(235, 241, 224, 1),
-                    child: Column(children: [
-                      Expanded(
-                        child: _buildResultView(),
-                      )
-                    ]),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    color: const Color.fromRGBO(235, 241, 224, 1),
-                    child: _buildNewForm(),
-                  ),
+                  child: _buildResultView(),
                 )
-              ],
+              ]),
             ),
-          )),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          Expanded(
+            child: Container(
+              color: const Color.fromRGBO(235, 241, 224, 1),
+              child: _buildNewForm(),
+            ),
+          )
+        ],
+      ),
     );
   }
 
   Widget _buildResultView() {
     return Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          color: const Color.fromRGBO(32, 76, 56, 1),
+        decoration: const BoxDecoration(
+          color: Color.fromRGBO(32, 76, 56, 1),
         ),
         margin: const EdgeInsets.all(15),
+        padding: const EdgeInsets.all(10),
         width: double.infinity,
-        child: SingleChildScrollView(
-            child: Column(
-          children: [
-            ListView.builder(
-              shrinkWrap: true,
-              itemCount: setoviResult?.result.length,
-              itemBuilder: (context, index) {
-                return setoviResult != null &&
-                        setoviResult?.result[index] != null &&
-                        setoviResult?.result[index].proizvodiSets.length == 3
-                    ? _buildExpansionTile(index)
-                    : Container();
-              },
-            )
-          ],
-        )));
+        child: PagedListView<int, Set?>(
+          pagingController: _pagingController,
+          builderDelegate: PagedChildBuilderDelegate<Set?>(
+            itemBuilder: (context, item, index) {
+              return item != null
+                  ? _buildExpansionTile(item, index)
+                  : Container();
+            },
+            noItemsFoundIndicatorBuilder: (context) => const Center(
+              child: Text(
+                "Nema narudžbi",
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            firstPageProgressIndicatorBuilder: (context) =>
+                const Center(child: CircularProgressIndicator()),
+            newPageProgressIndicatorBuilder: (context) =>
+                const Center(child: CircularProgressIndicator()),
+          ),
+        ));
   }
 
   Widget _buildNewForm() {
@@ -222,18 +222,11 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Expanded(
-                  child: FormBuilderTextField(
-                      readOnly: true,
-                      decoration:
-                          const InputDecoration(labelText: "Broj narudžbe"),
-                      name: "brojNarudzbe",
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      }),
-                ),
+                    child: FormBuilderTextField(
+                  readOnly: true,
+                  decoration: const InputDecoration(labelText: "Broj narudžbe"),
+                  name: "brojNarudzbe",
+                )),
                 const SizedBox(
                   width: 10,
                 ),
@@ -247,12 +240,6 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                     DropdownMenuItem(value: true, child: Text("Da")),
                     DropdownMenuItem(value: false, child: Text("Ne")),
                   ],
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please choose some value';
-                    }
-                    return null;
-                  },
                 )),
                 const SizedBox(
                   width: 10,
@@ -267,12 +254,6 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                     DropdownMenuItem(value: true, child: Text("Da")),
                     DropdownMenuItem(value: false, child: Text("Ne")),
                   ],
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please choose some value';
-                    }
-                    return null;
-                  },
                 )),
                 const SizedBox(
                   width: 10,
@@ -290,12 +271,6 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                     DropdownMenuItem(
                         value: "finished", child: Text("Završena")),
                   ],
-                  validator: (value) {
-                    if (value == null) {
-                      return 'Please choose some value';
-                    }
-                    return null;
-                  },
                   onChanged: (value) {},
                 ))
               ],
@@ -306,77 +281,86 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
               children: [
                 Expanded(
                   child: FormBuilderTextField(
-                      decoration:
-                          const InputDecoration(labelText: "Datum narudžbe"),
-                      readOnly: true,
-                      controller: _datumNarudzbeController,
-                      name: "datum",
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      }),
+                    decoration:
+                        const InputDecoration(labelText: "Datum narudžbe"),
+                    readOnly: true,
+                    controller: _datumNarudzbeController,
+                    name: "datum",
+                  ),
                 ),
                 const SizedBox(
                   width: 10,
                 ),
                 Expanded(
                   child: FormBuilderTextField(
-                      decoration:
-                          const InputDecoration(labelText: "Ukupna cijena"),
-                      readOnly: true,
-                      name: "ukupnaCijena",
-                      initialValue: _initialValue['ukupnaCijena'].toString(),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      }),
+                    decoration:
+                        const InputDecoration(labelText: "Ukupna cijena"),
+                    readOnly: true,
+                    name: "ukupnaCijena",
+                    initialValue: _initialValue['ukupnaCijena'].toString(),
+                  ),
                 ),
                 const SizedBox(
                   width: 10,
                 ),
                 Expanded(
                   child: FormBuilderTextField(
-                      decoration: const InputDecoration(labelText: "Kupac"),
-                      readOnly: true,
-                      name: "korisnickoIme",
-                      initialValue: korisnik ?? "",
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Please enter some text';
-                        }
-                        return null;
-                      }),
+                    decoration: const InputDecoration(labelText: "Kupac"),
+                    readOnly: true,
+                    name: "korisnickoIme",
+                    initialValue: korisnik ?? "",
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 15),
-            // Expanded widget for the save button, taking up the other half of the width
-
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 allowedActions != null && allowedActions!.contains("edit")
                     ? SizedBox(
                         child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  const Color.fromRGBO(32, 76, 56, 1)),
+                            ),
                             onPressed: () async {
-                              isLoadingSave = true;
-                              setState(() {});
-
-                              await _narudzbaProvider.narudzbeState(
-                                  action: "edit",
-                                  id: widget.narudzba?.narudzbaId);
-
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NarduzbeListScreen()));
-                            }, // Define this function to handle the save action
-                            child: const Text("Kreirana")))
+                              try {
+                                await _narudzbaProvider.narudzbeState(
+                                    action: "edit",
+                                    id: widget.narudzba?.narudzbaId);
+                                if (mounted) {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Narudžba je ažurirana",
+                                    confirmBtnText: "U redu",
+                                    text: "Narudžba je ažurirana",
+                                    onConfirmBtnTap: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  );
+                                }
+                              } on Exception catch (e) {
+                                if (mounted) {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: "Greška prilikom ažuriranja",
+                                    text: (e.toString().split(': '))[1],
+                                    confirmBtnText: "U redu",
+                                    onConfirmBtnTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  );
+                                }
+                              }
+                            },
+                            child: const Text(
+                              "Kreirana",
+                              style: TextStyle(color: Colors.white),
+                            )))
                     : Container(),
                 allowedActions != null && allowedActions!.contains("inprogress")
                     ? const SizedBox(
@@ -386,21 +370,45 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                 allowedActions != null && allowedActions!.contains("inprogress")
                     ? SizedBox(
                         child: ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        const Color.fromRGBO(32, 76, 56, 1))),
                             onPressed: () async {
-                              isLoadingSave = true;
-                              setState(() {});
-
-                              await _narudzbaProvider.narudzbeState(
-                                  action: "inprogress",
-                                  id: widget.narudzba?.narudzbaId);
-
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NarduzbeListScreen()));
-                            }, // Define this function to handle the save action
-                            child: const Text("U procesu")))
+                              try {
+                                await _narudzbaProvider.narudzbeState(
+                                    action: "inprogress",
+                                    id: widget.narudzba?.narudzbaId);
+                                if (mounted) {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Narudžba je ažurirana",
+                                    confirmBtnText: "U redu",
+                                    text: "Narudžba je ažurirana",
+                                    onConfirmBtnTap: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  );
+                                }
+                              } on Exception catch (e) {
+                                if (mounted) {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: "Greška prilikom ažuriranja",
+                                    text: (e.toString().split(': '))[1],
+                                    confirmBtnText: "U redu",
+                                    onConfirmBtnTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  );
+                                }
+                              }
+                            },
+                            child: const Text("U procesu",
+                                style: TextStyle(color: Colors.white))))
                     : Container(),
                 allowedActions != null && allowedActions!.contains("finish")
                     ? const SizedBox(
@@ -410,132 +418,46 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                 allowedActions != null && allowedActions!.contains("finish")
                     ? SizedBox(
                         child: ElevatedButton(
+                            style: ButtonStyle(
+                                backgroundColor:
+                                    MaterialStateProperty.all<Color>(
+                                        const Color.fromRGBO(32, 76, 56, 1))),
                             onPressed: () async {
-                              isLoadingSave = true;
-                              setState(() {});
-
-                              await _narudzbaProvider.narudzbeState(
-                                  action: "finish",
-                                  id: widget.narudzba?.narudzbaId);
-
-                              // ignore: use_build_context_synchronously
-                              Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const NarduzbeListScreen()));
-                            }, // Define this function to handle the save action
-                            child: const Text("Završena")))
+                              try {
+                                await _narudzbaProvider.narudzbeState(
+                                    action: "finish",
+                                    id: widget.narudzba?.narudzbaId);
+                                if (mounted) {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: "Narudžba je ažurirana",
+                                    confirmBtnText: "U redu",
+                                    text: "Narudžba je ažurirana",
+                                    onConfirmBtnTap: () {
+                                      Navigator.of(context).pop();
+                                      Navigator.of(context).pop(true);
+                                    },
+                                  );
+                                }
+                              } on Exception catch (e) {
+                                if (mounted) {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: "Greška prilikom ažuriranja",
+                                    text: (e.toString().split(': '))[1],
+                                    confirmBtnText: "U redu",
+                                    onConfirmBtnTap: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  );
+                                }
+                              }
+                            },
+                            child: const Text("Završena",
+                                style: TextStyle(color: Colors.white))))
                     : Container(),
-                widget.narudzba?.stateMachine == "created"
-                    ? Row(
-                        children: [
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          SizedBox(
-                            width: 60,
-                            height: 60,
-                            child: widget.narudzba?.stateMachine == "created"
-                                ? ElevatedButton(
-                                    onPressed: () async {
-                                      if (_formKey.currentState
-                                              ?.saveAndValidate() ==
-                                          true) {
-                                        debugPrint(_formKey.currentState?.value
-                                            .toString());
-
-                                        var request = Map.from(
-                                            _formKey.currentState!.value);
-                                        isLoadingSave = true;
-                                        setState(() {});
-                                        try {
-                                          await _narudzbaProvider.update(
-                                              widget.narudzba!.narudzbaId,
-                                              request);
-                                          // ignore: use_build_context_synchronously
-                                          Navigator.of(context).pushReplacement(
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const NarduzbeListScreen()));
-                                          // ignore: empty_catches
-                                        } on Exception catch (e) {
-                                          isLoadingSave = false;
-                                          showDialog(
-                                              // ignore: use_build_context_synchronously
-                                              context: context,
-                                              builder: (context) => AlertDialog(
-                                                    title: const Text("Error"),
-                                                    content: Text(e.toString()),
-                                                    actions: [
-                                                      TextButton(
-                                                          onPressed: () =>
-                                                              Navigator.pop(
-                                                                  context),
-                                                          child:
-                                                              const Text("Ok"))
-                                                    ],
-                                                  ));
-                                          setState(() {});
-                                        }
-                                      }
-                                    }, // Define this function to handle the save action
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
-                                      shape:
-                                          const CircleBorder(), // Makes the button circular
-                                      padding: const EdgeInsets.all(
-                                          8), // Adjust padding for icon size // Background color
-                                    ),
-
-                                    child: isLoadingSave
-                                        ? const CircularProgressIndicator()
-                                        : const Icon(
-                                            Icons.save,
-                                            color: Colors.white,
-                                          ), // Save icon inside
-                                  )
-                                : Container(),
-                          ),
-                          const SizedBox(
-                            width: 20,
-                          ),
-                          SizedBox(
-                            width: 60,
-                            height: 60,
-                            child: widget.narudzba?.stateMachine == "created"
-                                ? ElevatedButton(
-                                    onPressed: () async {
-                                      isLoadingSave = true;
-                                      setState(() {});
-
-                                      await _narudzbaProvider
-                                          .delete(widget.narudzba!.narudzbaId);
-
-                                      // ignore: use_build_context_synchronously
-                                      Navigator.of(context).pushReplacement(
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  const ZaposleniciListScreen()));
-                                    }, // Define this function to handle the save action
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors
-                                          .red, // Makes the button circular
-                                      padding: const EdgeInsets.all(
-                                          8), // Adjust padding for icon size // Background color
-                                    ),
-
-                                    child: isLoadingSave
-                                        ? const CircularProgressIndicator()
-                                        : const Icon(
-                                            Icons.delete,
-                                            color: Colors.white,
-                                          ), // Save icon inside
-                                  )
-                                : Container(),
-                          ),
-                        ],
-                      )
-                    : Container()
               ],
             ),
           ],
@@ -544,7 +466,7 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
     );
   }
 
-  Widget _buildExpansionTile(int index) {
+  Widget _buildExpansionTile(Set item, int index) {
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 5),
       color: Colors.white,
@@ -556,25 +478,39 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
         iconColor: Colors.black,
         collapsedIconColor: Colors.black,
         title: Text(
-          "Set ${index + 1} - ${setoviResult?.result[index].cijenaSaPopustom} KM",
-          style: TextStyle(color: Colors.black),
+          "Set ${index + 1} - ${item.cijenaSaPopustom} KM",
+          style: const TextStyle(color: Colors.black),
         ),
         textColor: Colors.white,
         children: [
-          ListTile(
-              title: Text(
-                  "${setoviResult?.result[index].proizvodiSets[0].proizvod?.naziv ?? ""} x ${setoviResult?.result[index].proizvodiSets[0].kolicina ?? ""} ${setoviResult?.result[index].proizvodiSets[0].proizvod?.jedinicaMjere?.skracenica ?? ""} = ${(setoviResult?.result[index].proizvodiSets[0].kolicina ?? 0) * (setoviResult?.result[index].proizvodiSets[0].proizvod?.cijena ?? 0.0)} KM",
-                  style: TextStyle(color: Colors.black))),
-          ListTile(
-              title: Text(
-                  "${setoviResult?.result[index].proizvodiSets[1].proizvod?.naziv ?? ""} x ${setoviResult?.result[index].proizvodiSets[1].kolicina ?? ""} ${setoviResult?.result[index].proizvodiSets[1].proizvod?.jedinicaMjere?.skracenica ?? ""} = ${(setoviResult?.result[index].proizvodiSets[1].kolicina ?? 0) * (setoviResult?.result[index].proizvodiSets[1].proizvod?.cijena ?? 0.0)} KM",
-                  style: TextStyle(color: Colors.black))),
-          ListTile(
-              title: Text(
-                  "${setoviResult?.result[index].proizvodiSets[2].proizvod?.naziv ?? ""} x ${setoviResult?.result[index].proizvodiSets[2].kolicina ?? ""} ${setoviResult?.result[index].proizvodiSets[2].proizvod?.jedinicaMjere?.skracenica ?? ""} = ${(setoviResult?.result[index].proizvodiSets[2].kolicina ?? 0) * (setoviResult?.result[index].proizvodiSets[2].proizvod?.cijena ?? 0.0)} KM",
-                  style: TextStyle(color: Colors.black)))
+          ListView.builder(
+            shrinkWrap: true,
+            itemCount: item.proizvodiSets.length,
+            itemBuilder: (context, i) {
+              final proizvodSet = item.proizvodiSets[i];
+              final naziv = proizvodSet.proizvod?.naziv ?? "";
+              final kolicina = proizvodSet.kolicina;
+              final jedinicaMjere =
+                  proizvodSet.proizvod?.jedinicaMjere?.skracenica ?? "";
+              final cijena = proizvodSet.proizvod?.cijena ?? 0.0;
+              final ukupnaCijena = kolicina * cijena;
+
+              return ListTile(
+                title: Text(
+                  "$naziv x $kolicina $jedinicaMjere = $ukupnaCijena KM",
+                  style: const TextStyle(color: Colors.black),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    _pagingController.dispose();
+    super.dispose();
   }
 }

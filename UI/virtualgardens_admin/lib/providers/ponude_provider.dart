@@ -11,10 +11,9 @@ class PonudeProvider extends BaseProvider<Ponuda> {
     return Ponuda.fromJson(data);
   }
 
-  Future AllowedActions({int? id}) async {
+  Future allowedActions({int? id}) async {
     var endpoint = "api/Ponude/$id/allowedActions";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:7011/");
+    var baseUrl = BaseProvider.baseUrl;
 
     var url = "$baseUrl$endpoint";
 
@@ -37,8 +36,7 @@ class PonudeProvider extends BaseProvider<Ponuda> {
 
   Future ponudeState({String? action, int? id}) async {
     var endpoint = "api/Ponude/$id/$action";
-    var baseUrl = const String.fromEnvironment("baseUrl",
-        defaultValue: "https://localhost:7011/");
+    var baseUrl = BaseProvider.baseUrl;
 
     var url = "$baseUrl$endpoint";
 
