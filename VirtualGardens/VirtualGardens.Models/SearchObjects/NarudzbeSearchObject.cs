@@ -19,9 +19,9 @@ namespace VirtualGardens.Models.SearchObjects
         public bool? Status { get; set; }
         public string? StateMachine { get; set; }
 
-        public int? UkupnaCijenaFrom { get; set; }
+        public float? UkupnaCijenaFrom { get; set; }
 
-        public int? UkupnaCijenaTo { get; set; }
+        public float? UkupnaCijenaTo { get; set; }
 
         public int? KorisnikId { get; set; }
 

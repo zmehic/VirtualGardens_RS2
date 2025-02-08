@@ -1,6 +1,5 @@
 import 'package:advanced_datatable/advanced_datatable_source.dart';
 import 'package:advanced_datatable/datatable.dart';
-import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
@@ -34,11 +33,6 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
   Map<String, dynamic> _initialValue = {};
   final Map<String, dynamic> _initialValue2 = {};
 
-  Map<bool, String> stanjeNaloga = {
-    false: "Nije završen",
-    true: "Završen",
-  };
-
   late bool selectedStanje;
   late NaloziProvider _naloziProvider;
   late NarudzbaProvider _narudzbaProvider;
@@ -49,7 +43,6 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
   SearchResult<Zaposlenik>? zaposleniciResult;
 
   bool isLoading = true;
-  bool isLoadingSave = false;
 
   int? zaposlenikId = 0;
   int? narudzbaId;
@@ -104,9 +97,9 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
       };
 
       narudzbaResult = await _narudzbaProvider.get(filter: filter2);
+      dataSource.filterServerSide(widget.nalog?.nalogId);
     }
 
-    dataSource.filterServerSide(widget.nalog?.nalogId);
     setState(() {
       isLoading = false;
     });
@@ -144,7 +137,7 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
                 ),
               ),
             )),
-        "Detalji");
+        "Nalog");
   }
 
   Widget _buildMain() {
@@ -173,217 +166,6 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _buildNewForm() {
-    return FormBuilder(
-        key: _formKey,
-        initialValue: _initialValue,
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                        child: FormBuilderDropdown(
-                      enabled: true,
-                      name: "zaposlenikId",
-                      initialValue: widget.nalog?.zaposlenikId.toString(),
-                      decoration:
-                          const InputDecoration(labelText: "Zaposlenik"),
-                      items: zaposleniciResult?.result
-                              .map((item) => DropdownMenuItem(
-                                    value: item.zaposlenikId.toString(),
-                                    child: Text("${item.ime} ${item.prezime}"),
-                                  ))
-                              .toList() ??
-                          [],
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Molimo odaberite zaposlenika';
-                        }
-                        return null;
-                      },
-                      onChanged: (value) {
-                        zaposlenikId = int.tryParse(value.toString());
-                      },
-                    )),
-                    const SizedBox(
-                      width: 10,
-                    ),
-                  ],
-                ),
-              ),
-              DropdownButtonHideUnderline(
-                child: DropdownButton2(
-                  value: selectedStanje
-                      ? selectedStanje.toString()
-                      : stanjeNaloga.entries.first.key.toString(),
-                  buttonStyleData: ButtonStyleData(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey.shade400),
-                    ),
-                  ),
-                  items: stanjeNaloga.entries
-                      .map((item) => DropdownMenuItem(
-                            value: item.key.toString(),
-                            child: Text(item.value,
-                                style: const TextStyle(color: Colors.black)),
-                          ))
-                      .toList(),
-                  onChanged: (value) async {
-                    if (value != null) {
-                      selectedStanje =
-                          value.toString() == "true" ? true : false;
-                      setState(() {});
-                    }
-                  },
-                ),
-              ),
-              Expanded(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            width: 60,
-                            height: 60,
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                if (_formKey.currentState?.saveAndValidate() ==
-                                    true) {
-                                  debugPrint(
-                                      _formKey.currentState?.value.toString());
-
-                                  var request =
-                                      Map.from(_formKey.currentState!.value);
-                                  request['brojNaloga'] =
-                                      widget.nalog?.brojNaloga;
-                                  request['zaposlenikId'] = zaposlenikId;
-                                  request['narudzbe'] = [];
-                                  request['zavrsen'] = selectedStanje;
-                                  isLoadingSave = true;
-                                  setState(() {});
-                                  try {
-                                    if (widget.nalog == null) {
-                                      await _naloziProvider.insert(request);
-                                      if (mounted) {
-                                        await QuickAlert.show(
-                                          context: context,
-                                          type: QuickAlertType.success,
-                                          text: "Novi nalog je uspješno dodan.",
-                                          title: "Uspješno dodan nalog",
-                                          confirmBtnText: "U redu",
-                                          onConfirmBtnTap: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        );
-                                      }
-                                    } else {
-                                      await _naloziProvider.update(
-                                          widget.nalog!.nalogId, request);
-                                      if (mounted) {
-                                        await QuickAlert.show(
-                                          context: context,
-                                          type: QuickAlertType.success,
-                                          text: "Nalog je uspješno izmijenjen.",
-                                          title: "Uspješno izmijenjen nalog",
-                                          confirmBtnText: "U redu",
-                                          onConfirmBtnTap: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        );
-                                      }
-                                    }
-
-                                    if (mounted) {
-                                      Navigator.of(context).pop(true);
-                                    }
-                                  } on Exception catch (e) {
-                                    if (mounted) {
-                                      QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.error,
-                                        text: e.toString(),
-                                        title: "Greška",
-                                        confirmBtnText: "U redu",
-                                        onConfirmBtnTap: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      );
-                                    }
-                                  }
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                shape: const CircleBorder(),
-                                padding: const EdgeInsets.all(8),
-                              ),
-                              child: const Icon(
-                                Icons.save,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
-        ));
-  }
-
-  Widget _buildResultView() {
-    return Expanded(
-      child: Container(
-          decoration: const BoxDecoration(
-            color: Color.fromRGBO(235, 241, 224, 1),
-          ),
-          margin: const EdgeInsets.all(15),
-          width: double.infinity,
-          child: SingleChildScrollView(
-              child: AdvancedPaginatedDataTable(
-            source: dataSource,
-            rowsPerPage: 9,
-            showCheckboxColumn: false,
-            addEmptyRows: false,
-            columns: const [
-              DataColumn(
-                  label: Text(
-                "Narudzba",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Datum",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                label: Text(
-                  "Cijena",
-                  style: TextStyle(color: Colors.black, fontSize: 18),
-                ),
-              ),
-              DataColumn(
-                label: Text(
-                  "Akcija",
-                  style: TextStyle(color: Colors.black, fontSize: 18),
-                ),
-              ),
-            ],
-          ))),
     );
   }
 
@@ -439,7 +221,6 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
                     request['korisnikId'] = narudzba?.korisnikId;
                     request['placeno'] = narudzba?.placeno;
                     request['nalogId'] = widget.nalog?.nalogId;
-                    isLoadingSave = true;
                     setState(() {});
                     try {
                       if (widget.nalog == null) {
@@ -456,29 +237,19 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
                       }
 
                       if (mounted) {
-                        await QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.success,
-                          title: "Uspješno ste dodali narudžbu",
-                          text: "Uspješno ste dodali narudžbu u željeni nalog",
-                          confirmBtnText: "U redu",
-                          onConfirmBtnTap: () {
-                            Navigator.of(context).pop();
-                          },
+                        await buildSuccessAlert(
+                          context,
+                          "Uspješno ste dodali narudžbu",
+                          "Uspješno ste dodali narudžbu ${narudzba?.brojNarudzbe} u nalog ${widget.nalog?.brojNaloga}",
+                          isDoublePop: false,
                         );
                       }
-
                       _formKey2.currentState?.reset();
                       initForm();
-                      setState(() {});
                     } on Exception catch (e) {
                       if (mounted) {
-                        QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.error,
-                          title: "Greška",
-                          text: e.toString(),
-                        );
+                        await buildErrorAlert(
+                            context, "Greška", e.toString(), e);
                       }
                     }
                   }
@@ -498,6 +269,182 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
         ),
       ),
     );
+  }
+
+  Widget _buildResultView() {
+    return Expanded(
+      child: Container(
+          decoration: const BoxDecoration(
+            color: Color.fromRGBO(235, 241, 224, 1),
+          ),
+          margin: const EdgeInsets.all(15),
+          width: double.infinity,
+          child: SingleChildScrollView(
+              child: AdvancedPaginatedDataTable(
+            source: dataSource,
+            rowsPerPage: 9,
+            showCheckboxColumn: false,
+            addEmptyRows: false,
+            columns: const [
+              DataColumn(
+                  label: Text(
+                "Narudzba",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                  label: Text(
+                "Datum",
+                style: TextStyle(color: Colors.black, fontSize: 18),
+              )),
+              DataColumn(
+                label: Text(
+                  "Cijena",
+                  style: TextStyle(color: Colors.black, fontSize: 18),
+                ),
+              ),
+              DataColumn(
+                label: Text(
+                  "Akcija",
+                  style: TextStyle(color: Colors.black, fontSize: 18),
+                ),
+              ),
+            ],
+          ))),
+    );
+  }
+
+  Widget _buildNewForm() {
+    return FormBuilder(
+        key: _formKey,
+        initialValue: _initialValue,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: FormBuilderDropdown(
+                      enabled: true,
+                      name: "zaposlenikId",
+                      initialValue: widget.nalog?.zaposlenikId.toString(),
+                      decoration:
+                          const InputDecoration(labelText: "Zaposlenik"),
+                      items: zaposleniciResult?.result
+                              .map((item) => DropdownMenuItem(
+                                    value: item.zaposlenikId.toString(),
+                                    child: Text("${item.ime} ${item.prezime}"),
+                                  ))
+                              .toList() ??
+                          [],
+                      validator: (value) {
+                        if (value == null) {
+                          return 'Molimo odaberite zaposlenika';
+                        }
+                        return null;
+                      },
+                      onChanged: (value) {
+                        zaposlenikId = int.tryParse(value.toString());
+                      },
+                    )),
+                    const SizedBox(
+                      width: 10,
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                  child: FormBuilderCheckbox(
+                name: "zavrsen",
+                initialValue: _initialValue['zavrsen'] ?? false,
+                validator: (value) {
+                  if (value == null) {
+                    return 'Morate odabrati neku vrijednost';
+                  }
+                  return null;
+                },
+                title: const Text(
+                  "Da li je nalog završen",
+                  style: TextStyle(fontSize: 15),
+                ),
+              )),
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 60,
+                            height: 60,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState?.saveAndValidate() ==
+                                    true) {
+                                  debugPrint(
+                                      _formKey.currentState?.value.toString());
+
+                                  var request =
+                                      Map.from(_formKey.currentState!.value);
+                                  request['brojNaloga'] =
+                                      widget.nalog?.brojNaloga;
+                                  request['zaposlenikId'] = zaposlenikId;
+                                  request['narudzbe'] = [];
+                                  setState(() {});
+                                  try {
+                                    if (widget.nalog == null) {
+                                      var response =
+                                          await _naloziProvider.insert(request);
+                                      if (mounted) {
+                                        await buildSuccessAlert(
+                                          context,
+                                          "Uspješno ste dodali nalog",
+                                          "Novi nalog ${response.brojNaloga} je uspješno dodan.",
+                                        );
+                                      }
+                                    } else {
+                                      var response =
+                                          await _naloziProvider.update(
+                                              widget.nalog!.nalogId, request);
+                                      if (mounted) {
+                                        await buildSuccessAlert(
+                                          context,
+                                          "Uspješno ste izmijenili nalog",
+                                          "Nalog ${response.brojNaloga} je uspješno izmijenjen.",
+                                        );
+                                      }
+                                    }
+                                  } on Exception catch (e) {
+                                    if (mounted) {
+                                      await buildErrorAlert(
+                                          context, "Greška", e.toString(), e);
+                                    }
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                shape: const CircleBorder(),
+                                padding: const EdgeInsets.all(8),
+                              ),
+                              child: const Icon(
+                                Icons.save,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                ),
+              )
+            ],
+          ),
+        ));
   }
 }
 
@@ -519,7 +466,6 @@ class NarudzbeNalogDataSource extends AdvancedDataTableSource<Narudzba> {
     }
 
     final item = data?[index];
-
     return DataRow(cells: [
       DataCell(Text(item!.brojNarudzbe,
           style: const TextStyle(color: Colors.black, fontSize: 18))),
@@ -545,27 +491,21 @@ class NarudzbeNalogDataSource extends AdvancedDataTableSource<Narudzba> {
                 request['nalogId'] = null;
                 try {
                   await provider.update(item.narudzbaId, request);
-
                   if (context.mounted) {
-                    await QuickAlert.show(
-                      context: context,
-                      type: QuickAlertType.success,
-                      title: "Uspješno ste obrisali narudžbu",
-                      confirmBtnText: "U redu",
-                      text: "Narudžba je uspješno obrisana iz naloga",
-                      onConfirmBtnTap: () {
-                        Navigator.of(context).pop();
-                      },
+                    await buildSuccessAlert(
+                      context,
+                      "Uspješno ste obrisali narudžbu",
+                      "Narudžba ${item.brojNarudzbe} je uspješno obrisana iz naloga",
+                      isDoublePop: false,
                     );
                   }
                 } on Exception {
                   if (context.mounted) {
-                    await QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.error,
-                        title: "Narudžba je završena",
-                        text: "Narudžba je završena unutar ovog naloga",
-                        confirmBtnText: "U redu");
+                    await buildErrorAlert(
+                        context,
+                        "Greška",
+                        "Narudžba je završena",
+                        Exception("Narudžba je završena unutar ovog naloga"));
                   }
                 }
                 if (context.mounted) {

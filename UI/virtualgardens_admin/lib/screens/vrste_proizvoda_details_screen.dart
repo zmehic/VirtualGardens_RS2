@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/vrsta_proizvoda.dart';
@@ -156,43 +155,26 @@ class _VrsteProizvodaDetailsScreenState
                 setState(() {});
                 try {
                   if (widget.vrstaProizvoda == null) {
-                    await _provider.insert(request);
+                    var response = await _provider.insert(request);
                     if (mounted) {
-                      QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno ste dodali vrstu proizvoda",
-                        confirmBtnText: "U redu",
-                        text: "Vrsta proizvoda je dodana",
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop(true);
-                        },
-                      );
+                      await buildSuccessAlert(
+                          context,
+                          "Uspješno ste dodali vrstu proizvoda",
+                          "Vrsta proizvoda ${response.naziv} je dodana");
                     }
                   } else {
-                    await _provider.update(
+                    var response = await _provider.update(
                         widget.vrstaProizvoda!.vrstaProizvodaId!, request);
                     if (mounted) {
-                      QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno ste ažurirali vrstu proizvoda",
-                        confirmBtnText: "U redu",
-                        text: "Vrsta proizvoda je ažurirana",
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop(true);
-                        },
-                      );
+                      await buildSuccessAlert(
+                          context,
+                          "Uspješno ste ažurirali vrstu proizvoda",
+                          "Vrsta proizvoda ${response.naziv} je ažurirana");
                     }
                   }
                 } on Exception catch (e) {
                   if (mounted) {
-                    QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.error,
-                        text: e.toString().split(': ')[1]);
+                    await buildErrorAlert(context, "Greška", e.toString(), e);
                   }
                   setState(() {});
                 }

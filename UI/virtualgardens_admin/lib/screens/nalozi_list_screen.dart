@@ -3,7 +3,6 @@ import 'package:advanced_datatable/datatable.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/nalozi.dart';
@@ -66,12 +65,35 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
     return MasterScreen(
       FullScreenLoader(
         isLoading: isLoading,
-        child: Expanded(
-          child: Column(
-            children: [
-              _buildSearch(),
-              _buildResultView(),
-            ],
+        child: Scaffold(
+          appBar: AppBar(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Colors.white),
+              onPressed: () {
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
+              },
+            ),
+            actions: <Widget>[Container()],
+            iconTheme: const IconThemeData(color: Colors.white),
+            centerTitle: true,
+            title: const Text(
+              "Nalozi",
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+          ),
+          backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
+          body: Container(
+            margin: const EdgeInsets.all(20),
+            padding: const EdgeInsets.all(10),
+            color: const Color.fromRGBO(235, 241, 224, 1),
+            child: Column(
+              children: [
+                _buildSearch(),
+                _buildResultView(),
+              ],
+            ),
           ),
         ),
       ),
@@ -99,26 +121,7 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
             const SizedBox(
               width: 8,
             ),
-            Expanded(
-                child: TextField(
-              controller: _datumOdEditingController,
-              decoration:
-                  const InputDecoration(labelText: "Datum od:", filled: true),
-              readOnly: true,
-              onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101));
-                if (pickedDate != null) {
-                  datumOdString = pickedDate.toIso8601String();
-                  _datumOdEditingController.text =
-                      formatDateString(pickedDate.toIso8601String());
-                  dataSource.filterServerSide(_ftsEditingController.text,
-                      datumOdString, datumDoString, selectedStanje);
-                }
-              },
-            )),
+            _buildDatePicker(_datumOdEditingController, "Datum od:", true),
             IconButton(
               icon: const Icon(
                 Icons.clear,
@@ -134,28 +137,7 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
             const SizedBox(
               width: 8,
             ),
-            Expanded(
-                child: TextField(
-              controller: _datumDoEditingController,
-              decoration:
-                  const InputDecoration(labelText: "Datum do:", filled: true),
-              readOnly: true,
-              onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101));
-                if (pickedDate != null) {
-                  pickedDate = DateTime(pickedDate.year, pickedDate.month,
-                      pickedDate.day, 23, 59, 59);
-                  datumDoString = pickedDate.toIso8601String();
-                  _datumDoEditingController.text =
-                      formatDateString(pickedDate.toIso8601String());
-                  dataSource.filterServerSide(_ftsEditingController.text,
-                      datumOdString, datumDoString, selectedStanje);
-                }
-              },
-            )),
+            _buildDatePicker(_datumDoEditingController, "Datum do:", false),
             IconButton(
               icon: const Icon(
                 Icons.clear,
@@ -171,35 +153,7 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
             const SizedBox(
               width: 8,
             ),
-            DropdownButtonHideUnderline(
-              child: DropdownButton2(
-                value: selectedStanje != null
-                    ? selectedStanje.toString()
-                    : stanjeNaloga.entries.first.key.toString(),
-                buttonStyleData: ButtonStyleData(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.grey.shade400),
-                  ),
-                ),
-                items: stanjeNaloga.entries
-                    .map((item) => DropdownMenuItem(
-                          value: item.key.toString(),
-                          child: Text(item.value,
-                              style: const TextStyle(color: Colors.black)),
-                        ))
-                    .toList(),
-                onChanged: (value) async {
-                  if (value != null) {
-                    selectedStanje = int.tryParse(value.toString())!;
-                    setState(() {});
-                    dataSource.filterServerSide(_ftsEditingController.text,
-                        datumOdString, datumDoString, selectedStanje);
-                  }
-                },
-              ),
-            ),
+            _buildDropdown(),
             const SizedBox(
               width: 8,
             ),
@@ -221,43 +175,90 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
   }
 
   Widget _buildResultView() {
-    return Expanded(
-      child: Container(
-          decoration: const BoxDecoration(
-            color: Color.fromRGBO(32, 76, 56, 1),
+    return buildResultView(AdvancedPaginatedDataTable(
+      showCheckboxColumn: false,
+      rowsPerPage: 10,
+      source: dataSource,
+      addEmptyRows: false,
+      columns: const [
+        DataColumn(
+            label: Text(
+          "Broj naloga",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Datum",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Zaposlenik",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+          label: Text(
+            "Akcija",
+            style: TextStyle(color: Colors.black, fontSize: 18),
           ),
-          margin: const EdgeInsets.all(15),
-          width: double.infinity,
-          child: SingleChildScrollView(
-              child: AdvancedPaginatedDataTable(
-            showCheckboxColumn: false,
-            rowsPerPage: 10,
-            source: dataSource,
-            addEmptyRows: false,
-            columns: const [
-              DataColumn(
-                  label: Text(
-                "Broj naloga",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Datum",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Zaposlenik",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                label: Text(
-                  "Akcija",
-                  style: TextStyle(color: Colors.black, fontSize: 18),
-                ),
-              ),
-            ],
-          ))),
+        ),
+      ],
+    ));
+  }
+
+  Widget _buildDatePicker(
+      TextEditingController controller, String s, bool isOd) {
+    return Expanded(
+        child: TextField(
+      controller: controller,
+      decoration: InputDecoration(labelText: s, filled: true),
+      readOnly: true,
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+            context: context,
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2101));
+        if (pickedDate != null) {
+          isOd == true
+              ? datumOdString = pickedDate.toIso8601String()
+              : datumDoString = pickedDate.toIso8601String();
+          controller.text = formatDateString(pickedDate.toIso8601String());
+          dataSource.filterServerSide(_ftsEditingController.text, datumOdString,
+              datumDoString, selectedStanje);
+        }
+      },
+    ));
+  }
+
+  Widget _buildDropdown() {
+    return DropdownButtonHideUnderline(
+      child: DropdownButton2(
+        value: selectedStanje != null
+            ? selectedStanje.toString()
+            : stanjeNaloga.entries.first.key.toString(),
+        buttonStyleData: ButtonStyleData(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade400),
+          ),
+        ),
+        items: stanjeNaloga.entries
+            .map((item) => DropdownMenuItem(
+                  value: item.key.toString(),
+                  child: Text(item.value,
+                      style: const TextStyle(color: Colors.black)),
+                ))
+            .toList(),
+        onChanged: (value) async {
+          if (value != null) {
+            selectedStanje = int.tryParse(value.toString())!;
+            setState(() {});
+            dataSource.filterServerSide(_ftsEditingController.text,
+                datumOdString, datumDoString, selectedStanje);
+          }
+        },
+      ),
     );
   }
 }
@@ -308,44 +309,9 @@ class NaloziDataSource extends AdvancedDataTableSource<Nalog> {
           DataCell(ElevatedButton(
             onPressed: () async {
               if (context.mounted) {
-                QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.confirm,
-                    title: "Potvrda brisanja",
-                    text: "Jeste li sigurni da želite obrisati nalog?",
-                    confirmBtnText: "U redu",
-                    onConfirmBtnTap: () async {
-                      try {
-                        await provider.delete(item.nalogId);
-                        if (context.mounted) {
-                          await QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.success,
-                            title: "Uspješno ste obrisali nalog",
-                            confirmBtnText: "U redu",
-                            text: "Nalog je obrisan",
-                            onConfirmBtnTap: () {
-                              Navigator.of(context).pop();
-                            },
-                          );
-                        }
-
-                        filterServerSide(_nazivGTE, _datumOd, _datumDo, _state);
-                      } on Exception catch (e) {
-                        if (context.mounted) {
-                          await QuickAlert.show(
-                              title: "Greška",
-                              confirmBtnText: "U redu",
-                              context: context,
-                              type: QuickAlertType.error,
-                              text: e.toString().split(': ')[1],
-                              onConfirmBtnTap: Navigator.of(context).pop);
-                        }
-                      }
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    });
+                await buildDeleteAlert(context, item.brojNaloga,
+                    item.brojNaloga, provider, item.nalogId);
+                filterServerSide(_nazivGTE, _datumOd, _datumDo, _state);
               }
             },
             style: ElevatedButton.styleFrom(
@@ -387,7 +353,6 @@ class NaloziDataSource extends AdvancedDataTableSource<Nalog> {
   Future<RemoteDataSourceDetails<Nalog>> getNextPage(
       NextPageRequest pageRequest) async {
     page = (pageRequest.offset ~/ pageSize).toInt() + 1;
-
     var filter = {
       'BrojNalogaGTE': _nazivGTE,
       'DatumKreiranjaFrom': _datumOd,
@@ -403,17 +368,12 @@ class NaloziDataSource extends AdvancedDataTableSource<Nalog> {
       var result = await provider.get(filter: filter);
       data = result.result;
       count = result.count;
-
       notifyListeners();
     } on Exception catch (e) {
       if (context.mounted) {
-        QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: e.toString().split(': ')[1]);
+        await buildErrorAlert(context, "Greška", e.toString(), e);
       }
     }
-
     return RemoteDataSourceDetails(count, data!);
   }
 }

@@ -2,7 +2,6 @@ import 'package:advanced_datatable/advanced_datatable_source.dart';
 import 'package:advanced_datatable/datatable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
@@ -49,13 +48,11 @@ class _UlaziListScreenState extends State<UlaziListScreen> {
   }
 
   Future initForm() async {
-    var filter = {'isDeleted': false, 'IncludeTables': "Korisnik"};
-
-    result = await _ulaziProvider.get(filter: filter);
-
     _datumOdEditingController.text = "";
     _ftsEditingController.text = "";
     _datumDoEditingController.text = "";
+    dataSource.filterServerSide(
+        _ftsEditingController.text, datumOdString, datumDoString);
 
     setState(() {
       isLoading = false;
@@ -200,28 +197,19 @@ class _UlaziListScreenState extends State<UlaziListScreen> {
                     'korisnikId': AuthProvider.korisnikId,
                   };
                   try {
-                    await _ulaziProvider.insert(request);
+                    var response = await _ulaziProvider.insert(request);
                     if (mounted) {
-                      await QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno ste dodali ulaz",
-                        confirmBtnText: "U redu",
-                        text: "Ulaz je dodan",
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                        },
-                      );
+                      await buildSuccessAlert(
+                          context,
+                          "Uspješno ste dodali ulaz",
+                          "Ulaz ${response.brojUlaza} je dodan",
+                          isDoublePop: false);
                     }
                   } on Exception catch (e) {
                     if (mounted) {
-                      QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.error,
-                          text: e.toString().split(': ')[1]);
+                      await buildErrorAlert(context, "Greška", e.toString(), e);
                     }
                   }
-
                   dataSource.filterServerSide(
                       _ftsEditingController.text, datumOdString, datumDoString);
                   setState(() {});
@@ -232,45 +220,34 @@ class _UlaziListScreenState extends State<UlaziListScreen> {
   }
 
   Widget _buildResultView() {
-    return Expanded(
-      child: Container(
-          alignment: Alignment.topCenter,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.white, width: 3),
-            color: const Color.fromRGBO(32, 76, 56, 1),
-          ),
-          margin: const EdgeInsets.all(15),
-          child: SingleChildScrollView(
-              child: AdvancedPaginatedDataTable(
-            showCheckboxColumn: false,
-            rowsPerPage: 10,
-            columns: const [
-              DataColumn(
-                  label: Text(
-                "Broj ulaza",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Datum",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Korisnik",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Akcija",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              ))
-            ],
-            source: dataSource,
-            addEmptyRows: false,
-          ))),
-    );
+    return buildResultView(AdvancedPaginatedDataTable(
+      showCheckboxColumn: false,
+      rowsPerPage: 10,
+      columns: const [
+        DataColumn(
+            label: Text(
+          "Broj ulaza",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Datum",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Korisnik",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Akcija",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        ))
+      ],
+      source: dataSource,
+      addEmptyRows: false,
+    ));
   }
 }
 
@@ -315,32 +292,9 @@ class UlazDataSource extends AdvancedDataTableSource<Ulaz> {
           DataCell(ElevatedButton(
             onPressed: () async {
               if (context.mounted) {
-                QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.confirm,
-                  title: "Potvrda brisanja",
-                  text: "Jeste li sigurni da želite obrisati ulaz?",
-                  confirmBtnText: "U redu",
-                  onConfirmBtnTap: () async {
-                    await provider.delete(item.ulazId);
-                    if (context.mounted) {
-                      await QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno ste obrisali ulaz",
-                        confirmBtnText: "U redu",
-                        text: "Ulaz je obrisan",
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                        },
-                      );
-                    }
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                    }
-                    filterServerSide(_nazivGTE, _datumOd, _datumDo);
-                  },
-                );
+                await buildDeleteAlert(context, item.brojUlaza, item.brojUlaza,
+                    provider, item.ulazId);
+                filterServerSide(_nazivGTE, _datumOd, _datumDo);
               }
             },
             style: ElevatedButton.styleFrom(
@@ -391,10 +345,7 @@ class UlazDataSource extends AdvancedDataTableSource<Ulaz> {
       notifyListeners();
     } on Exception catch (e) {
       if (context.mounted) {
-        QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: e.toString().split(': ')[1]);
+        await buildErrorAlert(context, "Greška", e.toString(), e);
       }
     }
 

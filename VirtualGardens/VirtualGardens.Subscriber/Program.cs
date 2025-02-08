@@ -11,15 +11,20 @@ DotNetEnv.Env.Load();
 
 Console.WriteLine("Hello, World!");
 
-await WaitForRabbitMQAsync("rabbitmq", 5672);
+string rabbitmqport = Environment.GetEnvironmentVariable("RABBIT_MQ_PORT") ?? string.Empty;
+Console.WriteLine($"{rabbitmqport}");
+await WaitForRabbitMQAsync("rabbitmq", int.TryParse(rabbitmqport, out var result) ? result : 0);
 
 string smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty;
 int smtpPort = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var port) ? port : 0;
 string smtpUser = Environment.GetEnvironmentVariable("SMTP_USER") ?? string.Empty;
 string smtpPass = Environment.GetEnvironmentVariable("SMTP_PASS") ?? string.Empty;
 
+string rabbitmq = Environment.GetEnvironmentVariable("RABBIT_MQ") ?? string.Empty;
+
 var emailService = new EmailService(smtpHost, smtpPort, smtpUser, smtpPass);
-var bus = RabbitHutch.CreateBus("host=rabbitmq:5672");
+var bus = RabbitHutch.CreateBus(rabbitmq);
+Console.WriteLine($"{rabbitmq}");
 
 
 bus.PubSub.Subscribe<VirtualGardens.Models.Messages.PonudaActivated>(string.Empty,async msg =>

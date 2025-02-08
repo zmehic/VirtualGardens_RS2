@@ -1,14 +1,10 @@
-import 'package:advanced_datatable/advanced_datatable_source.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/jedinice_mjere.dart';
-import 'package:virtualgardens_admin/models/nalozi.dart';
 import 'package:virtualgardens_admin/providers/jedinice_mjere_provider.dart';
-import 'package:virtualgardens_admin/providers/nalozi_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 
 class JedinicaMjereDetailsScreen extends StatefulWidget {
@@ -23,7 +19,6 @@ class JedinicaMjereDetailsScreen extends StatefulWidget {
 class _JedinicaMjereDetailsScreenState
     extends State<JedinicaMjereDetailsScreen> {
   final _formKey = GlobalKey<FormBuilderState>();
-  late ZaposleniciNaloziProizvodiDataSource dataSource;
 
   Map<String, dynamic> _initialValue = {};
 
@@ -186,46 +181,29 @@ class _JedinicaMjereDetailsScreenState
               if (_formKey.currentState?.saveAndValidate() == true) {
                 debugPrint(_formKey.currentState?.value.toString());
                 var request = Map.from(_formKey.currentState!.value);
-                setState(() {});
                 try {
                   if (widget.jedinicaMjere == null) {
-                    await _provider.insert(request);
+                    var response = await _provider.insert(request);
                     if (mounted) {
-                      QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno ste dodali jedinicu mjere",
-                        confirmBtnText: "U redu",
-                        text: "Jedinica mjere je dodana",
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop(true);
-                        },
-                      );
+                      await buildSuccessAlert(
+                          context,
+                          "Uspješno ste dodali jedinicu mjere - ${response.naziv}",
+                          "Jedinica mjere ${response.naziv} je dodana");
                     }
                   } else {
-                    await _provider.update(
+                    var response = await _provider.update(
                         widget.jedinicaMjere!.jedinicaMjereId!, request);
                     if (mounted) {
-                      QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno ste ažurirali jedinicu mjere",
-                        confirmBtnText: "U redu",
-                        text: "Jedinica mjere je ažurirana",
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop(true);
-                        },
-                      );
+                      await buildSuccessAlert(
+                          context,
+                          "Uspješno ste ažurirali jedinicu mjere - ${response.naziv}",
+                          "Jedinica mjere ${response.naziv} je ažurirana");
                     }
                   }
                 } on Exception catch (e) {
                   if (mounted) {
-                    QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.error,
-                        text: e.toString().split(': ')[1]);
+                    await buildErrorAlert(
+                        context, "Greška", e.toString().split(': ')[1], e);
                   }
                   setState(() {});
                 }
@@ -249,78 +227,5 @@ class _JedinicaMjereDetailsScreenState
             : Container(),
       ],
     );
-  }
-}
-
-class ZaposleniciNaloziProizvodiDataSource
-    extends AdvancedDataTableSource<Nalog> {
-  List<Nalog>? data = [];
-  final NaloziProvider provider;
-  int count = 9;
-  int page = 1;
-  int pageSize = 9;
-  int? zaposlenikId;
-  dynamic filter;
-  BuildContext context;
-  ZaposleniciNaloziProizvodiDataSource(
-      {required this.provider, required this.context});
-
-  @override
-  DataRow? getRow(int index) {
-    if (index >= data!.length) {
-      return null;
-    }
-
-    final item = data?[index];
-
-    return DataRow(cells: [
-      DataCell(Text(item!.brojNaloga,
-          style: const TextStyle(color: Colors.black, fontSize: 18))),
-      DataCell(Text(formatDateString(item.datumKreiranja.toIso8601String()),
-          style: const TextStyle(color: Colors.black, fontSize: 18))),
-      DataCell(Text(item.zavrsen == true ? "Da" : "Ne",
-          style: const TextStyle(color: Colors.black, fontSize: 18))),
-    ]);
-  }
-
-  void filterServerSide(zaposlenikID) {
-    zaposlenikId = zaposlenikID;
-    setNextView();
-  }
-
-  @override
-  bool get isRowCountApproximate => false;
-
-  @override
-  int get selectedRowCount => 0;
-
-  @override
-  Future<RemoteDataSourceDetails<Nalog>> getNextPage(
-      NextPageRequest pageRequest) async {
-    page = (pageRequest.offset ~/ pageSize).toInt() + 1;
-
-    var filter = {
-      'ZaposlenikId': zaposlenikId,
-      'IsDeleted': false,
-      'Page': page,
-      'PageSize': pageSize
-    };
-
-    try {
-      var result = await provider.get(filter: filter);
-      data = result.result;
-      count = result.count;
-
-      notifyListeners();
-    } on Exception catch (e) {
-      if (context.mounted) {
-        QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: e.toString().split(': ')[1]);
-      }
-    }
-
-    return RemoteDataSourceDetails(count, data!);
   }
 }

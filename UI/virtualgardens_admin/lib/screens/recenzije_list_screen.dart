@@ -21,10 +21,9 @@ class RecenzijeListScreen extends StatefulWidget {
 
 class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
   late Map<int, String> korisnici = {};
-  static const _pageSize = 1;
+  static const _pageSize = 8;
 
   late RecenzijeProvider _recenzijeProvider;
-
   SearchResult<Recenzija>? recenzijeResult;
 
   bool isLoading = true;
@@ -54,12 +53,14 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
   @override
   void initState() {
     _recenzijeProvider = context.read<RecenzijeProvider>();
+    initForm();
     korisnici[0] = "Svi";
-    super.initState();
+
     _pagingController.addPageRequestListener((pageKey) {
       _fetchPage(pageKey, false);
     });
-    initForm();
+
+    super.initState();
   }
 
   Future initForm() async {
@@ -69,14 +70,6 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
 
     await _fetchPage(0, true);
 
-    if (recenzijeResult != null) {
-      for (var element in recenzijeResult!.result) {
-        if (korisnici.keys.contains(element.korisnikId) == false) {
-          korisnici[element.korisnikId] =
-              "${element.korisnik?.ime} ${element.korisnik?.prezime}";
-        }
-      }
-    }
     setState(() {
       isLoading = false;
     });
@@ -105,17 +98,37 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
         if (reload == true && _pagingController.itemList != null) {
           _pagingController.itemList!.clear();
         }
+
         _pagingController.appendLastPage(recenzijeResult!.result);
+        if (_pagingController.itemList != null) {
+          for (var element in _pagingController.itemList!) {
+            if (korisnici.keys.contains(element!.korisnikId) == false) {
+              korisnici[element.korisnikId] =
+                  "${element.korisnik?.ime} ${element.korisnik?.prezime}";
+            }
+          }
+        }
       } else {
         if (reload == true && _pagingController.itemList != null) {
           _pagingController.itemList!.clear();
         }
         final nextPageKey = pageKey + 1;
+
         _pagingController.appendPage(recenzijeResult!.result, nextPageKey);
+        if (_pagingController.itemList != null) {
+          for (var element in _pagingController.itemList!) {
+            if (korisnici.keys.contains(element!.korisnikId) == false) {
+              korisnici[element.korisnikId] =
+                  "${element.korisnik?.ime} ${element.korisnik?.prezime}";
+            }
+          }
+        }
       }
     } catch (error) {
       _pagingController.error = error;
     }
+
+    setState(() {});
   }
 
   @override

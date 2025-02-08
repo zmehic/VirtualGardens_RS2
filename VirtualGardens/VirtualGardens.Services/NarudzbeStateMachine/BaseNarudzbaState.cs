@@ -50,7 +50,7 @@ namespace VirtualGardens.Services.NarudzbeStateMachine
 
         public virtual void Delete(int id)
         {
-            throw new UserException("Method not allowed");
+            throw new UserException("Narudžbu je moguće obrisati isključivo iz stanja 'kreirana'");
         }
 
         public virtual List<string> AllowedActions(Database.Narudzbe? entity)

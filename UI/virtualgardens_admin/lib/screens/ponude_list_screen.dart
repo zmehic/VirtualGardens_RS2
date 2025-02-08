@@ -3,7 +3,6 @@ import 'package:advanced_datatable/datatable.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/ponuda.dart';
@@ -325,48 +324,39 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
   }
 
   Widget _buildResultView() {
-    return Expanded(
-      child: Container(
-          decoration: const BoxDecoration(
-            color: Color.fromRGBO(32, 76, 56, 1),
-          ),
-          margin: const EdgeInsets.all(15),
-          width: double.infinity,
-          child: SingleChildScrollView(
-              child: AdvancedPaginatedDataTable(
-            showCheckboxColumn: false,
-            rowsPerPage: 10,
-            source: dataSource,
-            columns: const [
-              DataColumn(
-                  label: Text(
-                "Naziv ponude",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Datum",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Status",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Popust",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Akcija",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              ))
-            ],
-            addEmptyRows: false,
-          ))),
-    );
+    return buildResultView(AdvancedPaginatedDataTable(
+      showCheckboxColumn: false,
+      rowsPerPage: 10,
+      source: dataSource,
+      columns: const [
+        DataColumn(
+            label: Text(
+          "Naziv ponude",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Datum",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Status",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Popust",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Akcija",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        ))
+      ],
+      addEmptyRows: false,
+    ));
   }
 }
 
@@ -428,45 +418,10 @@ class PonudeDataSource extends AdvancedDataTableSource<Ponuda> {
           DataCell(ElevatedButton(
             onPressed: () async {
               if (context.mounted) {
-                QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.confirm,
-                    title: "Potvrda brisanja",
-                    text: "Jeste li sigurni da želite obrisati ulaz?",
-                    confirmBtnText: "U redu",
-                    onConfirmBtnTap: () async {
-                      try {
-                        await provider.delete(item.ponudaId);
-                        if (context.mounted) {
-                          await QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.success,
-                            title: "Uspješno ste obrisali ponudu",
-                            confirmBtnText: "U redu",
-                            text: "Ponuda je obrisana",
-                            onConfirmBtnTap: () {
-                              Navigator.of(context).pop();
-                            },
-                          );
-                        }
-
-                        filterServerSide(_nazivGTE, _datumOd, _datumDo,
-                            _popustOd, _popustDo, _stateMachine);
-                      } on Exception catch (e) {
-                        if (context.mounted) {
-                          await QuickAlert.show(
-                              title: "Greška",
-                              confirmBtnText: "U redu",
-                              context: context,
-                              type: QuickAlertType.error,
-                              text: e.toString().split(': ')[1],
-                              onConfirmBtnTap: Navigator.of(context).pop);
-                        }
-                      }
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                      }
-                    });
+                await buildDeleteAlert(
+                    context, item.naziv, item.naziv, provider, item.ponudaId);
+                filterServerSide(_nazivGTE, _datumOd, _datumDo, _popustOd,
+                    _popustDo, _stateMachine);
               }
             },
             style: ElevatedButton.styleFrom(
@@ -530,10 +485,7 @@ class PonudeDataSource extends AdvancedDataTableSource<Ponuda> {
       notifyListeners();
     } on Exception catch (e) {
       if (context.mounted) {
-        QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: e.toString().split(': ')[1]);
+        await buildErrorAlert(context, "Greška", e.toString(), e);
       }
     }
 

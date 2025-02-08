@@ -505,12 +505,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   }
                                 } on Exception catch (e) {
                                   if (mounted) {
-                                    QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.error,
-                                        title: "Greška prilikom ažuriranja",
-                                        text: (e.toString().split(': '))[1],
-                                        confirmBtnText: "U redu");
+                                    await buildErrorAlert(
+                                        context, "Greška", e.toString(), e);
                                   }
                                   setState(() {});
                                 }

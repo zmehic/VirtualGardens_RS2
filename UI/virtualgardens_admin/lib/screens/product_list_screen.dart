@@ -5,8 +5,6 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/proizvod.dart';
@@ -149,8 +147,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
               controller: cijenaOdEditingController,
               decoration:
                   const InputDecoration(labelText: "Cijena od:", filled: true),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+              ],
               onChanged: (value) {
                 dataSource.filterServerSide(ftsEditingController.text, value,
                     cijenaDoEditingController.text, selectedVrstaProizvoda);
@@ -164,8 +165,11 @@ class _ProductListScreenState extends State<ProductListScreen> {
               controller: cijenaDoEditingController,
               decoration:
                   const InputDecoration(labelText: "Cijena do:", filled: true),
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
+              inputFormatters: <TextInputFormatter>[
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+              ],
               onChanged: (value) {
                 dataSource.filterServerSide(
                     ftsEditingController.text,
@@ -225,57 +229,45 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 
   Widget _buildResultView() {
-    return Expanded(
-      child: Container(
-          alignment: Alignment.topCenter,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(32, 76, 56, 1),
-            border: Border.all(color: Colors.white, width: 3),
+    return buildResultView(AdvancedPaginatedDataTable(
+      showCheckboxColumn: false,
+      rowsPerPage: 10,
+      columns: const [
+        DataColumn(
+            label: Text(
+          "Naziv",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Cijena",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Količina",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Jed.",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Slika",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+          label: Text(
+            "Akcija",
+            style: TextStyle(color: Colors.black, fontSize: 18),
           ),
-          margin: const EdgeInsets.all(15),
-          width: double.infinity,
-          child: SingleChildScrollView(
-              child: AdvancedPaginatedDataTable(
-            showCheckboxColumn: false,
-            rowsPerPage: 10,
-            columns: const [
-              DataColumn(
-                  label: Text(
-                "Naziv",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Cijena",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Količina",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Jed.",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Slika",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                label: Text(
-                  "Akcija",
-                  style: TextStyle(color: Colors.black, fontSize: 18),
-                ),
-              ),
-            ],
-            source: dataSource,
-            addEmptyRows: false,
-          ))),
-    );
+        ),
+      ],
+      source: dataSource,
+      addEmptyRows: false,
+    ));
   }
 
   Widget _buildDropdown() {
@@ -369,33 +361,10 @@ class ProductDataSource extends AdvancedDataTableSource<Proizvod> {
           DataCell(ElevatedButton(
             onPressed: () async {
               if (context.mounted) {
-                QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.confirm,
-                  title: "Potvrda brisanja",
-                  text: "Jeste li sigurni da želite obrisati proizvod?",
-                  confirmBtnText: "U redu",
-                  onConfirmBtnTap: () async {
-                    await provider.delete(item.proizvodId!);
-                    if (context.mounted) {
-                      await QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno ste obrisali proizvod",
-                        confirmBtnText: "U redu",
-                        text: "Proizvod je obrisan",
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                        },
-                      );
-                    }
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                      filterServerSide(_nazivGTE, _cijenaFrom, _cijenaTo,
-                          _selectedVrstaProizvoda);
-                    }
-                  },
-                );
+                await buildDeleteAlert(context, item.naziv ?? "",
+                    item.naziv ?? "", provider, item.proizvodId!);
+                filterServerSide(
+                    _nazivGTE, _cijenaFrom, _cijenaTo, _selectedVrstaProizvoda);
               }
             },
             style: ElevatedButton.styleFrom(
@@ -449,10 +418,7 @@ class ProductDataSource extends AdvancedDataTableSource<Proizvod> {
       notifyListeners();
     } on Exception catch (e) {
       if (context.mounted) {
-        QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: e.toString().split(': ')[1]);
+        await buildErrorAlert(context, "Greška", e.toString(), e);
       }
     }
 

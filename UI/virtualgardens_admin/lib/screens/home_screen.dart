@@ -13,6 +13,7 @@ import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/product_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
+import 'package:quickalert/quickalert.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -51,20 +52,20 @@ class _HomeScreenState extends State<HomeScreen> {
     vrsteProizvodaResult = await vrsteProizvodaProvider.get();
     selectedVrstaProizvoda = vrsteProizvodaResult?.result[0].vrstaProizvodaId;
 
-    await fetchProducts(value);
+    try {
+      await fetchProducts(value);
+    } on Exception catch (e) {
+      if (mounted) {
+        QuickAlert.show(
+            context: context,
+            type: QuickAlertType.error,
+            title: "Greška",
+            confirmBtnText: "U redu",
+            text: e.toString().split(': ')[1]);
+      }
+    }
 
     korisnikResult = await korisnikProvider.getById(AuthProvider.korisnikId!);
-
-    var filterNarudzbe = {
-      'Page': 1,
-      'OrderBy': "Datum",
-      'SortDirection': "ASC",
-      'PageSize': 3,
-      'IncludeTables': "Korisnik",
-      'StateMachine': "created"
-    };
-
-    narudzbeResult = await narudzbaProvider.get(filter: filterNarudzbe);
 
     setState(() {
       isLoading = false;
@@ -82,6 +83,16 @@ class _HomeScreenState extends State<HomeScreen> {
       'isDeleted': false
     };
     proizvodiResult = await productProvider.get(filter: filterProizvodi);
+
+    var filterNarudzbe = {
+      'Page': 1,
+      'OrderBy': "Datum",
+      'SortDirection': "ASC",
+      'PageSize': 3,
+      'IncludeTables': "Korisnik",
+    };
+
+    narudzbeResult = await narudzbaProvider.get(filter: filterNarudzbe);
   }
 
   @override
@@ -108,75 +119,6 @@ class _HomeScreenState extends State<HomeScreen> {
         _buildGreeting(),
         _buildProfileImage(),
       ],
-    );
-  }
-
-  Widget _basicInfo() {
-    return Container(
-      margin: const EdgeInsets.only(top: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          _buildProductsPreview(),
-          const SizedBox(width: 10),
-          _buildOrderPreview(),
-        ],
-      ),
-    );
-  }
-
-  Widget buildList(String datum, String naziv, String cijena) {
-    return Expanded(
-      child: Container(
-        margin: const EdgeInsets.only(top: 10),
-        decoration: BoxDecoration(
-          color: const Color.fromRGBO(235, 241, 224, 1),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.only(left: 15, right: 15),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(datum,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
-              Text(naziv,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
-              Text(cijena,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget buildCard(String name, String number) {
-    return Expanded(
-      child: AspectRatio(
-        aspectRatio: 1,
-        child: Card(
-          elevation: 4,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(name,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 19, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 8),
-              Text(number,
-                  style: const TextStyle(
-                      fontSize: 27, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
-      ),
     );
   }
 
@@ -222,6 +164,20 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _basicInfo() {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildProductsPreview(),
+          const SizedBox(width: 10),
+          _buildOrderPreview(),
+        ],
       ),
     );
   }
@@ -276,36 +232,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildDropdown() {
-    return DropdownButtonHideUnderline(
-      child: DropdownButton2(
-        value: "$selectedVrstaProizvoda",
-        buttonStyleData: ButtonStyleData(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: Colors.grey.shade400),
-          ),
-        ),
-        items: vrsteProizvodaResult?.result
-                .map((item) => DropdownMenuItem(
-                      value: item.vrstaProizvodaId.toString(),
-                      child: Text(item.naziv ?? "",
-                          style: const TextStyle(color: Colors.black)),
-                    ))
-                .toList() ??
-            [],
-        onChanged: (value) async {
-          if (value != null) {
-            selectedVrstaProizvoda = int.tryParse(value.toString());
-            await fetchProducts(selectedVrstaProizvoda);
-            setState(() {});
-          }
-        },
       ),
     );
   }
@@ -373,5 +299,90 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
     ));
+  }
+
+  Widget buildList(String datum, String naziv, String cijena) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.only(top: 10),
+        decoration: BoxDecoration(
+          color: const Color.fromRGBO(235, 241, 224, 1),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.only(left: 15, right: 15),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(datum,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(naziv,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+              Text(cijena,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget buildCard(String name, String number) {
+    return Expanded(
+      child: AspectRatio(
+        aspectRatio: 1,
+        child: Card(
+          elevation: 4,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(name,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontSize: 19, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Text(number,
+                  style: const TextStyle(
+                      fontSize: 27, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDropdown() {
+    return DropdownButtonHideUnderline(
+      child: DropdownButton2(
+        value: "$selectedVrstaProizvoda",
+        buttonStyleData: ButtonStyleData(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(color: Colors.grey.shade400),
+          ),
+        ),
+        items: vrsteProizvodaResult?.result
+                .map((item) => DropdownMenuItem(
+                      value: item.vrstaProizvodaId.toString(),
+                      child: Text(item.naziv ?? "",
+                          style: const TextStyle(color: Colors.black)),
+                    ))
+                .toList() ??
+            [],
+        onChanged: (value) async {
+          if (value != null) {
+            selectedVrstaProizvoda = int.tryParse(value.toString());
+            await fetchProducts(selectedVrstaProizvoda);
+            setState(() {});
+          }
+        },
+      ),
+    );
   }
 }

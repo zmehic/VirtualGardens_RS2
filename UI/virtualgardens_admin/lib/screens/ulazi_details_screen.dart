@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/proizvod.dart';
@@ -234,39 +233,30 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
   }
 
   Widget _buildResultView() {
-    return Expanded(
-      child: Container(
-          decoration: const BoxDecoration(
-            color: Color.fromRGBO(235, 241, 224, 1),
+    return buildResultView(AdvancedPaginatedDataTable(
+      showCheckboxColumn: false,
+      rowsPerPage: 9,
+      columns: const [
+        DataColumn(
+            label: Text(
+          "Proizvod",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Količina",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+          label: Text(
+            "Obriši",
+            style: TextStyle(color: Colors.black, fontSize: 18),
           ),
-          margin: const EdgeInsets.all(15),
-          width: double.infinity,
-          child: SingleChildScrollView(
-              child: AdvancedPaginatedDataTable(
-            showCheckboxColumn: false,
-            rowsPerPage: 9,
-            columns: const [
-              DataColumn(
-                  label: Text(
-                "Proizvod",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Količina",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                label: Text(
-                  "Obriši",
-                  style: TextStyle(color: Colors.black, fontSize: 18),
-                ),
-              ),
-            ],
-            source: dataSource,
-            addEmptyRows: false,
-          ))),
-    );
+        ),
+      ],
+      source: dataSource,
+      addEmptyRows: false,
+    ));
   }
 
   _buildUlaziProizvodiForm() {
@@ -345,24 +335,22 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
                       } else {
                         await _ulaziProizvodiProvider.insert(request);
                         if (mounted) {
-                          QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.success,
-                            text: "Proizvod uspješno dodan u ulaz.",
-                            title: "Dodan proizvod",
-                            confirmBtnText: "U redu",
-                            onConfirmBtnTap: () {
-                              Navigator.of(context).pop();
-                              dataSource.filterServerSide(widget.ulaz?.ulazId);
-                            },
-                          );
+                          await buildSuccessAlert(
+                              context,
+                              "Uspješno ste dodali proizvod u ulaz",
+                              "Proizvod je dodan u ulaz ${widget.ulaz?.ulazId}",
+                              isDoublePop: false);
+                          dataSource.filterServerSide(widget.ulaz?.ulazId);
                         }
                       }
 
                       _formKey2.currentState?.reset();
                       setState(() {});
                     } on Exception catch (e) {
-                      debugPrint(e.toString());
+                      if (mounted) {
+                        await buildErrorAlert(
+                            context, "Greška", e.toString(), e);
+                      }
                     }
                   }
                 },
@@ -412,32 +400,9 @@ class UlaziProizvodiDataSource extends AdvancedDataTableSource<UlazProizvod> {
       DataCell(ElevatedButton(
         onPressed: () async {
           if (context.mounted) {
-            QuickAlert.show(
-              context: context,
-              type: QuickAlertType.confirm,
-              title: "Potvrda brisanja",
-              text: "Jeste li sigurni da želite obrisati proizvod?",
-              confirmBtnText: "U redu",
-              onConfirmBtnTap: () async {
-                await provider.delete(item.proizvodId);
-                if (context.mounted) {
-                  await QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.success,
-                    title: "Uspješno ste obrisali proizvod",
-                    confirmBtnText: "U redu",
-                    text: "Proizvod je obrisan",
-                    onConfirmBtnTap: () {
-                      Navigator.of(context).pop();
-                    },
-                  );
-                }
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                  filterServerSide(ulazId);
-                }
-              },
-            );
+            await buildDeleteAlert(context, item.proizvod!.naziv ?? "",
+                item.proizvod!.naziv ?? "", provider, item.proizvodId);
+            filterServerSide(ulazId);
           }
         },
         style: ElevatedButton.styleFrom(
@@ -484,10 +449,7 @@ class UlaziProizvodiDataSource extends AdvancedDataTableSource<UlazProizvod> {
       notifyListeners();
     } on Exception catch (e) {
       if (context.mounted) {
-        QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: e.toString().split(': ')[1]);
+        await buildErrorAlert(context, "Greška", e.toString(), e);
       }
     }
 

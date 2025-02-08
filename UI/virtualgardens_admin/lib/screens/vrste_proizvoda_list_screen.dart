@@ -3,12 +3,11 @@ import 'package:advanced_datatable/advanced_datatable_source.dart';
 import 'package:advanced_datatable/datatable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/models/quickalert_type.dart';
-import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/models/vrsta_proizvoda.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/providers/vrste_proizvoda_provider.dart';
 import 'package:virtualgardens_admin/screens/vrste_proizvoda_details_screen.dart';
 
@@ -144,37 +143,25 @@ class _VrsteProizvodaListScreenState extends State<VrsteProizvodaListScreen> {
   }
 
   Widget _buildResultView() {
-    return Expanded(
-      child: Container(
-          alignment: Alignment.topCenter,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(32, 76, 56, 1),
-            border: Border.all(color: Colors.white, width: 3),
+    return buildResultView(AdvancedPaginatedDataTable(
+      showCheckboxColumn: false,
+      rowsPerPage: 10,
+      columns: const [
+        DataColumn(
+            label: Text(
+          "Naziv",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+          label: Text(
+            "Akcija",
+            style: TextStyle(color: Colors.black, fontSize: 18),
           ),
-          margin: const EdgeInsets.all(15),
-          width: double.infinity,
-          child: SingleChildScrollView(
-              child: AdvancedPaginatedDataTable(
-            showCheckboxColumn: false,
-            rowsPerPage: 10,
-            columns: const [
-              DataColumn(
-                  label: Text(
-                "Naziv",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                label: Text(
-                  "Akcija",
-                  style: TextStyle(color: Colors.black, fontSize: 18),
-                ),
-              ),
-            ],
-            source: dataSource,
-            addEmptyRows: false,
-          ))),
-    );
+        ),
+      ],
+      source: dataSource,
+      addEmptyRows: false,
+    ));
   }
 }
 
@@ -217,46 +204,9 @@ class VrsteProizvodaDataSource extends AdvancedDataTableSource<VrstaProizvoda> {
           DataCell(ElevatedButton(
             onPressed: () async {
               if (context.mounted) {
-                QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.confirm,
-                  title: "Potvrda brisanja",
-                  text: "Jeste li sigurni da želite obrisati vrstu proizvoda?",
-                  confirmBtnText: "U redu",
-                  onConfirmBtnTap: () async {
-                    try {
-                      await provider.delete(item.vrstaProizvodaId!);
-                      if (context.mounted) {
-                        await QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.success,
-                          title: "Uspješno ste obrisali vrstu proizvoda",
-                          confirmBtnText: "U redu",
-                          text: "Vrsta proizvoda je obrisana",
-                          onConfirmBtnTap: () {
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      }
-                      if (context.mounted) {
-                        Navigator.of(context).pop();
-                        filterServerSide(_nazivGTE);
-                      }
-                    } on Exception catch (e) {
-                      if (context.mounted) {
-                        QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.error,
-                          text: e.toString().split(': ')[1],
-                          onConfirmBtnTap: () {
-                            Navigator.of(context).pop();
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      }
-                    }
-                  },
-                );
+                await buildDeleteAlert(context, item.naziv ?? "",
+                    item.naziv ?? "", provider, item.vrstaProizvodaId!);
+                filterServerSide(_nazivGTE);
               }
             },
             style: ElevatedButton.styleFrom(
@@ -302,10 +252,7 @@ class VrsteProizvodaDataSource extends AdvancedDataTableSource<VrstaProizvoda> {
       notifyListeners();
     } on Exception catch (e) {
       if (context.mounted) {
-        QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: e.toString().split(': ')[1]);
+        await buildErrorAlert(context, "Greška", e.toString(), e);
       }
     }
 

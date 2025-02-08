@@ -4,7 +4,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/jedinice_mjere.dart';
@@ -391,48 +390,30 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   setState(() {});
                                   try {
                                     if (widget.product == null) {
-                                      await productProvider.insert(request);
+                                      var response =
+                                          await productProvider.insert(request);
                                       if (mounted) {
-                                        QuickAlert.show(
-                                          context: context,
-                                          type: QuickAlertType.success,
-                                          title: "Proizvod je dodan",
-                                          confirmBtnText: "U redu",
-                                          text:
-                                              "Uspješno ste dodali novi proizvod",
-                                          onConfirmBtnTap: () {
-                                            Navigator.of(context).pop();
-                                            Navigator.of(context).pop(true);
-                                          },
-                                        );
+                                        await buildSuccessAlert(
+                                            context,
+                                            "Uspješno ste dodali proizvod",
+                                            "Proizvod ${response.naziv} je dodan");
                                       }
                                     } else {
-                                      await productProvider.update(
-                                          widget.product!.proizvodId!, request);
+                                      var response =
+                                          await productProvider.update(
+                                              widget.product!.proizvodId!,
+                                              request);
                                       if (mounted) {
-                                        QuickAlert.show(
-                                          context: context,
-                                          type: QuickAlertType.success,
-                                          title: "Proizvod je ažuriran",
-                                          confirmBtnText: "U redu",
-                                          text:
-                                              "Uspješno ste ažurirali podatke o proizvodu",
-                                          onConfirmBtnTap: () {
-                                            Navigator.of(context).pop();
-                                            Navigator.of(context).pop(true);
-                                          },
-                                        );
+                                        await buildSuccessAlert(
+                                            context,
+                                            "Uspješno ste ažurirali proizvod",
+                                            "Proizvod ${response.naziv} je ažuriran");
                                       }
                                     }
                                   } on Exception catch (e) {
                                     if (mounted) {
-                                      QuickAlert.show(
-                                          context: context,
-                                          type: QuickAlertType.error,
-                                          title:
-                                              "Greška prilikom ažuriranja ili dodavanja",
-                                          text: (e.toString().split(': '))[1],
-                                          confirmBtnText: "U redu");
+                                      await buildErrorAlert(
+                                          context, "Greška", e.toString(), e);
                                     }
                                     setState(() {});
                                   }

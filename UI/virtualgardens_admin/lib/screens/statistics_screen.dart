@@ -7,10 +7,10 @@ import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/statistics_dtos/statistics.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 
 class StatisticsScreen extends StatefulWidget {
@@ -1048,27 +1048,13 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
               try {
                 await file.writeAsBytes(await pdf.save());
                 if (mounted) {
-                  QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.success,
-                    title: "PDF spremljen",
-                    confirmBtnText: "U redu",
-                    text:
-                        "PDF je spremljen u odabranu mapu na lokaciji : \n$outputFilePath",
-                    onConfirmBtnTap: () {
-                      Navigator.of(context).pop();
-                    },
-                  );
+                  await buildSuccessAlert(context, "PDF spremljen",
+                      "PDF je spremljen u odabranu mapu na lokaciji : \n$outputFilePath",
+                      isDoublePop: false);
                 }
               } on Exception catch (e) {
                 if (mounted) {
-                  QuickAlert.show(
-                    context: context,
-                    type: QuickAlertType.error,
-                    title: "Greška",
-                    text: e.toString(),
-                    confirmBtnText: "U redu",
-                  );
+                  await buildErrorAlert(context, "Greška", e.toString(), e);
                 }
               }
             } else {

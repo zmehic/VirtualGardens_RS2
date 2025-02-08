@@ -45,6 +45,5 @@ class KorisnikProvider extends BaseProvider<Korisnik> {
     } else {
       throw Exception("Unknown error");
     }
-    // print("response: ${response.request} ${response.statusCode}, ${response.body}");
   }
 }

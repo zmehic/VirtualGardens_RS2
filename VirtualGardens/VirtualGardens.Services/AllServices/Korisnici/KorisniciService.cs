@@ -142,7 +142,7 @@ namespace VirtualGardens.Services.AllServices.Korisnici
 
             if (entity == null)
             {
-                return null;
+                throw new UserException("Netačna lozinka ili korisničko ime");
             }
 
             var hash = passwordService.GenerateHash(entity.LozinkaSalt, password);

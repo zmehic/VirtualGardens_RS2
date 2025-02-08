@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/narudzbe.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
-import 'package:virtualgardens_admin/models/ulazi_proizvodi.dart';
 import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 import 'package:virtualgardens_admin/providers/setovi_provider.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
@@ -33,8 +31,6 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
 
   SearchResult<Set>? setoviResult;
   List<String>? allowedActions;
-
-  UlazProizvod? zaposlenik;
 
   String? korisnik;
 
@@ -221,7 +217,7 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
             },
             noItemsFoundIndicatorBuilder: (context) => const Center(
               child: Text(
-                "Nema narudžbi",
+                "Nema setova",
                 style: TextStyle(color: Colors.white),
               ),
             ),
@@ -256,34 +252,6 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                 ),
                 Expanded(
                     child: FormBuilderDropdown(
-                  enabled: false,
-                  name: "otkazana",
-                  decoration: const InputDecoration(labelText: "Otkazana"),
-                  initialValue: _initialValue['otkazana'] ?? true,
-                  items: const [
-                    DropdownMenuItem(value: true, child: Text("Da")),
-                    DropdownMenuItem(value: false, child: Text("Ne")),
-                  ],
-                )),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: FormBuilderDropdown(
-                  enabled: false,
-                  name: "placeno",
-                  decoration: const InputDecoration(labelText: "Plaćeno"),
-                  initialValue: _initialValue['placeno'] ?? true,
-                  items: const [
-                    DropdownMenuItem(value: true, child: Text("Da")),
-                    DropdownMenuItem(value: false, child: Text("Ne")),
-                  ],
-                )),
-                const SizedBox(
-                  width: 10,
-                ),
-                Expanded(
-                    child: FormBuilderDropdown(
                   name: "stateMachine",
                   enabled: false,
                   decoration: const InputDecoration(labelText: "Status"),
@@ -296,7 +264,27 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                         value: "finished", child: Text("Završena")),
                   ],
                   onChanged: (value) {},
-                ))
+                )),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                    child: FormBuilderCheckbox(
+                  enabled: false,
+                  name: "otkazana",
+                  initialValue: _initialValue['otkazana'] ?? true,
+                  title: const Text("Otkazana"),
+                )),
+                const SizedBox(
+                  width: 10,
+                ),
+                Expanded(
+                    child: FormBuilderCheckbox(
+                  enabled: false,
+                  name: "placeno",
+                  initialValue: _initialValue['placeno'] ?? true,
+                  title: const Text("Plaćeno"),
+                )),
               ],
             ),
             const SizedBox(height: 15),
@@ -354,30 +342,15 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                                     action: "edit",
                                     id: widget.narudzba?.narudzbaId);
                                 if (mounted) {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Narudžba je ažurirana",
-                                    confirmBtnText: "U redu",
-                                    text: "Narudžba je ažurirana",
-                                    onConfirmBtnTap: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop(true);
-                                    },
-                                  );
+                                  await buildSuccessAlert(
+                                      context,
+                                      "Uspješno ste ažurirali narudžbu",
+                                      "Narudžba ${widget.narudzba?.brojNarudzbe} je ažurirana");
                                 }
                               } on Exception catch (e) {
                                 if (mounted) {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.error,
-                                    title: "Greška prilikom ažuriranja",
-                                    text: (e.toString().split(': '))[1],
-                                    confirmBtnText: "U redu",
-                                    onConfirmBtnTap: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  );
+                                  await buildErrorAlert(
+                                      context, "Greška", e.toString(), e);
                                 }
                               }
                             },
@@ -404,30 +377,15 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                                     action: "inprogress",
                                     id: widget.narudzba?.narudzbaId);
                                 if (mounted) {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Narudžba je ažurirana",
-                                    confirmBtnText: "U redu",
-                                    text: "Narudžba je ažurirana",
-                                    onConfirmBtnTap: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop(true);
-                                    },
-                                  );
+                                  await buildSuccessAlert(
+                                      context,
+                                      "Uspješno ste ažurirali narudžbu",
+                                      "Narudžba ${widget.narudzba?.brojNarudzbe} je ažurirana");
                                 }
                               } on Exception catch (e) {
                                 if (mounted) {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.error,
-                                    title: "Greška prilikom ažuriranja",
-                                    text: (e.toString().split(': '))[1],
-                                    confirmBtnText: "U redu",
-                                    onConfirmBtnTap: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  );
+                                  await buildErrorAlert(
+                                      context, "Greška", e.toString(), e);
                                 }
                               }
                             },
@@ -452,30 +410,15 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
                                     action: "finish",
                                     id: widget.narudzba?.narudzbaId);
                                 if (mounted) {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Narudžba je ažurirana",
-                                    confirmBtnText: "U redu",
-                                    text: "Narudžba je ažurirana",
-                                    onConfirmBtnTap: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop(true);
-                                    },
-                                  );
+                                  await buildSuccessAlert(
+                                      context,
+                                      "Uspješno ste ažurirali narudžbu",
+                                      "Narudžba ${widget.narudzba?.brojNarudzbe} je ažurirana");
                                 }
                               } on Exception catch (e) {
                                 if (mounted) {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.error,
-                                    title: "Greška prilikom ažuriranja",
-                                    text: (e.toString().split(': '))[1],
-                                    confirmBtnText: "U redu",
-                                    onConfirmBtnTap: () {
-                                      Navigator.of(context).pop();
-                                    },
-                                  );
+                                  await buildErrorAlert(
+                                      context, "Greška", e.toString(), e);
                                 }
                               }
                             },

@@ -4,7 +4,6 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/narudzbe.dart';
@@ -162,65 +161,11 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
             const SizedBox(
               width: 8,
             ),
-            Expanded(
-                child: TextField(
-              controller: _datumOdEditingController,
-              decoration:
-                  const InputDecoration(labelText: "Datum od:", filled: true),
-              readOnly: true,
-              onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101));
-                if (pickedDate != null) {
-                  datumOdString = pickedDate.toIso8601String();
-                  _datumOdEditingController.text =
-                      formatDateString(pickedDate.toIso8601String());
-                  _dataSource.filterServerSide(
-                      _brojNarudzbeEditingController.text,
-                      jeOtkazan,
-                      datumOdString,
-                      datumDoString,
-                      jePlacen,
-                      created,
-                      _cijenaOdEditingController.text,
-                      _cijenaDoEditingController.text,
-                      korisnik);
-                }
-              },
-            )),
+            _buildDatePicker(_datumOdEditingController, "Datum od:", true),
             const SizedBox(
               width: 8,
             ),
-            Expanded(
-                child: TextField(
-              controller: _datumDoEditingController,
-              decoration:
-                  const InputDecoration(labelText: "Datum do:", filled: true),
-              readOnly: true,
-              onTap: () async {
-                DateTime? pickedDate = await showDatePicker(
-                    context: context,
-                    firstDate: DateTime(2000),
-                    lastDate: DateTime(2101));
-                if (pickedDate != null) {
-                  datumDoString = pickedDate.toIso8601String();
-                  _datumDoEditingController.text =
-                      formatDateString(pickedDate.toIso8601String());
-                  _dataSource.filterServerSide(
-                      _brojNarudzbeEditingController.text,
-                      jeOtkazan,
-                      datumOdString,
-                      datumDoString,
-                      jePlacen,
-                      created,
-                      _cijenaOdEditingController.text,
-                      _cijenaDoEditingController.text,
-                      korisnik);
-                }
-              },
-            )),
+            _buildDatePicker(_datumDoEditingController, "Datum do:", false),
             IconButton(
               icon: const Icon(
                 Icons.clear,
@@ -249,9 +194,10 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
             Expanded(
                 child: TextField(
               controller: _cijenaOdEditingController,
-              keyboardType: TextInputType.number,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
               ],
               decoration:
                   const InputDecoration(labelText: "Cijena od", filled: true),
@@ -274,9 +220,10 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
             Expanded(
                 child: TextField(
               controller: _cijenaDoEditingController,
-              keyboardType: TextInputType.number,
+              keyboardType:
+                  const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.digitsOnly,
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
               ],
               decoration:
                   const InputDecoration(labelText: "Cijena do", filled: true),
@@ -300,62 +247,82 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
         ));
   }
 
-  Widget _buildResultView() {
+  Widget _buildDatePicker(
+      TextEditingController controller, String s, bool isOd) {
     return Expanded(
-      child: Container(
-          alignment: Alignment.topCenter,
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: const Color.fromRGBO(32, 76, 56, 1),
-            border: Border.all(color: Colors.white, width: 3),
-          ),
-          margin: const EdgeInsets.all(15),
-          width: double.infinity,
-          child: SingleChildScrollView(
-              child: AdvancedPaginatedDataTable(
-            source: _dataSource,
-            addEmptyRows: false,
-            rowsPerPage: 10,
-            showCheckboxColumn: false,
-            columns: const [
-              DataColumn(
-                  label: Text(
-                "Broj nardužbe",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Otkazana",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Plaćeno",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Datum",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Cijena",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Kupac",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-              DataColumn(
-                  label: Text(
-                "Akcija",
-                style: TextStyle(color: Colors.black, fontSize: 18),
-              )),
-            ],
-          ))),
-    );
+        child: TextField(
+      controller: controller,
+      decoration: InputDecoration(labelText: s, filled: true),
+      readOnly: true,
+      onTap: () async {
+        DateTime? pickedDate = await showDatePicker(
+            context: context,
+            firstDate: DateTime(2000),
+            lastDate: DateTime(2101));
+        if (pickedDate != null) {
+          isOd == true
+              ? datumOdString = pickedDate.toIso8601String()
+              : datumDoString = pickedDate.toIso8601String();
+          controller.text = formatDateString(pickedDate.toIso8601String());
+          _dataSource.filterServerSide(
+              _brojNarudzbeEditingController.text,
+              jeOtkazan,
+              datumOdString,
+              datumDoString,
+              jePlacen,
+              created,
+              _cijenaOdEditingController.text,
+              _cijenaDoEditingController.text,
+              korisnik);
+        }
+      },
+    ));
+  }
+
+  Widget _buildResultView() {
+    return buildResultView(AdvancedPaginatedDataTable(
+      source: _dataSource,
+      addEmptyRows: false,
+      rowsPerPage: 10,
+      showCheckboxColumn: false,
+      columns: const [
+        DataColumn(
+            label: Text(
+          "Broj nardužbe",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Otkazana",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Plaćeno",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Datum",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Cijena",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Kupac",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+        DataColumn(
+            label: Text(
+          "Akcija",
+          style: TextStyle(color: Colors.black, fontSize: 18),
+        )),
+      ],
+    ));
   }
 
   Widget _buildSearchDropdowns() {
@@ -674,54 +641,20 @@ class NarudzbeDataSource extends AdvancedDataTableSource<Narudzba> {
           DataCell(ElevatedButton(
             onPressed: () async {
               if (context.mounted) {
-                QuickAlert.show(
-                  context: context,
-                  type: QuickAlertType.confirm,
-                  title: "Potvrda brisanja",
-                  text: "Jeste li sigurni da želite obrisati narudžbu?",
-                  confirmBtnText: "U redu",
-                  onConfirmBtnTap: () async {
-                    try {
-                      await provider.delete(item.narudzbaId);
-                      if (context.mounted) {
-                        await QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.success,
-                          title: "Uspješno ste obrisali narudžbu",
-                          confirmBtnText: "U redu",
-                          text: "Narudžba je obrisana",
-                          onConfirmBtnTap: () {
-                            Navigator.of(context).pop();
-                          },
-                        );
-                      }
-                    } on Exception {
-                      if (context.mounted) {
-                        await QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.error,
-                            title: "Greška!",
-                            text:
-                                "Moguće je obrisati samo narudžbe koje su u stanju 'kreirana'",
-                            confirmBtnText: "U redu");
-                      }
-                    }
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                      filterServerSide(
-                          _brojGTE,
-                          _jeOtkazana,
-                          _datumOd,
-                          _datumDo,
-                          _jePlacena,
-                          _stateMachine,
-                          _cijenaFrom,
-                          _cijenaTo,
-                          _korisnikId);
-                    }
-                  },
-                );
+                await buildDeleteAlert(context, item.brojNarudzbe,
+                    item.brojNarudzbe, provider, item.narudzbaId);
               }
+
+              filterServerSide(
+                  _brojGTE,
+                  _jeOtkazana,
+                  _datumOd,
+                  _datumDo,
+                  _jePlacena,
+                  _stateMachine,
+                  _cijenaFrom,
+                  _cijenaTo,
+                  _korisnikId);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -783,13 +716,9 @@ class NarudzbeDataSource extends AdvancedDataTableSource<Narudzba> {
       notifyListeners();
     } on Exception catch (e) {
       if (context.mounted) {
-        QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: e.toString().split(': ')[1]);
+        await buildErrorAlert(context, "Greška", e.toString(), e);
       }
     }
-
     return RemoteDataSourceDetails(count, data!);
   }
 }

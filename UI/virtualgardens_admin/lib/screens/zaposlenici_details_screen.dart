@@ -3,7 +3,6 @@ import 'package:advanced_datatable/datatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/nalozi.dart';
@@ -185,21 +184,19 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                       width: 10,
                     ),
                     Expanded(
-                        child: FormBuilderDropdown(
-                      name: "jeAktivan",
-                      decoration: const InputDecoration(labelText: "Aktivan"),
-                      initialValue: _initialValue['jeAktivan'] ?? true,
-                      items: const [
-                        DropdownMenuItem(value: true, child: Text("Da")),
-                        DropdownMenuItem(value: false, child: Text("Ne")),
-                      ],
-                      validator: (value) {
-                        if (value == null) {
-                          return 'Please choose some value';
-                        }
-                        return null;
-                      },
-                    ))
+                        child: FormBuilderCheckbox(
+                            name: "jeAktivan",
+                            initialValue: _initialValue['jeAktivan'] ?? true,
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please choose some value';
+                              }
+                              return null;
+                            },
+                            title: const Text(
+                              "Da li je zaposlenik aktivan",
+                              style: TextStyle(fontSize: 15),
+                            )))
                   ],
                 ),
               ),
@@ -357,43 +354,26 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                 setState(() {});
                 try {
                   if (widget.zaposlenik == null) {
-                    await _zaposlenikProvider.insert(request);
+                    var response = await _zaposlenikProvider.insert(request);
                     if (mounted) {
-                      QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno ste dodali zaposlenika",
-                        confirmBtnText: "U redu",
-                        text: "Zaposlenik je dodan",
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop(true);
-                        },
-                      );
+                      await buildSuccessAlert(
+                          context,
+                          "Uspješno ste dodali zaposlenika",
+                          "Zaposlenik ${response.ime} ${response.prezime} je dodan");
                     }
                   } else {
-                    await _zaposlenikProvider.update(
+                    var response = await _zaposlenikProvider.update(
                         widget.zaposlenik!.zaposlenikId, request);
                     if (mounted) {
-                      QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.success,
-                        title: "Uspješno ste ažurirali zaposlenika",
-                        confirmBtnText: "U redu",
-                        text: "Zaposlenik je ažuriran",
-                        onConfirmBtnTap: () {
-                          Navigator.of(context).pop();
-                          Navigator.of(context).pop(true);
-                        },
-                      );
+                      await buildSuccessAlert(
+                          context,
+                          "Uspješno ste ažurirali zaposlenika",
+                          "Zaposlenik ${response.ime} ${response.prezime} je ažuriran");
                     }
                   }
                 } on Exception catch (e) {
                   if (mounted) {
-                    QuickAlert.show(
-                        context: context,
-                        type: QuickAlertType.error,
-                        text: e.toString().split(': ')[1]);
+                    await buildErrorAlert(context, "Greška", e.toString(), e);
                   }
                   setState(() {});
                 }
@@ -482,10 +462,7 @@ class ZaposleniciNaloziProizvodiDataSource
       notifyListeners();
     } on Exception catch (e) {
       if (context.mounted) {
-        QuickAlert.show(
-            context: context,
-            type: QuickAlertType.error,
-            text: e.toString().split(': ')[1]);
+        await buildErrorAlert(context, "Greška", e.toString(), e);
       }
     }
 

@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/ponuda.dart';
@@ -311,25 +310,20 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                   widget.ponuda != null
                       ? Expanded(
                           child: FormBuilderDropdown(
-                              enabled: false,
-                              name: "stateMachine",
-                              initialValue: widget.ponuda?.stateMachine,
-                              decoration:
-                                  const InputDecoration(labelText: "Stanje"),
-                              items: const [
-                                DropdownMenuItem(
-                                    value: "created", child: Text("Kreirana")),
-                                DropdownMenuItem(
-                                    value: "active", child: Text("Aktivna")),
-                                DropdownMenuItem(
-                                    value: "finished", child: Text("Završena"))
-                              ],
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please choose some value';
-                                }
-                                return null;
-                              }))
+                          enabled: false,
+                          name: "stateMachine",
+                          initialValue: widget.ponuda?.stateMachine,
+                          decoration:
+                              const InputDecoration(labelText: "Stanje"),
+                          items: const [
+                            DropdownMenuItem(
+                                value: "created", child: Text("Kreirana")),
+                            DropdownMenuItem(
+                                value: "active", child: Text("Aktivna")),
+                            DropdownMenuItem(
+                                value: "finished", child: Text("Završena"))
+                          ],
+                        ))
                       : Container(),
                   const SizedBox(
                     width: 10,
@@ -346,22 +340,21 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                       ? SizedBox(
                           child: ElevatedButton(
                               onPressed: () async {
-                                await _ponudeProvider.ponudeState(
-                                    action: "edit",
-                                    id: widget.ponuda?.ponudaId);
-
-                                if (mounted) {
-                                  await QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Stanje ponude usješno promijenjeno",
-                                    confirmBtnText: "U redu",
-                                    text: "Ponuda je spremljena",
-                                    onConfirmBtnTap: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop(true);
-                                    },
-                                  );
+                                try {
+                                  await _ponudeProvider.ponudeState(
+                                      action: "edit",
+                                      id: widget.ponuda?.ponudaId);
+                                  if (mounted) {
+                                    await buildSuccessAlert(
+                                        context,
+                                        "Ponuda je spremljena",
+                                        "Stanje ponude ${widget.ponuda?.naziv} usješno promijenjeno");
+                                  }
+                                } on Exception catch (e) {
+                                  if (mounted) {
+                                    await buildErrorAlert(
+                                        context, "Greška", e.toString(), e);
+                                  }
                                 }
                               },
                               child: const Text("Kreirana")))
@@ -378,22 +371,21 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                       ? SizedBox(
                           child: ElevatedButton(
                               onPressed: () async {
-                                await _ponudeProvider.ponudeState(
-                                    action: "activate",
-                                    id: widget.ponuda?.ponudaId);
-
-                                if (mounted) {
-                                  await QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Stanje ponude usješno promijenjeno",
-                                    confirmBtnText: "U redu",
-                                    text: "Ponuda je spremljena",
-                                    onConfirmBtnTap: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop(true);
-                                    },
-                                  );
+                                try {
+                                  await _ponudeProvider.ponudeState(
+                                      action: "activate",
+                                      id: widget.ponuda?.ponudaId);
+                                  if (mounted) {
+                                    await buildSuccessAlert(
+                                        context,
+                                        "Ponuda je spremljena",
+                                        "Stanje ponude ${widget.ponuda?.naziv} usješno promijenjeno");
+                                  }
+                                } on Exception catch (e) {
+                                  if (mounted) {
+                                    await buildErrorAlert(
+                                        context, "Greška", e.toString(), e);
+                                  }
                                 }
                               },
                               child: const Text("Aktiviraj")))
@@ -407,22 +399,21 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                       ? SizedBox(
                           child: ElevatedButton(
                               onPressed: () async {
-                                await _ponudeProvider.ponudeState(
-                                    action: "finish",
-                                    id: widget.ponuda?.ponudaId);
-
-                                if (mounted) {
-                                  await QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Stanje ponude usješno promijenjeno",
-                                    confirmBtnText: "U redu",
-                                    text: "Ponuda je spremljena",
-                                    onConfirmBtnTap: () {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop(true);
-                                    },
-                                  );
+                                try {
+                                  await _ponudeProvider.ponudeState(
+                                      action: "finish",
+                                      id: widget.ponuda?.ponudaId);
+                                  if (mounted) {
+                                    await buildSuccessAlert(
+                                        context,
+                                        "Ponuda je spremljena",
+                                        "Stanje ponude ${widget.ponuda?.naziv} usješno promijenjeno");
+                                  }
+                                } on Exception catch (e) {
+                                  if (mounted) {
+                                    await buildErrorAlert(
+                                        context, "Greška", e.toString(), e);
+                                  }
                                 }
                               },
                               child: const Text("Završena")))
@@ -452,55 +443,30 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                                               _formKey.currentState!.value);
                                           try {
                                             if (widget.ponuda != null) {
-                                              await _ponudeProvider.update(
-                                                  widget.ponuda!.ponudaId,
-                                                  request);
+                                              var response =
+                                                  await _ponudeProvider.update(
+                                                      widget.ponuda!.ponudaId,
+                                                      request);
                                               if (mounted) {
-                                                await QuickAlert.show(
-                                                  context: context,
-                                                  type: QuickAlertType.success,
-                                                  title:
-                                                      "Uspješno ste spremili ponudu",
-                                                  confirmBtnText: "U redu",
-                                                  text: "Ponuda je spremljena",
-                                                  onConfirmBtnTap: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                );
+                                                await buildSuccessAlert(
+                                                    context,
+                                                    "Ponuda je spremljena",
+                                                    "Ponuda ${response.naziv} je spremljena");
                                               }
                                             } else {
                                               await _ponudeProvider
                                                   .insert(request);
                                               if (mounted) {
-                                                await QuickAlert.show(
-                                                  context: context,
-                                                  type: QuickAlertType.success,
-                                                  title:
-                                                      "Uspješno ste dodali ponudu",
-                                                  confirmBtnText: "U redu",
-                                                  text: "Ponuda je dodana",
-                                                  onConfirmBtnTap: () {
-                                                    Navigator.of(context).pop();
-                                                  },
-                                                );
+                                                await buildSuccessAlert(
+                                                    context,
+                                                    "Ponuda je dodana",
+                                                    "Ponuda ${widget.ponuda?.naziv} je dodana");
                                               }
-                                            }
-                                            if (mounted) {
-                                              Navigator.of(context).pop(true);
                                             }
                                           } on Exception catch (e) {
                                             if (mounted) {
-                                              QuickAlert.show(
-                                                context: context,
-                                                type: QuickAlertType.error,
-                                                title: "Greška",
-                                                confirmBtnText: "U redu",
-                                                text:
-                                                    e.toString().split(': ')[1],
-                                                onConfirmBtnTap: () {
-                                                  Navigator.of(context).pop();
-                                                },
-                                              );
+                                              await buildErrorAlert(context,
+                                                  "Greška", e.toString(), e);
                                             }
                                           }
                                         }
@@ -569,33 +535,13 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                 ),
                 onPressed: () async {
                   if (context.mounted) {
-                    await QuickAlert.show(
-                      context: context,
-                      type: QuickAlertType.confirm,
-                      title: "Potvrda brisanja",
-                      text: "Jeste li sigurni da želite obrisati set?",
-                      confirmBtnText: "U redu",
-                      onConfirmBtnTap: () async {
-                        await _setoviPonudeProvider.delete(
-                            setoviPonudeResult!.result[index].setoviPonudeId);
-                        if (mounted) {
-                          await QuickAlert.show(
-                            context: context,
-                            type: QuickAlertType.success,
-                            title: "Uspješno ste obrisali set",
-                            confirmBtnText: "U redu",
-                            text: "Set je obrisan",
-                            onConfirmBtnTap: () {
-                              Navigator.of(context).pop();
-                            },
-                          );
-                        }
-                        if (mounted) {
-                          Navigator.of(context).pop();
-                        }
-                        initForm();
-                      },
-                    );
+                    await buildDeleteAlert(
+                        context,
+                        "Set ${index + 1}",
+                        "Set ${index + 1}",
+                        _setoviPonudeProvider,
+                        setoviPonudeResult!.result[index].setoviPonudeId);
+                    initForm();
                   }
                 },
               )
@@ -718,16 +664,9 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                                     .insert(requestTwo);
                               }
                               if (mounted) {
-                                await QuickAlert.show(
-                                  context: context,
-                                  type: QuickAlertType.success,
-                                  title: "Uspješno ste dodali set",
-                                  confirmBtnText: "U redu",
-                                  text: "Set je dodan",
-                                  onConfirmBtnTap: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                );
+                                await buildSuccessAlert(context,
+                                    "Uspješno ste dodali set", "Set je dodan",
+                                    isDoublePop: false);
                               }
                             }
 
@@ -735,7 +674,10 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                             initForm();
                             setState(() {});
                           } on Exception catch (e) {
-                            debugPrint(e.toString());
+                            if (mounted) {
+                              await buildErrorAlert(
+                                  context, "Greška", e.toString(), e);
+                            }
                           }
                         }
                       },

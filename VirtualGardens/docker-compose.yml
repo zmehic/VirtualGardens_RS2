@@ -77,6 +77,7 @@ services:
         - ENABLE_SSL=${ENABLE_SSL}
         - SMTP_PORT=${SMTP_PORT}
         - RABBIT_MQ=${RABBIT_MQ}
+        - RABBIT_MQ_PORT=${RABBIT_MQ_PORT}
     networks:
       - virtualgardensnet2024
 
