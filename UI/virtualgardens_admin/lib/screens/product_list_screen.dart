@@ -5,7 +5,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
+import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/proizvod.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
@@ -34,10 +34,6 @@ class _ProductListScreenState extends State<ProductListScreen> {
 
   bool isLoading = true;
   int? selectedVrstaProizvoda;
-
-  final GlobalKey<ScaffoldState> _scaffoldKeyProfile =
-      GlobalKey<ScaffoldState>();
-
   final TextEditingController ftsEditingController = TextEditingController();
   final TextEditingController cijenaOdEditingController =
       TextEditingController();
@@ -77,39 +73,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-      FullScreenLoader(
+      FullScreenLoader2(
+        isList: true,
+        title: "Lista proizvoda",
+        actions: <Widget>[Container()],
         isLoading: isLoading,
-        child: Scaffold(
-          key: _scaffoldKeyProfile,
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-            ),
-            actions: <Widget>[Container()],
-            iconTheme: const IconThemeData(color: Colors.white),
-            centerTitle: true,
-            title: const Text(
-              "Skladište",
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-          ),
-          backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
-          body: Container(
-            margin: const EdgeInsets.all(20),
-            padding: const EdgeInsets.all(10),
-            color: const Color.fromRGBO(235, 241, 224, 1),
-            child: Column(
-              children: [
-                _buildSearch(),
-                _buildResultView(),
-              ],
-            ),
-          ),
+        child: Column(
+          children: [
+            _buildSearch(),
+            _buildResultView(),
+          ],
         ),
       ),
       "Lista proizvoda",

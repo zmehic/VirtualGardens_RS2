@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:provider/provider.dart';
-import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
+import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/narudzbe.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
@@ -31,7 +31,7 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
 
   SearchResult<Set>? setoviResult;
   List<String>? allowedActions;
-
+  List<Widget> actions = [];
   String? korisnik;
 
   bool isLoading = true;
@@ -60,6 +60,26 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
   }
 
   Future initForm() async {
+    actions.add(widget.narudzba != null
+        ? Container(
+            margin: const EdgeInsets.only(right: 10),
+            child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => PitanjaOdgovoriListScreen(
+                          narudzba: widget.narudzba)));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromRGBO(235, 241, 224, 1),
+                ),
+                child: const Text(
+                  "Pitanja",
+                  style: TextStyle(
+                    color: Color.fromRGBO(32, 76, 56, 1),
+                  ),
+                )),
+          )
+        : Container());
     _initialValue = {
       "narudzbaId": widget.narudzba?.narudzbaId,
       "brojNarudzbe": widget.narudzba?.brojNarudzbe,
@@ -116,58 +136,16 @@ class _NarudzbeDetailsScreenState extends State<NarudzbeDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-        FullScreenLoader(
-            isLoading: isLoading,
-            child: Scaffold(
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-                actions: <Widget>[
-                  widget.narudzba != null
-                      ? Container(
-                          margin: const EdgeInsets.only(right: 10),
-                          child: ElevatedButton(
-                              onPressed: () {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) =>
-                                        PitanjaOdgovoriListScreen(
-                                            narudzba: widget.narudzba)));
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color.fromRGBO(235, 241, 224, 1),
-                              ),
-                              child: const Text(
-                                "Pitanja",
-                                style: TextStyle(
-                                  color: Color.fromRGBO(32, 76, 56, 1),
-                                ),
-                              )),
-                        )
-                      : Container(),
-                ],
-                iconTheme: const IconThemeData(color: Colors.white),
-                centerTitle: true,
-                title: const Text(
-                  "Detalji o narudžbi",
-                  style: TextStyle(color: Colors.white),
-                ),
-                backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-              ),
-              backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
-              body: Container(
-                margin: const EdgeInsets.all(20),
-                padding: const EdgeInsets.all(10),
-                color: const Color.fromRGBO(235, 241, 224, 1),
-                child: Column(
-                  children: [_buildMain()],
-                ),
-              ),
-            )),
+        FullScreenLoader2(
+          isLoading: isLoading,
+          isList: false,
+          title:
+              widget.narudzba != null ? "Detalji o narudžbi" : "Dodaj narudžbu",
+          actions: actions,
+          child: Column(
+            children: [_buildMain()],
+          ),
+        ),
         "Detalji o narudžbi");
   }
 

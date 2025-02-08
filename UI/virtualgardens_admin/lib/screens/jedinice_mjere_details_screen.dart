@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
+import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/jedinice_mjere.dart';
 import 'package:virtualgardens_admin/providers/jedinice_mjere_provider.dart';
@@ -53,37 +53,17 @@ class _JedinicaMjereDetailsScreenState
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-        FullScreenLoader(
-            isLoading: isLoading,
-            child: Scaffold(
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-                actions: <Widget>[Container()],
-                iconTheme: const IconThemeData(color: Colors.white),
-                centerTitle: true,
-                title: Text(
-                  widget.jedinicaMjere != null
-                      ? "Detalji o jedinici mjere"
-                      : "Dodaj jedinicu mjere",
-                  style: const TextStyle(color: Colors.white),
-                ),
-                backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-              ),
-              backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
-              body: Container(
-                margin: const EdgeInsets.all(20),
-                padding: const EdgeInsets.all(10),
-                color: const Color.fromRGBO(235, 241, 224, 1),
-                child: Column(
-                  children: [_buildMain()],
-                ),
-              ),
-            )),
+        FullScreenLoader2(
+          isLoading: isLoading,
+          isList: false,
+          title: widget.jedinicaMjere != null
+              ? "Detalji o jedinici mjere"
+              : "Dodaj jedinicu mjere",
+          actions: <Widget>[Container()],
+          child: Column(
+            children: [_buildMain()],
+          ),
+        ),
         "Detalji o jedinici mjere");
   }
 

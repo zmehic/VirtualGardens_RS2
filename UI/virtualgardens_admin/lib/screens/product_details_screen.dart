@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
-import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
+import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/jedinice_mjere.dart';
 import 'package:virtualgardens_admin/models/proizvod.dart';
@@ -36,13 +36,9 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   SearchResult<VrstaProizvoda>? vrsteProizvodaResult;
 
   bool isLoading = true;
-
+  List<Widget> actions = [];
   String? _base64Image;
   dynamic image;
-
-  final GlobalKey<ScaffoldState> _scaffoldProductDetails =
-      GlobalKey<ScaffoldState>();
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -53,8 +49,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     productProvider = context.read<ProductProvider>();
     jediniceMjereProvider = context.read<JediniceMjereProvider>();
     vrsteProizvodaProvider = context.read<VrsteProizvodaProvider>();
-    super.initState();
     initForm();
+    super.initState();
   }
 
   Future initForm() async {
@@ -74,6 +70,26 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     jediniceMjereResult = await jediniceMjereProvider.get();
     vrsteProizvodaResult = await vrsteProizvodaProvider.get();
 
+    actions.add(widget.product != null
+        ? Container(
+            margin: const EdgeInsets.only(right: 10),
+            child: ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => RecenzijeListScreen(
+                            proizvod: widget.product,
+                          )));
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.yellow.shade700,
+                ),
+                child: const Text(
+                  "Recenzije",
+                  style: TextStyle(color: Colors.white),
+                )),
+          )
+        : Container());
+
     setState(() {
       isLoading = false;
     });
@@ -82,51 +98,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-        FullScreenLoader(
+        FullScreenLoader2(
+          isList: false,
+          title:
+              widget.product != null ? "Detalji o proizvodu" : "Dodaj proizvod",
+          actions: actions,
           isLoading: isLoading,
-          child: Scaffold(
-            key: _scaffoldProductDetails,
-            appBar: AppBar(
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.white),
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                },
-              ),
-              actions: <Widget>[
-                widget.product != null
-                    ? Container(
-                        margin: const EdgeInsets.only(right: 10),
-                        child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => RecenzijeListScreen(
-                                        proizvod: widget.product,
-                                      )));
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.yellow.shade700,
-                            ),
-                            child: const Text(
-                              "Recenzije",
-                              style: TextStyle(color: Colors.white),
-                            )),
-                      )
-                    : Container(),
-              ],
-              iconTheme: const IconThemeData(color: Colors.white),
-              centerTitle: true,
-              title: Text(
-                widget.product != null
-                    ? "Detalji o proizvodu"
-                    : "Dodaj proizvod",
-                style: const TextStyle(color: Colors.white),
-              ),
-              backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-            ),
-            backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
-            body: _buildMain(),
-          ),
+          child: _buildMain(),
         ),
         "Detalji");
   }

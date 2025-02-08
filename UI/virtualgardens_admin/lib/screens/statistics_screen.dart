@@ -7,7 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:provider/provider.dart';
-import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
+import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/statistics_dtos/statistics.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
@@ -37,7 +37,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   ];
   bool showAvg = false;
   bool showAvgPrihodi = false;
-
+  List<Widget> actions = [];
   bool isLoading = true;
 
   final TextEditingController _godinaEditingController =
@@ -60,7 +60,18 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     for (var i = 2024; i <= DateTime.now().year; i++) {
       availableYears[i.toString()] = i;
     }
-
+    actions.add(Row(
+      children: [
+        _buildPrintButton(),
+        const SizedBox(
+          width: 5,
+        ),
+        _buildDropdown(),
+        const SizedBox(
+          width: 5,
+        )
+      ],
+    ));
     await _fetchStatistic(year);
   }
 
@@ -98,49 +109,15 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-        FullScreenLoader(
-            isLoading: isLoading,
-            child: Scaffold(
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    Navigator.of(context).pop();
-                  },
-                ),
-                actions: <Widget>[
-                  Row(
-                    children: [
-                      _buildPrintButton(),
-                      const SizedBox(
-                        width: 5,
-                      ),
-                      _buildDropdown(),
-                      const SizedBox(
-                        width: 5,
-                      )
-                    ],
-                  )
-                ],
-                iconTheme: const IconThemeData(color: Colors.white),
-                centerTitle: true,
-                title: const Text(
-                  "Statistika",
-                  style: TextStyle(color: Colors.white),
-                ),
-                backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-              ),
-              backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
-              body: Container(
-                margin: const EdgeInsets.all(20),
-                padding: const EdgeInsets.all(10),
-                color: const Color.fromRGBO(235, 241, 224, 1),
-                child: Column(
-                  children: [_buildMain()],
-                ),
-              ),
-            )),
+        FullScreenLoader2(
+          isList: true,
+          title: "Statistika",
+          actions: actions,
+          isLoading: isLoading,
+          child: Column(
+            children: [_buildMain()],
+          ),
+        ),
         "Statistika");
   }
 

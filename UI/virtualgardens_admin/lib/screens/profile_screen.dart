@@ -4,7 +4,7 @@ import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
-import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
+import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/main.dart';
 import 'package:virtualgardens_admin/models/korisnici.dart';
@@ -33,9 +33,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final TextEditingController _datumRodjenjaController =
       TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKeyProfile =
-      GlobalKey<ScaffoldState>();
-
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -79,30 +76,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-      FullScreenLoader(
+      FullScreenLoader2(
+        isList: true,
+        title: "Detalji o profilu",
+        actions: <Widget>[Container()],
         isLoading: isLoading,
-        child: Scaffold(
-          key: _scaffoldKeyProfile,
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-            ),
-            actions: <Widget>[Container()],
-            iconTheme: const IconThemeData(color: Colors.white),
-            centerTitle: true,
-            title: const Text(
-              "Detalji o profilu",
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-          ),
-          backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
-          body: _buildMain(),
-        ),
+        child: _buildMain(),
       ),
       "Profil",
     );

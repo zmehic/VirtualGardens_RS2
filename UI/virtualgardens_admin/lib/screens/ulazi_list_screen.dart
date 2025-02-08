@@ -2,7 +2,7 @@ import 'package:advanced_datatable/advanced_datatable_source.dart';
 import 'package:advanced_datatable/datatable.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
+import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
 import 'package:virtualgardens_admin/models/ulazi.dart';
@@ -62,37 +62,16 @@ class _UlaziListScreenState extends State<UlaziListScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-      FullScreenLoader(
+      FullScreenLoader2(
+        isList: false,
+        title: "Ulazi",
+        actions: <Widget>[Container()],
         isLoading: isLoading,
-        child: Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Colors.white),
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-            ),
-            actions: <Widget>[Container()],
-            iconTheme: const IconThemeData(color: Colors.white),
-            centerTitle: true,
-            title: const Text(
-              "Ulazi",
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-          ),
-          backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
-          body: Container(
-            margin: const EdgeInsets.all(20),
-            padding: const EdgeInsets.all(10),
-            color: const Color.fromRGBO(235, 241, 224, 1),
-            child: Column(
-              children: [
-                _buildSearch(),
-                _buildResultView(),
-              ],
-            ),
-          ),
+        child: Column(
+          children: [
+            _buildSearch(),
+            _buildResultView(),
+          ],
         ),
       ),
       "Ulazi",

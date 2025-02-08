@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:provider/provider.dart';
-import 'package:virtualgardens_admin/helpers/fullscreen_loader.dart';
+import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/proizvod.dart';
 import 'package:virtualgardens_admin/models/search_result.dart';
@@ -96,35 +96,15 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     return MasterScreen(
-        FullScreenLoader(
-            isLoading: isLoading,
-            child: Scaffold(
-              appBar: AppBar(
-                leading: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.white),
-                  onPressed: () {
-                    Navigator.of(context).pop(true);
-                  },
-                ),
-                actions: <Widget>[Container()],
-                iconTheme: const IconThemeData(color: Colors.white),
-                centerTitle: true,
-                title: const Text(
-                  "Detalji o ulazu",
-                  style: TextStyle(color: Colors.white),
-                ),
-                backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-              ),
-              backgroundColor: const Color.fromRGBO(103, 122, 105, 1),
-              body: Container(
-                margin: const EdgeInsets.all(20),
-                padding: const EdgeInsets.all(10),
-                color: const Color.fromRGBO(235, 241, 224, 1),
-                child: Column(
-                  children: [_buildMain()],
-                ),
-              ),
-            )),
+        FullScreenLoader2(
+          isList: false,
+          title: widget.ulaz != null ? "Detalji o ulazu" : "Dodaj ulaz",
+          actions: <Widget>[Container()],
+          isLoading: isLoading,
+          child: Column(
+            children: [_buildMain()],
+          ),
+        ),
         "Detalji");
   }
 
