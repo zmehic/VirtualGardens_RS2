@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VirtualGardens.Models.Exceptions;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.JediniceMjere;
 using VirtualGardens.Models.SearchObjects;
@@ -38,6 +39,24 @@ namespace VirtualGardens.Services.AllServices.JediniceMjere
             }
 
             return query;
+        }
+
+        public override void BeforeInsert(JediniceMjereUpsertRequest request, Database.JediniceMjere entity)
+        {
+            var jedinicaMjere = context.JediniceMjeres.Where(x => x.IsDeleted == false && x.Naziv == request.Naziv).FirstOrDefault();
+            if (jedinicaMjere != null)
+            {
+                throw new UserException("Već postoji jedinica mjere sa tim nazivom");
+            }
+        }
+
+        public override void BeforeUpdate(JediniceMjereUpsertRequest request, Database.JediniceMjere entity)
+        {
+            var jedinicaMjere = context.JediniceMjeres.Where(x => x.IsDeleted == false && x.Naziv == request.Naziv).FirstOrDefault();
+            if (jedinicaMjere != null && jedinicaMjere.Naziv != entity.Naziv)
+            {
+                throw new UserException("Već postoji jedinica mjere sa tim nazivom");
+            }
         }
     }
 }

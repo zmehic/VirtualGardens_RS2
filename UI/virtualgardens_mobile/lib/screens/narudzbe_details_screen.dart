@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:flutter_paypal_payment/flutter_paypal_payment.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
@@ -59,7 +58,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
   }
 
   Future<bool> checkValidity() async {
-    listaValidity = await _narudzbaProvider.CheckOrderValidity(
+    listaValidity = await _narudzbaProvider.checkOrderValidity(
         orderid: widget.narudzba!.narudzbaId);
     if (listaValidity.isEmpty == true) {
       return true;
@@ -239,24 +238,13 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
             widget.narudzba?.stateMachine == 'created'
                 ? IconButton(
                     onPressed: () async {
-                      QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.confirm,
-                          title: "Brisanje seta",
-                          text: "Jeste li sigurni da želite obrisati ovaj set?",
-                          confirmBtnText: "Da",
-                          showCancelBtn: true,
-                          cancelBtnText: "Ne",
-                          onConfirmBtnTap: () async {
-                            await _setoviProvider
-                                .delete(setoviResult!.result[index].setId);
-                            setoviResult!.result.removeAt(index);
-                            if (context.mounted) {
-                              Navigator.of(context).pop(true);
-                            }
-                            setState(() {});
-                            return;
-                          });
+                      await buildDeleteAlert(context, "Set", "Set",
+                          _setoviProvider, setoviResult!.result[index].setId);
+                      widget.narudzba!.ukupnaCijena =
+                          (widget.narudzba!.ukupnaCijena -
+                              setoviResult!.result[index].cijenaSaPopustom!);
+                      setoviResult!.result.removeAt(index);
+                      setState(() {});
                     },
                     icon: const Icon(
                       Icons.delete,
@@ -303,12 +291,11 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                       String errorText = listaValidity.join("\n");
                       if (response == false) {
                         if (mounted) {
-                          QuickAlert.show(
-                              context: context,
-                              type: QuickAlertType.error,
-                              title: "Vaša narudžba nije validna",
-                              confirmBtnText: "U redu",
-                              text: errorText);
+                          await buildErrorAlert(
+                              context,
+                              "Vaša narudžba nije validna",
+                              errorText,
+                              Exception("Invalid order"));
                         }
                         return;
                       } else {
@@ -328,11 +315,11 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                         if ((secretValue?.isEmpty ?? true) ||
                             (clientValue?.isEmpty ?? true)) {
                           if (mounted) {
-                            QuickAlert.show(
-                                context: context,
-                                type: QuickAlertType.error,
-                                title: "Greška",
-                                text: "Greška sa plaćanjem");
+                            await buildErrorAlert(
+                                context,
+                                "Greška",
+                                "Greška sa plaćanjem",
+                                Exception("Invalid order"));
                           }
                           return;
                         }
@@ -394,8 +381,9 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                                       action: "inprogress",
                                       id: widget.narudzba?.narudzbaId);
                                 }
-
-                                Navigator.of(context).pop(true);
+                                if (context.mounted) {
+                                  Navigator.of(context).pop(true);
+                                }
                               },
                               onError: (error) {
                                 Navigator.pop(context);
@@ -409,13 +397,9 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                                   .getById(widget.narudzba!.narudzbaId);
                               setState(() {});
                               if (mounted) {
-                                QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Plaćanje",
-                                    text:
-                                        "Uspješno ste izvršili uplatu, vaša narudžba se sada nalazi u procesu.",
-                                    confirmBtnText: "U redu");
+                                await buildSuccessAlert(context, "Plaćanje",
+                                    "Uspješno ste izvršili uplatu, vaša narudžba se sada nalazi u procesu.",
+                                    isDoublePop: false);
                               }
                             }
                           });
@@ -499,8 +483,8 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
               "Otkazana:", widget.narudzba?.otkazana == true ? "Da" : "Ne"),
           _buildDetailRow(
               "Plaćena:", widget.narudzba?.placeno == true ? "Da" : "Ne"),
-          _buildDetailRow(
-              "Ukupna cijena:", "${widget.narudzba?.ukupnaCijena} KM"),
+          _buildDetailRow("Ukupna cijena:",
+              "${widget.narudzba?.ukupnaCijena.toStringAsFixed(2)} KM"),
         ],
       ),
     );
@@ -561,13 +545,10 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                     await _ponudeProvider.addOfferToOrder(
                         ponudaId: offer?.ponudaId,
                         narudzbaId: widget.narudzba?.narudzbaId);
-                    if (mounted) {
-                      QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.success,
-                          title: "Uspješno dodano!",
-                          text: "Ponuda je dodana u narudzbu.",
-                          confirmBtnText: "U redu");
+                    if (context.mounted) {
+                      await buildSuccessAlert(context, "Uspješno dodano!",
+                          "Ponuda je dodana u narudzbu.",
+                          isDoublePop: false);
                     }
                     initForm();
                   },

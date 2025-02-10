@@ -83,7 +83,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
       currentPage = 1;
       hasMoreData = true;
       result = null;
-      isLoading = true;
+      isLoading = false;
     }
 
     setState(() {
@@ -196,20 +196,16 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   filled: true,
                   fillColor: Color.fromRGBO(235, 241, 224, 1),
                 ),
+                onChanged: (value) {
+                  _fetchProducts(
+                      searchQuery: _productListFormKey
+                              .currentState?.fields['naziv']?.value
+                              .toString() ??
+                          "",
+                      vrstaProizvodaId: selectedVrstaProizvoda,
+                      reset: true);
+                },
               ),
-            ),
-            const SizedBox(width: 8),
-            ElevatedButton(
-              onPressed: () {
-                _fetchProducts(
-                    searchQuery: _productListFormKey
-                            .currentState?.fields['naziv']?.value
-                            .toString() ??
-                        "",
-                    vrstaProizvodaId: selectedVrstaProizvoda,
-                    reset: true);
-              },
-              child: const Text("Pretraga"),
             ),
           ],
         ),

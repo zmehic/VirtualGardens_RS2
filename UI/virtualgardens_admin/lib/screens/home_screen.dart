@@ -49,7 +49,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future initScreen(int? value) async {
-    vrsteProizvodaResult = await vrsteProizvodaProvider.get();
+    var filter = {
+      'isDeleted': false,
+    };
+    vrsteProizvodaResult = await vrsteProizvodaProvider.get(filter: filter);
     selectedVrstaProizvoda = vrsteProizvodaResult?.result[0].vrstaProizvodaId;
 
     try {

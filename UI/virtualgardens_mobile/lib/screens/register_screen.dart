@@ -3,7 +3,6 @@ import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:virtualgardens_mobile/main.dart';
 import 'package:virtualgardens_mobile/models/korisnici.dart';
 import 'package:virtualgardens_mobile/providers/korisnik_provider.dart';
 import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
@@ -144,6 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   name: "korisnickoIme",
                   isRequired: true,
                   minLength: 3,
+                  maxLength: 32,
                   match: r'^\S+$',
                   matchErrorText:
                       "Korisničko ime ne smije sadržavati razmake."),
@@ -158,6 +158,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               buildFormBuilderTextField(
                   label: "Ime",
                   name: "ime",
+                  minLength: 3,
+                  maxLength: 32,
                   isRequired: true,
                   match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                   matchErrorText: "Ime može sadržavati samo slova."),
@@ -167,6 +169,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
               buildFormBuilderTextField(
                   label: "Prezime",
                   name: "prezime",
+                  minLength: 3,
+                  maxLength: 32,
                   isRequired: true,
                   match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                   matchErrorText: "Prezime može sadržavati samo slova."),
@@ -189,7 +193,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         DateTime? pickedDate = await showDatePicker(
                             context: context,
                             firstDate: DateTime(1900),
-                            lastDate: DateTime(2101));
+                            lastDate: DateTime.now());
                         if (pickedDate != null) {
                           _datumRodjenjaController.text =
                               formatDateString(pickedDate.toIso8601String());
@@ -203,14 +207,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 15),
               buildFormBuilderTextField(
+                maxLength: 12,
                 label: "Broj telefona",
                 name: "brojTelefona",
                 match: r'^(?:\+387[0-9]{2}[0-9]{6}|06[0-9]{7})$',
                 matchErrorText:
-                    "Unesite ispravan broj mobitela (npr. +38761234567).",
+                    "Unesite ispravan broj mobitela \n(npr. +38761234567 ili 061234567).",
               ),
               const SizedBox(height: 15),
               buildFormBuilderTextField(
+                maxLength: 32,
                 label: "Adresa",
                 name: "adresa",
                 isValidated: false,
@@ -219,6 +225,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 height: 15,
               ),
               buildFormBuilderTextField(
+                  maxLength: 32,
                   label: "Grad",
                   name: "grad",
                   match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
@@ -227,6 +234,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 height: 15,
               ),
               buildFormBuilderTextField(
+                  maxLength: 32,
                   label: "Država",
                   name: "drzava",
                   match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
@@ -239,9 +247,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   name: "lozinka",
                   isRequired: true,
                   minLength: 8,
+                  maxLength: 32,
                   match: r"",
                   matchErrorText:
-                      "Lozinka mora sadržavati velika slova, mala slova, brojeve \n i specijalne znakove.",
+                      "Lozinka mora sadržavati \nvelika slova, mala slova, brojeve \n i specijalne znakove.",
                   obscureText: true),
               const SizedBox(
                 height: 15,
@@ -254,6 +263,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       decoration:
                           const InputDecoration(labelText: "Potvrdite lozinku"),
                       obscureText: true,
+                      maxLength: 32,
                       name: "lozinkaPotvrda",
                       validator: FormBuilderValidators.compose([
                         FormBuilderValidators.required(
@@ -306,9 +316,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           child: ElevatedButton(
                             onPressed: () async {
                               try {
-                                Navigator.of(context).pushReplacement(
-                                    MaterialPageRoute(
-                                        builder: (context) => LoginPage()));
+                                Navigator.of(context).pop();
                               } on Exception catch (e) {
                                 debugPrint(e.toString());
                               }
@@ -341,20 +349,20 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 setState(() {});
                                 isLoading = true;
                                 try {
-                                  await _korisnikProvider.insert(request);
+                                  await _korisnikProvider.register(
+                                      request: request);
                                   if (mounted) {
-                                    Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) => LoginPage()));
+                                    await buildSuccessAlert(
+                                      context,
+                                      "Uspješno ste se registrovali!",
+                                      "Registracija je uspješno završena.",
+                                    );
                                   }
                                 } on Exception catch (e) {
                                   isLoading = false;
                                   if (mounted) {
-                                    QuickAlert.show(
-                                        context: context,
-                                        type: QuickAlertType.error,
-                                        title: "Greška",
-                                        text: e.toString());
+                                    buildErrorAlert(
+                                        context, "Greška", e.toString(), e);
                                   }
                                   setState(() {});
                                 }
@@ -397,13 +405,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
     } else {
       if (mounted) {
-        QuickAlert.show(
-          context: context,
-          type: QuickAlertType.success,
-          title: "Slika uspješno dodana",
-          text: "Uspješno ste odabrali sliku.",
-          confirmBtnText: "U redu",
-        );
+        await buildSuccessAlert(
+            context, "Slika uspješno dodana", "Uspješno ste odabrali sliku.");
       }
       base64Image = image.toString();
     }

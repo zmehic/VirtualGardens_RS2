@@ -66,8 +66,8 @@ namespace VirtualGardens.Services.Recommender
                 predictionResult.Add(new(product, prediction.Score));
             }
 
-            var finalResult = predictionResult.Where(x => x.Item1.VrstaProizvoda.Naziv == "Prihrana").OrderByDescending(x => x.Item2).Select(x => x.Item1).Take(1).ToList();
-            finalResult.Add(predictionResult.Where(x => x.Item1.VrstaProizvoda.Naziv == "Tlo").OrderByDescending(x => x.Item2).Select(x => x.Item1).FirstOrDefault()!);
+            var finalResult = predictionResult.Where(x => x.Item1.VrstaProizvoda.Naziv == "Prihrana" && x.Item1.IsDeleted == false && x.Item1.DostupnaKolicina > 0).OrderByDescending(x => x.Item2).Select(x => x.Item1).Take(1).ToList();
+            finalResult.Add(predictionResult.Where(x => x.Item1.VrstaProizvoda.Naziv == "Tlo" && x.Item1.IsDeleted == false && x.Item1.DostupnaKolicina > 0).OrderByDescending(x => x.Item2).Select(x => x.Item1).FirstOrDefault()!);
 
             return mapper.Map<List<ProizvodiDTO>>(finalResult);
         }

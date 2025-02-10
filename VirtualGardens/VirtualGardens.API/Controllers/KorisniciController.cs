@@ -54,5 +54,12 @@ namespace VirtualGardens.API.Controllers
         {
             base.Delete(id);
         }
+
+        [AllowAnonymous]
+        [HttpPost("register")]
+        public Models.DTOs.KorisniciDTO Register(KorisniciInsertRequest request)
+        {
+            return (_service as IKorisniciService)!.Register(request);
+        }
     }
 }

@@ -5,8 +5,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_mobile/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_mobile/providers/korisnik_provider.dart';
 import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
@@ -200,12 +200,11 @@ class LoginPage extends StatelessWidget {
                                     builder: (context) => const HomeScreen()));
                               } on Exception catch (e) {
                                 if (context.mounted) {
-                                  QuickAlert.show(
-                                      context: context,
-                                      type: QuickAlertType.error,
-                                      title: "Greška prilikom prijave",
-                                      text: e.toString().split(': ')[1],
-                                      confirmBtnText: "U redu");
+                                  buildErrorAlert(
+                                      context,
+                                      "Greška prilikom prijave",
+                                      e.toString(),
+                                      e);
                                 }
                                 _passwordController.text = "";
                               }
@@ -251,7 +250,7 @@ class LoginPage extends StatelessWidget {
                                           fontWeight: FontWeight.bold),
                                     )),
                                     onTap: () async {
-                                      Navigator.of(context).pushReplacement(
+                                      Navigator.of(context).push(
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   const RegisterScreen()));

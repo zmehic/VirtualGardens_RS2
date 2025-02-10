@@ -60,7 +60,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
   }
 
   Future initForm(int? vrstaProizvodaId) async {
-    vrsteProizvodaResult = await vrsteProizvodaProvider.get();
+    var filter = {'isDeleted': false};
+    vrsteProizvodaResult = await vrsteProizvodaProvider.get(filter: filter);
     vrsteProizvodaResult?.result
         .insert(0, VrstaProizvoda(vrstaProizvodaId: 0, naziv: "Svi"));
 
@@ -100,6 +101,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
             Expanded(
                 child: TextField(
               controller: ftsEditingController,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(50),
+              ],
               decoration: const InputDecoration(
                 filled: true,
                 labelText: "Naziv",
@@ -123,7 +127,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                LengthLimitingTextInputFormatter(20),
               ],
               onChanged: (value) {
                 dataSource.filterServerSide(ftsEditingController.text, value,
@@ -141,7 +146,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                LengthLimitingTextInputFormatter(20),
               ],
               onChanged: (value) {
                 dataSource.filterServerSide(

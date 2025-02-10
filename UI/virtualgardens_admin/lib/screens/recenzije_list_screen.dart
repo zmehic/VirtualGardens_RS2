@@ -170,7 +170,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
                       DateTime? pickedDate = await showDatePicker(
                           context: context,
                           firstDate: DateTime(2000),
-                          lastDate: DateTime(2101));
+                          lastDate: DateTime.now());
                       if (pickedDate != null) {
                         datumOdString = pickedDate.toIso8601String();
                         _datumOdEditingController.text =
@@ -205,7 +205,7 @@ class _RecenzijeListScreenState extends State<RecenzijeListScreen> {
                       DateTime? pickedDate = await showDatePicker(
                           context: context,
                           firstDate: DateTime(2000),
-                          lastDate: DateTime(2101));
+                          lastDate: DateTime.now());
                       if (pickedDate != null) {
                         pickedDate = DateTime(pickedDate.year, pickedDate.month,
                             pickedDate.day, 23, 59, 59);

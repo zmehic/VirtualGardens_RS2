@@ -5,6 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:intl/intl.dart';
+import 'package:quickalert/quickalert.dart';
+
+import 'base_provider.dart';
 
 String formatNumber(dynamic) {
   var f = NumberFormat('#,##0.00');
@@ -80,11 +83,11 @@ Widget buildFormBuilderTextField(
                   if (maxLength != null)
                     FormBuilderValidators.maxLength(maxLength,
                         errorText:
-                            "Polje $label ne smije sadržavati više od $maxLength znakova."),
+                            "Polje $label ne smije sadržavati \nviše od $maxLength znakova."),
                   if (minLength != null)
                     FormBuilderValidators.minLength(minLength,
                         errorText:
-                            "Polje $label mora sadržavati najmanje $minLength znakova."),
+                            "Polje $label mora sadržavati \nnajmanje $minLength znakova."),
                   if (match != null)
                     FormBuilderValidators.match(match,
                         errorText: matchErrorText),
@@ -94,5 +97,73 @@ Widget buildFormBuilderTextField(
         ),
       ),
     ],
+  );
+}
+
+Future<dynamic> buildSuccessAlert(
+    BuildContext context, String title, String text,
+    {bool isDoublePop = true}) async {
+  return await QuickAlert.show(
+    context: context,
+    type: QuickAlertType.success,
+    title: title,
+    text: text,
+    confirmBtnText: "U redu",
+    onConfirmBtnTap: () {
+      Navigator.of(context).pop();
+      if (isDoublePop == true) {
+        Navigator.of(context).pop(true);
+      }
+    },
+  );
+}
+
+Future<dynamic> buildErrorAlert(
+    BuildContext context, String title, String text, Exception e) async {
+  return await QuickAlert.show(
+    context: context,
+    type: QuickAlertType.error,
+    text: e.toString().split(': ')[1],
+    title: "Greška",
+    confirmBtnText: "U redu",
+    onConfirmBtnTap: () {
+      Navigator.of(context).pop();
+    },
+  );
+}
+
+Future<dynamic> buildDeleteAlert(BuildContext context, String title,
+    String text, BaseProvider provider, int id) async {
+  return await QuickAlert.show(
+    context: context,
+    type: QuickAlertType.confirm,
+    title: "Potvrda brisanja",
+    text: "Jeste li sigurni da želite obrisati $title",
+    confirmBtnText: "U redu",
+    onConfirmBtnTap: () async {
+      try {
+        await provider.delete(id);
+        if (context.mounted) {
+          await QuickAlert.show(
+            context: context,
+            type: QuickAlertType.success,
+            title: "Brisanje je uspješno završeno!",
+            confirmBtnText: "U redu",
+            text: "Uspješno ste obrisali $title",
+            onConfirmBtnTap: () {
+              Navigator.of(context).pop();
+            },
+          );
+        }
+      } on Exception catch (e) {
+        if (context.mounted) {
+          await buildErrorAlert(context, "Greška", e.toString(), e);
+        }
+      }
+
+      if (context.mounted) {
+        Navigator.of(context).pop();
+      }
+    },
   );
 }

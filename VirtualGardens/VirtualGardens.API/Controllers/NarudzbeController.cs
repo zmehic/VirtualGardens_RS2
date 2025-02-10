@@ -41,6 +41,12 @@ namespace VirtualGardens.API.Controllers
             return (_service as INarudzbeService)!.Edit(id);
         }
 
+        [Authorize(Roles = "Kupac")]
+        public override NarudzbeDTO Insert(NarudzbeUpsertRequest request)
+        {
+            return (_service as INarudzbeService)!.Insert(request);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/finish")]
         public NarudzbeDTO Finish(int id)

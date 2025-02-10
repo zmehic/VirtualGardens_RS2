@@ -104,6 +104,7 @@ class _VrsteProizvodaDetailsScreenState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     buildFormBuilderTextField(
+                      maxLength: 32,
                       label: "Naziv",
                       name: "naziv",
                       isRequired: true,

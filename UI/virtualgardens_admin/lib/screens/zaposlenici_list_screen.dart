@@ -1,6 +1,7 @@
 import 'package:advanced_datatable/advanced_datatable_source.dart';
 import 'package:advanced_datatable/datatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
@@ -94,6 +95,9 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
           children: [
             Expanded(
                 child: TextField(
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(32),
+              ],
               controller: _imeEditingController,
               decoration: const InputDecoration(labelText: "Ime", filled: true),
               onChanged: (value) {
@@ -112,6 +116,9 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             Expanded(
                 child: TextField(
               controller: _prezimeEditingController,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(32),
+              ],
               decoration:
                   const InputDecoration(labelText: "Prezime", filled: true),
               onChanged: (value) {
@@ -130,6 +137,9 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             Expanded(
                 child: TextField(
               controller: _brojTelefonaEditingController,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(12),
+              ],
               decoration: const InputDecoration(
                   labelText: "Broj telefona", filled: true),
               onChanged: (value) {
@@ -147,6 +157,9 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             ),
             Expanded(
                 child: TextField(
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(32),
+              ],
               controller: _adresaEditingController,
               decoration:
                   const InputDecoration(labelText: "Adresa", filled: true),
@@ -165,6 +178,9 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             ),
             Expanded(
                 child: TextField(
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(32),
+              ],
               controller: _gradEditingController,
               decoration:
                   const InputDecoration(labelText: "Grad", filled: true),
@@ -183,6 +199,9 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             ),
             Expanded(
                 child: TextField(
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(32),
+              ],
               controller: _drzavaEditingController,
               decoration:
                   const InputDecoration(labelText: "Država", filled: true),

@@ -280,6 +280,7 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
             ),
             Expanded(
               child: FormBuilderTextField(
+                maxLength: 7,
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: const InputDecoration(

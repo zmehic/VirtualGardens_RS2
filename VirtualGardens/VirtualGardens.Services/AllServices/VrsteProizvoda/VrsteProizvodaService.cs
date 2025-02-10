@@ -55,7 +55,23 @@ namespace VirtualGardens.Services.AllServices.VrsteProizvoda
             {
                 throw new UserException("Ovo je bazna vrsta proizvoda i nije je moguće uređivati");
             }
+
+            var vrstaProizvoda = context.VrsteProizvoda.Where(x => x.IsDeleted == false && x.Naziv == request.Naziv).FirstOrDefault();
+            if (vrstaProizvoda != null && vrstaProizvoda.Naziv != entity.Naziv)
+            {
+                throw new UserException("Već postoji vrsta proizvoda sa tim nazivom");
+            }
             base.BeforeUpdate(request, entity);
+        }
+
+        public override void BeforeInsert(VrsteProizvodaUpsertRequest request, VrsteProizvodum entity)
+        {
+            var vrstaProizvoda = context.VrsteProizvoda.Where(x => x.IsDeleted == false && x.Naziv == request.Naziv).FirstOrDefault();
+            if (vrstaProizvoda != null)
+            {
+                throw new UserException("Već postoji jedinica mjere sa tim nazivom");
+            }
+            base.BeforeInsert(request, entity);
         }
 
         public override void BeforeDelete(int id, VrsteProizvodum entity)

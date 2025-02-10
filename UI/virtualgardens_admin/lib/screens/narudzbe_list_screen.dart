@@ -60,7 +60,7 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
 
   Future initScreen() async {
     var filter = {
-      'isDeleted': jeOtkazan,
+      'isDeleted': false,
       'IncludeTables': "Korisnik",
       'Placeno': jePlacen
     };
@@ -121,6 +121,9 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
             Expanded(
                 child: TextField(
               controller: _brojNarudzbeEditingController,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(20),
+              ],
               decoration: const InputDecoration(
                   labelText: "Broj narudzbe", filled: true),
               onChanged: (value) {
@@ -175,7 +178,8 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                LengthLimitingTextInputFormatter(10),
               ],
               decoration:
                   const InputDecoration(labelText: "Cijena od", filled: true),
@@ -201,7 +205,8 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
               keyboardType:
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
+                LengthLimitingTextInputFormatter(10),
               ],
               decoration:
                   const InputDecoration(labelText: "Cijena do", filled: true),
@@ -236,7 +241,7 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
         DateTime? pickedDate = await showDatePicker(
             context: context,
             firstDate: DateTime(2000),
-            lastDate: DateTime(2101));
+            lastDate: DateTime.now());
         if (pickedDate != null) {
           isOd == true
               ? datumOdString = pickedDate.toIso8601String()

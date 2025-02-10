@@ -3,6 +3,7 @@ import 'package:advanced_datatable/datatable.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
 import 'package:virtualgardens_admin/models/ponuda.dart';
@@ -107,6 +108,9 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
             Expanded(
                 child: TextField(
               controller: _ftsEditingController,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(30),
+              ],
               decoration:
                   const InputDecoration(labelText: "Naziv", filled: true),
               onChanged: (value) {
@@ -132,7 +136,7 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
                 DateTime? pickedDate = await showDatePicker(
                     context: context,
                     firstDate: DateTime(2000),
-                    lastDate: DateTime(2101));
+                    lastDate: DateTime.now());
                 if (pickedDate != null) {
                   datumOdString = pickedDate.toIso8601String();
                   _datumOdEditingController.text =
@@ -174,7 +178,7 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
                 DateTime? pickedDate = await showDatePicker(
                     context: context,
                     firstDate: DateTime(2000),
-                    lastDate: DateTime(2101));
+                    lastDate: DateTime.now());
                 if (pickedDate != null) {
                   pickedDate = DateTime(pickedDate.year, pickedDate.month,
                       pickedDate.day, 23, 59, 59);

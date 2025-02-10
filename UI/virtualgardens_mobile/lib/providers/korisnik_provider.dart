@@ -12,6 +12,27 @@ class KorisnikProvider extends BaseProvider<Korisnik> {
     return Korisnik.fromJson(data);
   }
 
+  Future register({dynamic request}) async {
+    var url = "${BaseProvider.baseUrl}api/Korisnici/register";
+    var uri = Uri.parse(url);
+    var headers = {
+      'Content-Type': 'application/json',
+    };
+
+    var response = await http.post(
+      uri,
+      headers: headers,
+      body: jsonEncode(request),
+    );
+
+    if (isValidResponse(response)) {
+      var data = jsonDecode(response.body);
+      return fromJson(data);
+    } else {
+      throw Exception("Unknown error");
+    }
+  }
+
   Future login({dynamic filter, String? username, String? password}) async {
     var endpoint = "api/Korisnici/login?username=$username&password=$password";
     var url = "${BaseProvider.baseUrl}$endpoint";

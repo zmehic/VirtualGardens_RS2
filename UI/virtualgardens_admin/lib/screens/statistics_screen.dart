@@ -60,6 +60,7 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     for (var i = 2024; i <= DateTime.now().year; i++) {
       availableYears[i.toString()] = i;
     }
+    await _fetchStatistic(year);
     actions.add(Row(
       children: [
         _buildPrintButton(),
@@ -72,7 +73,6 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         )
       ],
     ));
-    await _fetchStatistic(year);
   }
 
   _fetchStatistic(int year) async {
@@ -440,8 +440,14 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       case 1:
         text = '1';
         break;
+      case 3:
+        text = '3';
+        break;
       case 5:
         text = '5';
+        break;
+      case 7:
+        text = '7';
         break;
       case 10:
         text = '10';
@@ -708,7 +714,19 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
       minX: 1,
       maxX: 12,
       minY: 0,
-      maxY: isPrihodi ? 5000 : 6,
+      maxY: isPrihodi
+          ? ((monthlyStatistic?.prihodi
+                      .reduce(
+                          (value, element) => value > element ? value : element)
+                      .toDouble()) ??
+                  0) +
+              1000
+          : ((monthlyStatistic?.narudzbe
+                      .reduce(
+                          (value, element) => value > element ? value : element)
+                      .toDouble()) ??
+                  0) +
+              1,
       lineBarsData: [
         LineChartBarData(
           spots: spots,

@@ -68,7 +68,11 @@ namespace VirtualGardens.Services.AllServices.Setovi
         {
             var narudzba = context.Narudzbes.Where(x => x.NarudzbaId == entity.NarudzbaId).FirstOrDefault();
             if(narudzba!=null && entity!=null)
+            {
                 narudzba.UkupnaCijena -= (float)entity.CijenaSaPopustom!;
+                narudzba.UkupnaCijena = (float)Math.Round(narudzba.UkupnaCijena, 2);
+            }
+                
 
             context.SaveChanges();
 

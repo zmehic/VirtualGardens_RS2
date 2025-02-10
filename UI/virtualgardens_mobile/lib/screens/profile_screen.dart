@@ -167,6 +167,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: "Korisničko ime",
                         isRequired: true,
                         minLength: 3,
+                        maxLength: 32,
                         match: r'^\S+$',
                         matchErrorText:
                             "Korisničko ime ne smije sadržavati razmake."),
@@ -182,12 +183,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         name: "ime",
                         label: "Ime",
                         isRequired: true,
+                        minLength: 3,
+                        maxLength: 32,
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                         matchErrorText: "Ime može sadržavati samo slova."),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
                         name: "prezime",
                         label: "Prezime",
+                        minLength: 3,
+                        maxLength: 32,
                         isRequired: true,
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                         matchErrorText: "Prezime može sadržavati samo slova."),
@@ -195,6 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     _buildDateField("datumRodjenja", "Datum rođenja"),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
+                      maxLength: 12,
                       name: "brojTelefona",
                       label: "Broj telefona",
                       match: r'^(?:\+387[0-9]{2}[0-9]{6}|06[0-9]{7})$',
@@ -203,18 +209,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
+                      maxLength: 32,
                       name: "adresa",
                       label: "Adresa",
                       isValidated: false,
                     ),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
+                        maxLength: 32,
                         name: "grad",
                         label: "Grad",
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
                         matchErrorText: "Grad može sadržavati samo slova."),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
+                        maxLength: 32,
                         name: "drzava",
                         label: "Država",
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
@@ -298,12 +307,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             }
                           } on Exception catch (e) {
                             if (mounted) {
-                              QuickAlert.show(
-                                  context: context,
-                                  type: QuickAlertType.error,
-                                  title: "Greška prilikom ažuriranja",
-                                  text: (e.toString().split(': '))[1],
-                                  confirmBtnText: "U redu");
+                              await buildErrorAlert(
+                                  context,
+                                  "Greška prilikom ažuriranja",
+                                  e.toString(),
+                                  e);
                             }
                             setState(() {});
                           }
@@ -343,7 +351,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           DateTime? pickedDate = await showDatePicker(
               context: context,
               firstDate: DateTime(1900),
-              lastDate: DateTime(2101));
+              lastDate: DateTime.now());
           if (pickedDate != null) {
             _birthDateController.text =
                 formatDateString(pickedDate.toIso8601String());
@@ -363,6 +371,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             name: "lozinka",
             label: "Nova lozinka",
             isRequired: true,
+            maxLength: 32,
             minLength: 8,
             match:
                 r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
@@ -380,6 +389,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const InputDecoration(labelText: "Potvrdite lozinku"),
                   obscureText: true,
                   name: "lozinkaPotvrda",
+                  maxLength: 32,
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
                         errorText: "Potvrda lozinke je obavezno."),
@@ -397,6 +407,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 10),
           buildFormBuilderTextField(
+            maxLength: 32,
             name: "staraLozinka",
             label: "Stara lozinka",
             isRequired: true,

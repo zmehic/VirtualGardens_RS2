@@ -1,6 +1,7 @@
 import 'package:advanced_datatable/advanced_datatable_source.dart';
 import 'package:advanced_datatable/datatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
@@ -88,6 +89,9 @@ class _UlaziListScreenState extends State<UlaziListScreen> {
             Expanded(
                 child: TextField(
               controller: _ftsEditingController,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(50),
+              ],
               decoration:
                   const InputDecoration(labelText: "Naziv", filled: true),
               onChanged: (value) {
@@ -108,7 +112,7 @@ class _UlaziListScreenState extends State<UlaziListScreen> {
                 DateTime? pickedDate = await showDatePicker(
                     context: context,
                     firstDate: DateTime(2000),
-                    lastDate: DateTime(2101));
+                    lastDate: DateTime.now());
                 if (pickedDate != null) {
                   datumOdString = pickedDate.toIso8601String();
                   _datumOdEditingController.text =
@@ -143,7 +147,7 @@ class _UlaziListScreenState extends State<UlaziListScreen> {
                 DateTime? pickedDate = await showDatePicker(
                     context: context,
                     firstDate: DateTime(2000),
-                    lastDate: DateTime(2101));
+                    lastDate: DateTime.now());
                 if (pickedDate != null) {
                   pickedDate = DateTime(pickedDate.year, pickedDate.month,
                       pickedDate.day, 23, 59, 59);

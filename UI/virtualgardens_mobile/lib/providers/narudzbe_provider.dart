@@ -12,7 +12,7 @@ class NarudzbaProvider extends BaseProvider<Narudzba> {
     return Narudzba.fromJson(data);
   }
 
-  Future<List<String>> CheckOrderValidity({int? orderid}) async {
+  Future<List<String>> checkOrderValidity({int? orderid}) async {
     var endpoint = "api/Narudzbe/CheckOrderValidity/$orderid";
 
     var url = "${BaseProvider.baseUrl}$endpoint";

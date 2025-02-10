@@ -214,6 +214,7 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                 children: [
                   Expanded(
                     child: FormBuilderTextField(
+                        maxLength: 30,
                         decoration:
                             const InputDecoration(labelText: "Naziv ponude"),
                         name: "naziv",
@@ -230,7 +231,9 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                   ),
                   Expanded(
                     child: FormBuilderTextField(
-                        decoration: const InputDecoration(labelText: "Popust"),
+                        decoration:
+                            const InputDecoration(labelText: "Popust (%)"),
+                        maxLength: 2,
                         name: "popust",
                         keyboardType: TextInputType.number,
                         inputFormatters: [

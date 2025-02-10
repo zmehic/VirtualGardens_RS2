@@ -67,8 +67,11 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
 
     _base64Image = widget.product?.slika;
 
-    jediniceMjereResult = await jediniceMjereProvider.get();
-    vrsteProizvodaResult = await vrsteProizvodaProvider.get();
+    var filter = {
+      'isDeleted': false,
+    };
+    jediniceMjereResult = await jediniceMjereProvider.get(filter: filter);
+    vrsteProizvodaResult = await vrsteProizvodaProvider.get(filter: filter);
 
     actions.add(widget.product != null
         ? Container(
@@ -205,6 +208,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               child: Row(
                 children: [
                   buildFormBuilderTextField(
+                    maxLength: 50,
                     label: "Naziv",
                     name: "naziv",
                     isRequired: true,
@@ -213,19 +217,15 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
             Expanded(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   buildFormBuilderTextField(
-                    label: "Opis",
-                    name: "opis",
-                  ),
+                      label: "Opis", name: "opis", maxLength: 250),
                 ],
               ),
             ),
-            const SizedBox(height: 15),
             Expanded(
               child: Row(
                 children: [
@@ -267,7 +267,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 15),
             Expanded(
               child: Row(
                 children: [
@@ -277,6 +276,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.digitsOnly,
+                            LengthLimitingTextInputFormatter(10),
                           ],
                           decoration: InputDecoration(
                               labelText:
@@ -295,7 +295,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                               decimal: true),
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow(
-                                RegExp(r'^\d*\.?\d*')),
+                                RegExp(r'^\d+\.?\d*')),
+                            LengthLimitingTextInputFormatter(20),
                           ],
                           decoration: InputDecoration(
                               labelText:
@@ -307,9 +308,6 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           ])))
                 ],
               ),
-            ),
-            const SizedBox(
-              height: 15,
             ),
             Expanded(
               child: Row(

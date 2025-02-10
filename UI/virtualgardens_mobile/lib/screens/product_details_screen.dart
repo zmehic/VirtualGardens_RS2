@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_mobile/helpers/fullscreen_loader.dart';
 import 'package:virtualgardens_mobile/layouts/master_screen.dart';
 import 'package:virtualgardens_mobile/models/proizvod.dart';
@@ -279,9 +277,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                   );
                                   return;
                                 }
-                                setState(() {
-                                  isLoading = true;
-                                });
+
                                 final newReview = {
                                   'ocjena': userRating.toInt(),
                                   'komentar': _productRatingFormKey
@@ -297,27 +293,23 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                       .insert(newReview);
                                   recenzijeResult!.result.add(result);
                                   if (mounted) {
-                                    QuickAlert.show(
-                                      context: context,
-                                      type: QuickAlertType.success,
-                                      title: "Uspješno!",
-                                      text:
-                                          "Vaša recenzija je uspješno poslana!",
-                                      confirmBtnText: "U redu",
-                                    );
+                                    await buildSuccessAlert(
+                                        context,
+                                        "Uspješno!",
+                                        "Vaša recenzija je uspješno poslana!",
+                                        isDoublePop: false);
                                   }
+                                  setState(() {
+                                    isLoading = true;
+                                  });
                                   userRating = 0;
                                   commentController.clear();
                                   _scaffoldKey.currentState?.closeEndDrawer();
                                   setState(() {});
                                 } on Exception catch (e) {
                                   if (mounted) {
-                                    QuickAlert.show(
-                                      title: "Greška",
-                                      context: context,
-                                      type: QuickAlertType.error,
-                                      text: e.toString().split(': ')[1],
-                                    );
+                                    await buildErrorAlert(
+                                        context, "Greška", e.toString(), e);
                                   }
                                   setState(() {});
                                 }
@@ -391,39 +383,20 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               ),
               recenzija.korisnikId == AuthProvider.korisnikId
                   ? IconButton(
-                      icon: const Icon(Icons.delete),
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
                       onPressed: () async {
                         if (mounted) {
-                          await QuickAlert.show(
-                              context: context,
-                              type: QuickAlertType.confirm,
-                              title: "Brisanje seta",
-                              text:
-                                  "Jeste li sigurni da želite obrisati ovaj set?",
-                              confirmBtnText: "Da",
-                              showCancelBtn: true,
-                              cancelBtnText: "Ne",
-                              onConfirmBtnTap: () async {
-                                await _recenzijeProvider
-                                    .delete(recenzija.recenzijaId);
-                                recenzijeResult!.result.remove(recenzija);
-                                if (context.mounted) {
-                                  Navigator.of(context).pop(true);
-                                }
-                                if (mounted) {
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.success,
-                                    title: "Uspješno!",
-                                    text: "Recenzija je uspješno obrisana.",
-                                    confirmBtnText: "U redu",
-                                  );
-                                }
-                                setState(() {});
-                                return;
-                              });
+                          await buildDeleteAlert(
+                              context,
+                              "Recenzija",
+                              "Recenzija",
+                              _recenzijeProvider,
+                              recenzija.recenzijaId);
                         }
-
+                        recenzijeResult!.result.remove(recenzija);
                         setState(() {});
                       },
                     )

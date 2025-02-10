@@ -109,10 +109,10 @@ class _MasterScreenState extends State<MasterScreen> {
                     const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               ),
               onPressed: () {
-                Navigator.of(context).popUntil((route) => route.isFirst);
                 AuthProvider.korisnikId = 0;
                 AuthProvider.username = "";
                 AuthProvider.password = "";
+                Navigator.of(context).popUntil((route) => route.isFirst);
               },
               icon: const Icon(Icons.logout, color: Colors.white),
               label: const Text(

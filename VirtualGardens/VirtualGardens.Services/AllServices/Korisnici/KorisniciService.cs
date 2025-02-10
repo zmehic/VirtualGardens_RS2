@@ -64,15 +64,20 @@ namespace VirtualGardens.Services.AllServices.Korisnici
             return query;
         }
 
-        public override void BeforeInsert(KorisniciInsertRequest request, Database.Korisnici entity)
+        public void BeforeRegister(KorisniciInsertRequest request, Database.Korisnici entity)
         {
             logger.LogInformation($"Adding user: {entity.KorisnickoIme}");
 
+            var postojiKorisnik = context.Korisnicis.Where(x=>x.KorisnickoIme ==  request.KorisnickoIme).FirstOrDefault();
+
+            if (postojiKorisnik != null)
+                throw new UserException("Već postoji korisnik sa takvim korisničkim imenom");
+
             if (string.IsNullOrEmpty(request.Lozinka) || string.IsNullOrEmpty(request.LozinkaPotvrda))
-                throw new Exception("Lozinka i potvrda lozinke moraju imati vrijednost");
+                throw new UserException("Lozinka i potvrda lozinke moraju imati vrijednost");
 
             if (request.Lozinka != request.LozinkaPotvrda)
-                throw new Exception("Lozinka i potvrda lozinke moraju biti iste");
+                throw new UserException("Lozinka i potvrda lozinke moraju biti iste");
 
             entity.LozinkaSalt = passwordService.GenerateSalt();
             entity.LozinkaHash = passwordService.GenerateHash(entity.LozinkaSalt, request.Lozinka);
@@ -80,7 +85,7 @@ namespace VirtualGardens.Services.AllServices.Korisnici
 
         }
 
-        public override void AfterInsert(KorisniciInsertRequest request, Database.Korisnici entity)
+        public void AfterRegister(KorisniciInsertRequest request, Database.Korisnici entity)
         {
             if (request.Uloge != null && request.Uloge.Count > 0)
             {
@@ -112,7 +117,11 @@ namespace VirtualGardens.Services.AllServices.Korisnici
 
         public override void BeforeUpdate(KorisniciUpdateRequest request, Database.Korisnici entity)
         {
-
+            var korisnik = context.Korisnicis.Where(x=>x.IsDeleted == false && x.KorisnickoIme == request.KorisnickoIme).FirstOrDefault();
+            if (korisnik != null && korisnik.KorisnickoIme != entity.KorisnickoIme)
+            {
+                throw new UserException("Već postoji korisnik sa tim korisničkim imenom");
+            }
 
             if (request.Lozinka != null && !string.IsNullOrEmpty(request.Lozinka) && request.LozinkaPotvrda != null && !string.IsNullOrEmpty(request.LozinkaPotvrda))
             {
@@ -130,6 +139,15 @@ namespace VirtualGardens.Services.AllServices.Korisnici
                     entity.LozinkaHash = passwordService.GenerateHash(entity.LozinkaSalt, request.Lozinka);
                 }
             }
+        }
+        public KorisniciDTO Register(KorisniciInsertRequest request)
+        {
+            Database.Korisnici entity = mapper.Map<Database.Korisnici>(request);
+            BeforeRegister(request, entity);
+            context.Add(entity);
+            context.SaveChanges();
+            AfterRegister(request, entity);
+            return mapper.Map<KorisniciDTO>(entity);
         }
 
 

@@ -159,6 +159,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                         label: "Email",
                         name: "email",
                         isRequired: true,
+                        maxLength: 50,
                         isEmail: true),
                     const SizedBox(
                       width: 10,
@@ -180,7 +181,6 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 15),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -188,6 +188,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                     buildFormBuilderTextField(
                         label: "Ime",
                         name: "ime",
+                        maxLength: 32,
                         isRequired: true,
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                         matchErrorText: "Ime može sadržavati samo slova."),
@@ -197,6 +198,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                     buildFormBuilderTextField(
                         label: "Prezime",
                         name: "prezime",
+                        maxLength: 32,
                         isRequired: true,
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                         matchErrorText: "Prezime može sadržavati samo slova."),
@@ -214,7 +216,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                           DateTime? pickedDate = await showDatePicker(
                               context: context,
                               firstDate: DateTime(1900),
-                              lastDate: DateTime(2101));
+                              lastDate: DateTime.now());
                           if (pickedDate != null) {
                             _datumRodjenjaController.text =
                                 formatDateString(pickedDate.toIso8601String());
@@ -227,11 +229,11 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 15),
               Expanded(
                 child: Row(
                   children: [
                     buildFormBuilderTextField(
+                      maxLength: 12,
                       label: "Broj telefona",
                       name: "brojTelefona",
                       match: r'^(?:\+387[0-9]{2}[0-9]{6}|06[0-9]{7})$',
@@ -242,6 +244,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                       width: 10,
                     ),
                     buildFormBuilderTextField(
+                      maxLength: 32,
                       name: "adresa",
                       label: "Adresa",
                       isValidated: false,
@@ -249,13 +252,11 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                   ],
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
               Expanded(
                 child: Row(
                   children: [
                     buildFormBuilderTextField(
+                        maxLength: 32,
                         name: "grad",
                         label: "Grad",
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
@@ -264,15 +265,13 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                       width: 10,
                     ),
                     buildFormBuilderTextField(
+                        maxLength: 32,
                         name: "drzava",
                         label: "Država",
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
                         matchErrorText: "Država može sadržavati samo slova."),
                   ],
                 ),
-              ),
-              const SizedBox(
-                height: 15,
               ),
               Expanded(child: _buildSaveButton()),
             ],

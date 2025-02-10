@@ -203,6 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           label: "Korisničko ime",
                           isRequired: true,
                           minLength: 3,
+                          maxLength: 32,
                           match: r'^\S+$',
                           matchErrorText:
                               "Korisničko ime ne smije sadržavati razmake."),
@@ -210,6 +211,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buildFormBuilderTextField(
                         name: "email",
                         label: "Email",
+                        maxLength: 50,
                         isEmail: true,
                         isRequired: true,
                       ),
@@ -223,6 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           name: "ime",
                           label: "Ime",
                           isRequired: true,
+                          maxLength: 32,
                           match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                           matchErrorText: "Ime može sadržavati samo slova."),
                       const SizedBox(
@@ -231,6 +234,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buildFormBuilderTextField(
                           name: "prezime",
                           label: "Prezime",
+                          maxLength: 32,
                           isRequired: true,
                           match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                           matchErrorText:
@@ -255,7 +259,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             DateTime? pickedDate = await showDatePicker(
                                 context: context,
                                 firstDate: DateTime(1900),
-                                lastDate: DateTime(2101));
+                                lastDate: DateTime.now());
                             if (pickedDate != null) {
                               _datumRodjenjaController.text = formatDateString(
                                   pickedDate.toIso8601String());
@@ -295,16 +299,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       buildFormBuilderTextField(
                         name: "brojTelefona",
+                        maxLength: 12,
                         label: "Broj telefona",
                         match: r'^(?:\+387[0-9]{2}[0-9]{6}|06[0-9]{7})$',
                         matchErrorText:
-                            "Unesite ispravan broj mobitela (npr. +38761234567).",
+                            "Unesite ispravan broj mobitela \n(npr. +38761234567 ili 061234567).",
                       ),
                       const SizedBox(
                         width: 10,
                       ),
                       buildFormBuilderTextField(
                         name: "adresa",
+                        maxLength: 32,
                         label: "Adresa",
                         isValidated: false,
                       ),
@@ -318,6 +324,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buildFormBuilderTextField(
                           name: "grad",
                           label: "Grad",
+                          maxLength: 32,
                           match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
                           matchErrorText: "Grad može sadržavati samo slova."),
                       const SizedBox(
@@ -326,6 +333,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buildFormBuilderTextField(
                           name: "drzava",
                           label: "Država",
+                          maxLength: 32,
                           match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
                           matchErrorText: "Država može sadržavati samo slova."),
                     ],
@@ -535,6 +543,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 label: "Nova lozinka",
                 isRequired: true,
                 minLength: 8,
+                maxLength: 32,
                 match:
                     r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
                 matchErrorText:
@@ -547,6 +556,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration:
                       const InputDecoration(labelText: "Potvrdite lozinku"),
                   obscureText: true,
+                  maxLength: 32,
                   name: "lozinkaPotvrda",
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
@@ -563,6 +573,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(width: 10),
               buildFormBuilderTextField(
+                maxLength: 32,
                 name: "staraLozinka",
                 label: "Stara lozinka",
                 isRequired: true,

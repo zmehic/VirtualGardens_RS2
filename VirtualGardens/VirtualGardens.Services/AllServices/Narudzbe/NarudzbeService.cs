@@ -172,7 +172,7 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
 
         public StatisticsDTO MonthlyStatistics(int year)
         {
-            var list = context.Narudzbes.Where(x=>x.Datum.Year==year && x.IsDeleted == false).ToList();
+            var list = context.Narudzbes.Where(x=>x.Datum.Year==year && x.IsDeleted == false && x.StateMachine != "created").ToList();
             List<int> result = new List<int> { 0,0,0,0,0,0,0,0,0,0,0,0};
             List<float> prihod = new List<float> { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -182,9 +182,9 @@ namespace VirtualGardens.Services.AllServices.Narudzbe
                 prihod[item.Datum.Month - 1] += item.UkupnaCijena;
             }
 
-            var kupci = context.Narudzbes.Where(x=>x.IsDeleted==false && x.Datum.Year==year).Include(x => x.Korisnik).Select(x => new Buyers { korisnik = mapper.Map<KorisniciDTO>(x.Korisnik) }).Distinct().ToList();
+            var kupci = context.Narudzbes.Where(x=>x.IsDeleted==false && x.Datum.Year==year && x.StateMachine != "created").Include(x => x.Korisnik).Select(x => new Buyers { korisnik = mapper.Map<KorisniciDTO>(x.Korisnik) }).Distinct().ToList();
             var radnici = context.Narudzbes.Where(x => x.IsDeleted == false && x.Datum.Year == year && x.Nalog != null).Include(x => x.Nalog).ThenInclude(x => x!.Zaposlenik).Select(x => new Workers { zaposlenik = mapper.Map<ZaposleniciDTO>(x.Nalog!.Zaposlenik) }).Distinct().ToList();
-            var narudzbe = context.Narudzbes.Where(x=>x.IsDeleted == false && x.Datum.Year == year).Include(x=>x.Nalog).ToList();
+            var narudzbe = context.Narudzbes.Where(x=>x.IsDeleted == false && x.Datum.Year == year && x.StateMachine != "created").Include(x=>x.Nalog).ToList();
 
             foreach(var narudzba in narudzbe)
             {

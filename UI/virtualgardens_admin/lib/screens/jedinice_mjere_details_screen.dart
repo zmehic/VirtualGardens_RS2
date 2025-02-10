@@ -106,6 +106,7 @@ class _JedinicaMjereDetailsScreenState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     buildFormBuilderTextField(
+                      maxLength: 32,
                       label: "Naziv",
                       name: "naziv",
                       isRequired: true,
@@ -119,10 +120,10 @@ class _JedinicaMjereDetailsScreenState
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     buildFormBuilderTextField(
-                      label: "Skracenica",
-                      name: "skracenica",
-                      isRequired: false,
-                    ),
+                        label: "Skracenica",
+                        name: "skracenica",
+                        isRequired: false,
+                        maxLength: 10),
                   ],
                 ),
               ),
@@ -131,10 +132,10 @@ class _JedinicaMjereDetailsScreenState
                 child: Row(
                   children: [
                     buildFormBuilderTextField(
-                      label: "Opis",
-                      name: "opis",
-                      isRequired: false,
-                    ),
+                        label: "Opis",
+                        name: "opis",
+                        isRequired: false,
+                        maxLength: 100),
                   ],
                 ),
               ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:advanced_datatable/advanced_datatable_source.dart';
 import 'package:advanced_datatable/datatable.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
@@ -82,6 +83,9 @@ class _VrsteProizvodaListScreenState extends State<VrsteProizvodaListScreen> {
             Expanded(
                 child: TextField(
               controller: ftsEditingController,
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(32),
+              ],
               decoration: const InputDecoration(
                 filled: true,
                 labelText: "Naziv",

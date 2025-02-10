@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.Exceptions;
 using VirtualGardens.Models.Messages;
 using VirtualGardens.Models.Requests.Narudzbe;
 using VirtualGardens.Models.Requests.Ponude;
@@ -23,9 +24,19 @@ namespace VirtualGardens.Services.PonudeStateMachine
         {
         }
 
+        private void checkForExisting(PonudeUpsertRequest request)
+        {
+            var ponuda = context.Ponudes.Where(x => x.IsDeleted == false && x.Naziv == request.Naziv).FirstOrDefault();
+            if (ponuda != null)
+            {
+                throw new UserException("Ponuda sa tim nazivom već postoji!");
+            }
+        }
+
         public override PonudeDTO Update(int id, PonudeUpsertRequest request)
         {
             var set = context.Set<Ponude>();
+            checkForExisting(request);
             var entity = set.Find(id);
             mapper.Map(request, entity);
             context.SaveChanges();

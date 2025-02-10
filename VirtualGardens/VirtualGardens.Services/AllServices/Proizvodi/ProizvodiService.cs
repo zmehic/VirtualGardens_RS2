@@ -13,6 +13,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using VirtualGardens.Models.DTOs;
+using VirtualGardens.Models.Exceptions;
 using VirtualGardens.Models.Requests;
 using VirtualGardens.Models.Requests.Proizvodi;
 using VirtualGardens.Models.SearchObjects;
@@ -76,6 +77,24 @@ namespace VirtualGardens.Services.AllServices.Proizvodi
             return query;
         }
 
+        public override void BeforeInsert(ProizvodiUpsertRequest request, Database.Proizvodi entity)
+        {
+            var proizvod = context.Proizvodis.Where(x => x.IsDeleted == false && x.Naziv == request.Naziv).FirstOrDefault();
+            if (proizvod != null)
+            {
+                throw new UserException("Već postoji proizvod sa tim nazivom");
+            }
+        }
+
+        public override void BeforeUpdate(ProizvodiUpsertRequest request, Database.Proizvodi entity)
+        {
+            var proizvod = context.Proizvodis.Where(x => x.IsDeleted == false && x.Naziv == request.Naziv).FirstOrDefault();
+            if (proizvod != null && proizvod.Naziv != entity.Naziv)
+            {
+                throw new UserException("Već postoji proizvod sa tim nazivom");
+            }
+
+        }
 
         public List<ProizvodiDTO> Recommend(int id)
         {

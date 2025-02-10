@@ -2,6 +2,7 @@ import 'package:advanced_datatable/advanced_datatable_source.dart';
 import 'package:advanced_datatable/datatable.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
@@ -91,6 +92,9 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
               controller: _ftsEditingController,
               decoration:
                   const InputDecoration(labelText: "Naziv", filled: true),
+              inputFormatters: [
+                LengthLimitingTextInputFormatter(20),
+              ],
               onChanged: (value) {
                 dataSource.filterServerSide(
                     value, datumOdString, datumDoString, selectedStanje);
@@ -195,7 +199,7 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
         DateTime? pickedDate = await showDatePicker(
             context: context,
             firstDate: DateTime(2000),
-            lastDate: DateTime(2101));
+            lastDate: DateTime.now());
         if (pickedDate != null) {
           isOd == true
               ? datumOdString = pickedDate.toIso8601String()

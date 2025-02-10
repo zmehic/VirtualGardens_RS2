@@ -33,11 +33,8 @@ namespace VirtualGardens.Services.BaseServices
         {
             var set = context.Set<TDbEntity>();
             var entity = set.Find(id);
-
-            mapper.Map(request, entity);
-
             BeforeUpdate(request, entity);
-
+            mapper.Map(request, entity);
             context.SaveChanges();
 
             AfterUpdate(request, entity);
