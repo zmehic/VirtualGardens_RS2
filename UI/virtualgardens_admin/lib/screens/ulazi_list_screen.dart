@@ -90,10 +90,10 @@ class _UlaziListScreenState extends State<UlaziListScreen> {
                 child: TextField(
               controller: _ftsEditingController,
               inputFormatters: [
-                LengthLimitingTextInputFormatter(50),
+                LengthLimitingTextInputFormatter(20),
               ],
               decoration:
-                  const InputDecoration(labelText: "Naziv", filled: true),
+                  const InputDecoration(labelText: "Broj ulaza", filled: true),
               onChanged: (value) {
                 dataSource.filterServerSide(
                     value, datumOdString, datumDoString);

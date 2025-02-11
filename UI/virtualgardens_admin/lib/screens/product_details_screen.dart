@@ -208,7 +208,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
               child: Row(
                 children: [
                   buildFormBuilderTextField(
-                    maxLength: 50,
+                    maxLength: 100,
                     label: "Naziv",
                     name: "naziv",
                     isRequired: true,
@@ -222,7 +222,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   buildFormBuilderTextField(
-                      label: "Opis", name: "opis", maxLength: 250),
+                      label: "Opis", name: "opis", maxLength: 255),
                 ],
               ),
             ),
@@ -276,7 +276,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           keyboardType: TextInputType.number,
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.digitsOnly,
-                            LengthLimitingTextInputFormatter(10),
+                            LengthLimitingTextInputFormatter(9),
                           ],
                           decoration: InputDecoration(
                               labelText:
@@ -296,7 +296,7 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                           inputFormatters: <TextInputFormatter>[
                             FilteringTextInputFormatter.allow(
                                 RegExp(r'^\d+\.?\d*')),
-                            LengthLimitingTextInputFormatter(20),
+                            LengthLimitingTextInputFormatter(8),
                           ],
                           decoration: InputDecoration(
                               labelText:

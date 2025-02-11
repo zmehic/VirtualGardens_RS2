@@ -165,7 +165,7 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
                 children: [
                   Expanded(
                       child: FormBuilderTextField(
-                    enabled: false,
+                    readOnly: true,
                     decoration: const InputDecoration(labelText: "Broj ulaza"),
                     name: "brojUlaza",
                   ))
@@ -177,7 +177,6 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
                 children: [
                   Expanded(
                     child: FormBuilderTextField(
-                      enabled: false,
                       controller: _datumUlazaController,
                       decoration:
                           const InputDecoration(labelText: "Datum ulaza"),

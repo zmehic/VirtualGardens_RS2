@@ -93,9 +93,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Expanded(
             child: Container(
           margin: const EdgeInsets.all(15),
-          decoration: const BoxDecoration(
-            color: Color.fromRGBO(103, 122, 105, 1),
-          ),
           child: Container(
             margin: const EdgeInsets.all(30),
             child: Row(
@@ -203,7 +200,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           label: "Korisničko ime",
                           isRequired: true,
                           minLength: 3,
-                          maxLength: 32,
+                          maxLength: 50,
                           match: r'^\S+$',
                           matchErrorText:
                               "Korisničko ime ne smije sadržavati razmake."),
@@ -211,7 +208,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buildFormBuilderTextField(
                         name: "email",
                         label: "Email",
-                        maxLength: 50,
+                        maxLength: 100,
                         isEmail: true,
                         isRequired: true,
                       ),
@@ -225,7 +222,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           name: "ime",
                           label: "Ime",
                           isRequired: true,
-                          maxLength: 32,
+                          maxLength: 50,
                           match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                           matchErrorText: "Ime može sadržavati samo slova."),
                       const SizedBox(
@@ -234,7 +231,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buildFormBuilderTextField(
                           name: "prezime",
                           label: "Prezime",
-                          maxLength: 32,
+                          maxLength: 50,
                           isRequired: true,
                           match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                           matchErrorText:
@@ -310,7 +307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       buildFormBuilderTextField(
                         name: "adresa",
-                        maxLength: 32,
+                        maxLength: 255,
                         label: "Adresa",
                         isValidated: false,
                       ),
@@ -324,7 +321,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buildFormBuilderTextField(
                           name: "grad",
                           label: "Grad",
-                          maxLength: 32,
+                          maxLength: 100,
                           match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
                           matchErrorText: "Grad može sadržavati samo slova."),
                       const SizedBox(
@@ -333,7 +330,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       buildFormBuilderTextField(
                           name: "drzava",
                           label: "Država",
-                          maxLength: 32,
+                          maxLength: 100,
                           match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
                           matchErrorText: "Država može sadržavati samo slova."),
                     ],
@@ -543,7 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 label: "Nova lozinka",
                 isRequired: true,
                 minLength: 8,
-                maxLength: 32,
+                maxLength: 50,
                 match:
                     r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
                 matchErrorText:
@@ -556,7 +553,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration:
                       const InputDecoration(labelText: "Potvrdite lozinku"),
                   obscureText: true,
-                  maxLength: 32,
+                  maxLength: 50,
                   name: "lozinkaPotvrda",
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
@@ -573,7 +570,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               const SizedBox(width: 10),
               buildFormBuilderTextField(
-                maxLength: 32,
+                maxLength: 50,
                 name: "staraLozinka",
                 label: "Stara lozinka",
                 isRequired: true,

@@ -14,7 +14,8 @@ import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/providers/narudzbe_provider.dart';
 
 class StatisticsScreen extends StatefulWidget {
-  const StatisticsScreen({super.key});
+  final int? sentYear;
+  const StatisticsScreen({super.key, this.sentYear});
 
   @override
   State<StatisticsScreen> createState() => _StatisticsScreenState();
@@ -51,16 +52,16 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
   @override
   void initState() {
     _narudzbaProvider = context.read<NarudzbaProvider>();
+    selectedYear = widget.sentYear ?? DateTime.now().year;
     initForm();
     super.initState();
   }
 
   initForm() async {
-    var year = DateTime.now().year;
     for (var i = 2024; i <= DateTime.now().year; i++) {
       availableYears[i.toString()] = i;
     }
-    await _fetchStatistic(year);
+    await _fetchStatistic(selectedYear);
     actions.add(Row(
       children: [
         _buildPrintButton(),
@@ -424,8 +425,9 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
         onChanged: (value) async {
           if (value != null) {
             selectedYear = int.tryParse(value.toString())!;
-            _fetchStatistic(int.tryParse(value.toString())!);
-            setState(() {});
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: ((context) =>
+                    StatisticsScreen(sentYear: selectedYear))));
           }
         },
       ),

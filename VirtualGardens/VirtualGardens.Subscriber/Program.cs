@@ -12,8 +12,9 @@ DotNetEnv.Env.Load();
 Console.WriteLine("Hello, World!");
 
 string rabbitmqport = Environment.GetEnvironmentVariable("RABBIT_MQ_PORT") ?? string.Empty;
+string rabbitmqhost = Environment.GetEnvironmentVariable("RABBIT_MQ_HOST") ?? string.Empty;
 Console.WriteLine($"{rabbitmqport}");
-await WaitForRabbitMQAsync("rabbitmq", int.TryParse(rabbitmqport, out var result) ? result : 0);
+await WaitForRabbitMQAsync($"{rabbitmqhost}", int.TryParse(rabbitmqport, out var result) ? result : 0);
 
 string smtpHost = Environment.GetEnvironmentVariable("SMTP_HOST") ?? string.Empty;
 int smtpPort = int.TryParse(Environment.GetEnvironmentVariable("SMTP_PORT"), out var port) ? port : 0;

@@ -96,7 +96,7 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             Expanded(
                 child: TextField(
               inputFormatters: [
-                LengthLimitingTextInputFormatter(32),
+                LengthLimitingTextInputFormatter(50),
               ],
               controller: _imeEditingController,
               decoration: const InputDecoration(labelText: "Ime", filled: true),
@@ -117,7 +117,7 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
                 child: TextField(
               controller: _prezimeEditingController,
               inputFormatters: [
-                LengthLimitingTextInputFormatter(32),
+                LengthLimitingTextInputFormatter(50),
               ],
               decoration:
                   const InputDecoration(labelText: "Prezime", filled: true),
@@ -158,7 +158,7 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             Expanded(
                 child: TextField(
               inputFormatters: [
-                LengthLimitingTextInputFormatter(32),
+                LengthLimitingTextInputFormatter(255),
               ],
               controller: _adresaEditingController,
               decoration:
@@ -179,7 +179,7 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             Expanded(
                 child: TextField(
               inputFormatters: [
-                LengthLimitingTextInputFormatter(32),
+                LengthLimitingTextInputFormatter(100),
               ],
               controller: _gradEditingController,
               decoration:
@@ -200,7 +200,7 @@ class _ZaposleniciListScreenState extends State<ZaposleniciListScreen> {
             Expanded(
                 child: TextField(
               inputFormatters: [
-                LengthLimitingTextInputFormatter(32),
+                LengthLimitingTextInputFormatter(100),
               ],
               controller: _drzavaEditingController,
               decoration:

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
@@ -176,6 +177,9 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
                     child: Container(
                       color: Colors.white,
                       child: TextField(
+                        inputFormatters: <TextInputFormatter>[
+                          LengthLimitingTextInputFormatter(255),
+                        ],
                         controller: _porukaEditingController,
                         decoration: const InputDecoration(
                           hintText: 'Upišite poruku...',

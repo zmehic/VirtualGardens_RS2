@@ -39,7 +39,7 @@ class KorisnikProvider extends BaseProvider<Korisnik> {
           break;
         } else {
           throw Exception(
-              "Ne možete pristupiti interfejsu kupca putem dekstop aplikacije");
+              "Ne možete pristupiti interfejsu kupca putem desktop aplikacije");
         }
       }
     } else {

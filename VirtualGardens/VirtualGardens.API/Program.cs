@@ -93,7 +93,7 @@ builder.Services.AddSwaggerGen(c =>
 
 });
 
-var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? "Data Source=localhost,1401;Database=210011;User=sa;Password=sQlZaIm123!;TrustServerCertificate=True";
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
 builder.Services.AddDbContext<_210011Context>(options => options.UseSqlServer(connectionString));
 builder.Services.AddMapster();
 builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication",null);

@@ -109,7 +109,7 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
                 child: TextField(
               controller: _ftsEditingController,
               inputFormatters: [
-                LengthLimitingTextInputFormatter(30),
+                LengthLimitingTextInputFormatter(50),
               ],
               decoration:
                   const InputDecoration(labelText: "Naziv", filled: true),

@@ -159,7 +159,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                         label: "Email",
                         name: "email",
                         isRequired: true,
-                        maxLength: 50,
+                        maxLength: 100,
                         isEmail: true),
                     const SizedBox(
                       width: 10,
@@ -188,7 +188,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                     buildFormBuilderTextField(
                         label: "Ime",
                         name: "ime",
-                        maxLength: 32,
+                        maxLength: 50,
                         isRequired: true,
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                         matchErrorText: "Ime može sadržavati samo slova."),
@@ -198,7 +198,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                     buildFormBuilderTextField(
                         label: "Prezime",
                         name: "prezime",
-                        maxLength: 32,
+                        maxLength: 50,
                         isRequired: true,
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                         matchErrorText: "Prezime može sadržavati samo slova."),
@@ -244,7 +244,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                       width: 10,
                     ),
                     buildFormBuilderTextField(
-                      maxLength: 32,
+                      maxLength: 255,
                       name: "adresa",
                       label: "Adresa",
                       isValidated: false,
@@ -256,7 +256,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                 child: Row(
                   children: [
                     buildFormBuilderTextField(
-                        maxLength: 32,
+                        maxLength: 100,
                         name: "grad",
                         label: "Grad",
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
@@ -265,7 +265,7 @@ class _ZaposleniciDetailsScreenState extends State<ZaposleniciDetailsScreen> {
                       width: 10,
                     ),
                     buildFormBuilderTextField(
-                        maxLength: 32,
+                        maxLength: 100,
                         name: "drzava",
                         label: "Država",
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',

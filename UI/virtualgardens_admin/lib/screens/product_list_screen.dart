@@ -102,7 +102,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 child: TextField(
               controller: ftsEditingController,
               inputFormatters: [
-                LengthLimitingTextInputFormatter(50),
+                LengthLimitingTextInputFormatter(100),
               ],
               decoration: const InputDecoration(
                 filled: true,
@@ -128,7 +128,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-                LengthLimitingTextInputFormatter(20),
+                LengthLimitingTextInputFormatter(8),
               ],
               onChanged: (value) {
                 dataSource.filterServerSide(ftsEditingController.text, value,
@@ -147,7 +147,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-                LengthLimitingTextInputFormatter(20),
+                LengthLimitingTextInputFormatter(8),
               ],
               onChanged: (value) {
                 dataSource.filterServerSide(
@@ -191,8 +191,9 @@ class _ProductListScreenState extends State<ProductListScreen> {
                   minimumSize: MaterialStateProperty.all(const Size(150, 50))),
               onPressed: () async {
                 bool result = await Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) => const UlaziListScreen()));
+                        MaterialPageRoute(
+                            builder: (context) => const UlaziListScreen())) ??
+                    false;
                 if (result == true) {
                   dataSource.filterServerSide(
                       ftsEditingController.text,

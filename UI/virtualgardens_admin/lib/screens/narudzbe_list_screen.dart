@@ -122,7 +122,7 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                 child: TextField(
               controller: _brojNarudzbeEditingController,
               inputFormatters: [
-                LengthLimitingTextInputFormatter(20),
+                LengthLimitingTextInputFormatter(30),
               ],
               decoration: const InputDecoration(
                   labelText: "Broj narudzbe", filled: true),
@@ -179,7 +179,7 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-                LengthLimitingTextInputFormatter(10),
+                LengthLimitingTextInputFormatter(8),
               ],
               decoration:
                   const InputDecoration(labelText: "Cijena od", filled: true),
@@ -206,7 +206,7 @@ class _NarudzbeListScreenState extends State<NarduzbeListScreen> {
                   const TextInputType.numberWithOptions(decimal: true),
               inputFormatters: <TextInputFormatter>[
                 FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d*')),
-                LengthLimitingTextInputFormatter(10),
+                LengthLimitingTextInputFormatter(8),
               ],
               decoration:
                   const InputDecoration(labelText: "Cijena do", filled: true),

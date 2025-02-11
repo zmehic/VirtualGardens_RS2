@@ -214,7 +214,7 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                 children: [
                   Expanded(
                     child: FormBuilderTextField(
-                        maxLength: 30,
+                        maxLength: 50,
                         decoration:
                             const InputDecoration(labelText: "Naziv ponude"),
                         name: "naziv",
@@ -437,13 +437,14 @@ class _PonudeDetailsScreenState extends State<PonudeDetailsScreen> {
                                                     "Ponuda ${response.naziv} je spremljena");
                                               }
                                             } else {
-                                              await _ponudeProvider
-                                                  .insert(request);
+                                              var response =
+                                                  await _ponudeProvider
+                                                      .insert(request);
                                               if (mounted) {
                                                 await buildSuccessAlert(
                                                     context,
                                                     "Ponuda je dodana",
-                                                    "Ponuda ${widget.ponuda?.naziv} je dodana");
+                                                    "Ponuda ${response.naziv} je dodana");
                                               }
                                             }
                                           } on Exception catch (e) {

@@ -91,9 +91,9 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
                 child: TextField(
               controller: _ftsEditingController,
               decoration:
-                  const InputDecoration(labelText: "Naziv", filled: true),
+                  const InputDecoration(labelText: "Broj naloga", filled: true),
               inputFormatters: [
-                LengthLimitingTextInputFormatter(20),
+                LengthLimitingTextInputFormatter(30),
               ],
               onChanged: (value) {
                 dataSource.filterServerSide(

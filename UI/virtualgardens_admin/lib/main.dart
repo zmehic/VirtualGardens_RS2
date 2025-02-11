@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
 import 'package:provider/provider.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.dart';
+import 'package:virtualgardens_admin/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_admin/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_admin/providers/korisnik_provider.dart';
 import 'package:virtualgardens_admin/providers/nalozi_provider.dart';
@@ -124,6 +124,7 @@ class LoginPage extends StatelessWidget {
             height: 10,
           ),
           FormBuilderTextField(
+            maxLength: 50,
             name: "username",
             controller: _usernameController,
             decoration: const InputDecoration(
@@ -137,6 +138,7 @@ class LoginPage extends StatelessWidget {
             height: 10,
           ),
           FormBuilderTextField(
+            maxLength: 50,
             name: "password",
             controller: _passwordController,
             obscureText: true,
@@ -168,12 +170,8 @@ class LoginPage extends StatelessWidget {
                     }
                   } on Exception catch (e) {
                     if (context.mounted) {
-                      QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.error,
-                          title: "Greška prilikom prijave",
-                          text: e.toString().split(': ')[1],
-                          confirmBtnText: "U redu");
+                      await buildErrorAlert(
+                          context, "Greška prilikom prijave", e.toString(), e);
                     }
                     _usernameController.clear();
                     _passwordController.clear();
