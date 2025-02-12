@@ -252,7 +252,7 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
           children: [
             DropdownButtonHideUnderline(
                 child: DropdownButton2(
-                    value: proizvodiResult?.result[0].proizvodId.toString(),
+                    value: "$selectedProizvodId",
                     iconStyleData:
                         const IconStyleData(iconEnabledColor: Colors.black),
                     buttonStyleData: ButtonStyleData(
@@ -273,6 +273,7 @@ class _UlaziDetailsScreenState extends State<UlaziDetailsScreen> {
                         [],
                     onChanged: (value) async {
                       selectedProizvodId = int.tryParse(value.toString())!;
+                      setState(() {});
                     })),
             const SizedBox(
               width: 10,

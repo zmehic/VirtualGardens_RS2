@@ -106,7 +106,10 @@ class _ProductListScreenState extends State<ProductListScreen> {
     };
 
     if (reset) {
-      vrsteProizvodaResult = await vrsteProizvodaProvider.get();
+      var filter = {
+        'isDeleted': false,
+      };
+      vrsteProizvodaResult = await vrsteProizvodaProvider.get(filter: filter);
       vrsteProizvodaResult?.result
           .insert(0, VrstaProizvoda(vrstaProizvodaId: 0, naziv: "Svi"));
     }

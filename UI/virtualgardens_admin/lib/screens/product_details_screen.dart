@@ -53,6 +53,25 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     super.initState();
   }
 
+  bool checkIfJedinicaMjereExists(int jedinicaMjereId) {
+    for (var i = 0; i < jediniceMjereResult!.result.length; i++) {
+      if (jediniceMjereResult!.result[i].jedinicaMjereId == jedinicaMjereId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  bool checkIfVrstaProizvodaExists(int vrstaProizvodaId) {
+    for (var i = 0; i < vrsteProizvodaResult!.result.length; i++) {
+      if (vrsteProizvodaResult!.result[i].vrstaProizvodaId ==
+          vrstaProizvodaId) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   Future initForm() async {
     _initialValue = {
       'naziv': widget.product?.naziv,
@@ -72,6 +91,17 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
     };
     jediniceMjereResult = await jediniceMjereProvider.get(filter: filter);
     vrsteProizvodaResult = await vrsteProizvodaProvider.get(filter: filter);
+    if (widget.product != null) {
+      _initialValue['jedinicaMjereId'] =
+          checkIfJedinicaMjereExists(widget.product!.jedinicaMjereId!)
+              ? widget.product!.jedinicaMjereId.toString()
+              : null;
+
+      _initialValue['vrstaProizvodaId'] =
+          checkIfVrstaProizvodaExists(widget.product!.vrstaProizvodaId!)
+              ? widget.product!.vrstaProizvodaId.toString()
+              : null;
+    }
 
     actions.add(widget.product != null
         ? Container(

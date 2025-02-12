@@ -24,10 +24,10 @@ namespace VirtualGardens.Services.PonudeStateMachine
         {
         }
 
-        private void checkForExisting(PonudeUpsertRequest request)
+        private void checkForExisting(PonudeUpsertRequest request, Database.Ponude entity)
         {
             var ponuda = context.Ponudes.Where(x => x.IsDeleted == false && x.Naziv == request.Naziv).FirstOrDefault();
-            if (ponuda != null)
+            if (ponuda != null && ponuda.Naziv != entity.Naziv)
             {
                 throw new UserException("Ponuda sa tim nazivom već postoji!");
             }
@@ -36,8 +36,8 @@ namespace VirtualGardens.Services.PonudeStateMachine
         public override PonudeDTO Update(int id, PonudeUpsertRequest request)
         {
             var set = context.Set<Ponude>();
-            checkForExisting(request);
             var entity = set.Find(id);
+            checkForExisting(request, entity);
             mapper.Map(request, entity);
             context.SaveChanges();
 
