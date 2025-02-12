@@ -6,7 +6,6 @@ import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
-import 'package:virtualgardens_admin/main.dart';
 import 'package:virtualgardens_admin/models/korisnici.dart';
 import 'package:virtualgardens_admin/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_admin/providers/korisnik_provider.dart';
@@ -477,11 +476,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                         builder: (context) =>
                                                             const HomeScreen()));
                                           } else {
-                                            Navigator.of(context)
-                                                .pushReplacement(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            LoginPage()));
+                                            Navigator.popUntil(context,
+                                                (route) => route.isFirst);
                                           }
                                         },
                                       );

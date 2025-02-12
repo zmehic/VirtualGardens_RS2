@@ -40,9 +40,9 @@ namespace VirtualGardens.Services.Migrations
             values: new object[,]
             {
                 {
-                    1, "admin", "admin@example.com", "Admin", "User",
-                    null, "Admin Address", "Admin City", "Admin Country", "I1PzXagqJGdStq2B+UIacXapKS0=",
-                    "P2W0L0dMofP7yH0SvCzeyA==", DateTime.UtcNow, DateTime.UtcNow, true, new DateTime(1990, 1, 1), null
+                    1, "desktop", "admin@example.com", "Admin", "User",
+                    null, "Admin Address", "Admin City", "Admin Country", "VWOEVaOuJZwoXrb3J0XrBkq8AzY=",
+                    "h4p3Z/xIkap7vbFxCsChag==", DateTime.UtcNow, DateTime.UtcNow, true, new DateTime(1990, 1, 1), null
                 },
                 {
                     2, "zmehic", "zaim.mehic@edu.fit.ba", "Zaim", "Mehic",
@@ -50,9 +50,9 @@ namespace VirtualGardens.Services.Migrations
                     "P2W0L0dMofP7yH0SvCzeyA==", DateTime.UtcNow, DateTime.UtcNow, true, new DateTime(2000, 1, 1), null
                 },
                 {
-                    3, "user", "user@example.com", "Regular", "User",
-                    null, "User Address", "User City", "User Country", "tVeXz/bhKIFIANPp0WrD4I0NPpo=",
-                    "P2W0L0dMofP7yH0SvCzeyA==", DateTime.UtcNow, null, true, new DateTime(1995, 5, 5), null
+                    3, "mobile", "user@example.com", "Regular", "User",
+                    null, "User Address", "User City", "User Country", "VWOEVaOuJZwoXrb3J0XrBkq8AzY=",
+                    "h4p3Z/xIkap7vbFxCsChag==", DateTime.UtcNow, null, true, new DateTime(1995, 5, 5), null
                 }
             });
 

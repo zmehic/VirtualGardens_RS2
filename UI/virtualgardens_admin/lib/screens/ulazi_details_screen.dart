@@ -381,7 +381,7 @@ class UlaziProizvodiDataSource extends AdvancedDataTableSource<UlazProizvod> {
         onPressed: () async {
           if (context.mounted) {
             await buildDeleteAlert(context, item.proizvod!.naziv ?? "",
-                item.proizvod!.naziv ?? "", provider, item.proizvodId);
+                item.proizvod!.naziv ?? "", provider, item.ulaziProizvodiId);
             filterServerSide(ulazId);
           }
         },
