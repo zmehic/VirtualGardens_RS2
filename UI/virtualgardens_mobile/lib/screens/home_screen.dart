@@ -100,7 +100,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       );
                     },
-                    child: const Text('Kreiraj narudžbu'),
+                    child: const Text('Moje narudžbe'),
                   ),
                 ),
               ],

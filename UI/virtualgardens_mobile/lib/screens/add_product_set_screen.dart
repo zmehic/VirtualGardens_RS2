@@ -14,7 +14,6 @@ import 'package:virtualgardens_mobile/models/vrsta_proizvoda.dart';
 import 'package:virtualgardens_mobile/providers/product_provider.dart';
 import 'package:virtualgardens_mobile/providers/setovi_provider.dart';
 import 'package:virtualgardens_mobile/providers/vrste_proizvoda_provider.dart';
-import 'package:virtualgardens_mobile/screens/narudzbe_details_screen.dart';
 
 class ProizvodiSetDTO {
   int? proizvodId;
@@ -258,6 +257,7 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
             Expanded(
               child: FormBuilderTextField(
                 name: 'naziv',
+                maxLength: 100,
                 decoration: const InputDecoration(
                   labelText: "Pretraži proizvode",
                   prefixIcon: Icon(Icons.search),
@@ -545,14 +545,7 @@ class _AddProductSetScreentate extends State<AddProductSetScreen> {
                               };
                               await _setoviProvider.insert(request);
                               if (mounted) {
-                                Navigator.of(context).pushReplacement(
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        NarudzbaUserDetailsScreen(
-                                      narudzba: widget.narudzba,
-                                    ),
-                                  ),
-                                );
+                                Navigator.of(context).pop(true);
                               }
                             }
                           },

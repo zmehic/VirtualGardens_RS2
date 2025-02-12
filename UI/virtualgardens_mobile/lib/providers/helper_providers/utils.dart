@@ -72,6 +72,7 @@ Widget buildFormBuilderTextField(
         child: FormBuilderTextField(
           obscureText: obscureText,
           name: name,
+          maxLength: maxLength,
           validator: isValidated
               ? FormBuilderValidators.compose([
                   if (isRequired == true)

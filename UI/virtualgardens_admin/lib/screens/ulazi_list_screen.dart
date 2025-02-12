@@ -258,7 +258,7 @@ class UlazDataSource extends AdvancedDataTableSource<Ulaz> {
     return DataRow(
         onSelectChanged: (selected) async {
           if (selected == true) {
-            var response = await Navigator.of(context).push(MaterialPageRoute(
+            bool? response = await Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => UlaziDetailsScreen(ulaz: item)));
             if (response == true) {
               filterServerSide(_nazivGTE, _datumOd, _datumDo);

@@ -140,19 +140,57 @@ namespace VirtualGardens.Services.AllServices.Ponude
         public NarudzbeDTO AddPonudaToOrder(int ponudaId, int narudzbaId)
         {
             var setovi = context.SetoviPonudes.Include(x => x.Set).ThenInclude(x => x.ProizvodiSets).Where(x => x.PonudaId == ponudaId && x.IsDeleted==false && x.Set.IsDeleted==false).Select(x=> mapper.Map<SetoviUpsertRequest>(x.Set)).ToList();
+
+            var sumaPopust = 0.0f;
             var suma = 0.0f;
-            foreach (var item in setovi)
+            var sumaUkupno = 0.0f;
+
+            if(setovi.Count > 0)
             {
-                Database.Setovi entity = mapper.Map<Database.Setovi>(item);
-                entity.NarudzbaId = narudzbaId;
-                context.Add(entity);
+                foreach(var set in setovi)
+                {
+                    if(set.ProizvodiSets != null && set.ProizvodiSets.Count > 0)
+                    {
+                        foreach (var item in set.ProizvodiSets)
+                        {
+                            float cijena = context.Proizvodis.Where(x => x.ProizvodId == item.ProizvodId).FirstOrDefault()?.Cijena ?? 0.0f;
+                            if(cijena != 0.0f && item != null)
+                            {
+                                float ukupnaCijena = item.Kolicina * cijena;
+                                float ukupnaCijenaPopust = (float)item.Kolicina * (float)Math.Round((cijena * (1 - (float)((float)set.Popust! / 100))), 2);
+                                suma += ukupnaCijena;
+                                sumaPopust += ukupnaCijenaPopust;
+                            }
+                        }
+                    }
 
-                suma += (float)entity.CijenaSaPopustom!;
+                    suma = (float)Math.Round(suma, 2);
+                    sumaPopust = (float)Math.Round(sumaPopust, 2);
 
+                    set.Cijena = suma;
+
+                    if (set.Popust == null || set.Popust == 0)
+                        set.Popust = 0;
+
+                    if (set.Popust > 0)
+                    {
+                        var popust = 1 - set.Popust / 100;
+                        set.CijenaSaPopustom = sumaPopust;
+                    }
+                    else
+                    {
+                        set.CijenaSaPopustom = suma;
+                    }
+
+                    Database.Setovi entity = mapper.Map<Database.Setovi>(set);
+                    entity.NarudzbaId = narudzbaId;
+                    context.Add(entity);
+                    sumaUkupno += (float)entity.CijenaSaPopustom!;
+                }
             }
             var narudzba = context.Narudzbes.Where(x => x.NarudzbaId == narudzbaId).FirstOrDefault();
             if(narudzba!=null)
-                narudzba.UkupnaCijena += suma;
+                narudzba.UkupnaCijena += sumaUkupno;
             if(narudzba!=null)
                 context.Update(narudzba);
             context.SaveChanges();

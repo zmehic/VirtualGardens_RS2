@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_admin/helpers/fullscreen_loader_2.dart';
 import 'package:virtualgardens_admin/layouts/master_screen.dart';
@@ -64,6 +65,10 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     await _fetchStatistic(selectedYear);
     actions.add(Row(
       children: [
+        _buildPrintPdfButton(),
+        const SizedBox(
+          width: 5,
+        ),
         _buildPrintButton(),
         const SizedBox(
           width: 5,
@@ -891,148 +896,141 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
     return groups;
   }
 
+  Future<pw.MultiPage> _buildContent() async {
+    final ByteData bytes = await rootBundle.load('assets/images/logo.png');
+    final Uint8List list = bytes.buffer.asUint8List();
+    final companyLogo = pw.MemoryImage(list);
+
+    const primaryColor = PdfColor.fromInt(0x1E2C2F);
+    const secondaryColor = PdfColor.fromInt(0x204C38);
+
+    return pw.MultiPage(
+      pageFormat: PdfPageFormat.a4,
+      build: (pw.Context context) {
+        return [
+          pw.Container(
+            color: primaryColor,
+            padding: const pw.EdgeInsets.all(10),
+            child: pw.Row(
+              crossAxisAlignment: pw.CrossAxisAlignment.center,
+              children: [
+                pw.Container(
+                  height: 60,
+                  width: 60,
+                  child: pw.Image(companyLogo),
+                ),
+                pw.SizedBox(width: 15),
+                pw.Text(
+                  "Virtual Gardens",
+                  style: pw.TextStyle(
+                    fontSize: 24,
+                    fontWeight: pw.FontWeight.bold,
+                    color: PdfColors.white,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          pw.SizedBox(height: 20),
+          pw.Text("Kupci",
+              style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                  color: secondaryColor)),
+          pw.SizedBox(height: 5),
+          pw.TableHelper.fromTextArray(
+            headers: ["Ime i prezime", "Email", "Broj narudzbi"],
+            data: monthlyStatistic!.kupci.map((customer) {
+              final korisnik = customer.korisnik;
+              return [
+                "${korisnik.ime} ${korisnik.prezime}",
+                korisnik.email,
+                customer.brojNarudzbi.toString()
+              ];
+            }).toList(),
+            border: pw.TableBorder.all(width: 1, color: primaryColor),
+            headerStyle: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+            headerDecoration: const pw.BoxDecoration(color: secondaryColor),
+            cellAlignment: pw.Alignment.centerLeft,
+          ),
+          pw.SizedBox(height: 20),
+          pw.Text("Zaposlenici",
+              style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                  color: secondaryColor)),
+          pw.SizedBox(height: 5),
+          pw.TableHelper.fromTextArray(
+            headers: ["Ime i prezime", "Email", "Broj narudzbi"],
+            data: monthlyStatistic!.workers.map((worker) {
+              final zaposlenik = worker.zaposlenik;
+              return [
+                "${zaposlenik.ime} ${zaposlenik.prezime}",
+                zaposlenik.email,
+                worker.brojNarudzbi.toString()
+              ];
+            }).toList(),
+            border: pw.TableBorder.all(width: 1, color: primaryColor),
+            headerStyle: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+            headerDecoration: const pw.BoxDecoration(color: secondaryColor),
+            cellAlignment: pw.Alignment.centerLeft,
+          ),
+          pw.SizedBox(height: 20),
+          pw.Text("Broj narudzbi po mjesecima",
+              style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                  color: secondaryColor)),
+          pw.SizedBox(height: 5),
+          pw.TableHelper.fromTextArray(
+            headers: ["Mjesec", "Broj"],
+            data: List.generate(
+                12,
+                (index) => [
+                      "${index + 1}",
+                      monthlyStatistic!.narudzbe[index].toString()
+                    ]),
+            border: pw.TableBorder.all(width: 1, color: primaryColor),
+            headerStyle: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+            headerDecoration: const pw.BoxDecoration(color: secondaryColor),
+            cellAlignment: pw.Alignment.centerLeft,
+          ),
+          pw.SizedBox(height: 20),
+          pw.Text("Prihodi po mjesecu",
+              style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                  color: secondaryColor)),
+          pw.SizedBox(height: 5),
+          pw.TableHelper.fromTextArray(
+            headers: ["Mjesec", "Prihod"],
+            data: List.generate(
+                12,
+                (index) => [
+                      "${index + 1}",
+                      "${monthlyStatistic!.prihodi[index].toString()} KM"
+                    ]),
+            border: pw.TableBorder.all(width: 1, color: primaryColor),
+            headerStyle: pw.TextStyle(
+                fontWeight: pw.FontWeight.bold, color: PdfColors.white),
+            headerDecoration: const pw.BoxDecoration(color: secondaryColor),
+            cellAlignment: pw.Alignment.centerLeft,
+          ),
+        ];
+      },
+    );
+  }
+
   Widget _buildPrintButton() {
     return Container(
       margin: const EdgeInsets.only(right: 10),
       child: ElevatedButton(
           onPressed: () async {
             final pdf = pw.Document();
-
-            final ByteData bytes =
-                await rootBundle.load('assets/images/logo.png');
-            final Uint8List list = bytes.buffer.asUint8List();
-            final companyLogo = pw.MemoryImage(list);
-
-            const primaryColor = PdfColor.fromInt(0x1E2C2F);
-            const secondaryColor = PdfColor.fromInt(0x204C38);
-            pdf.addPage(
-              pw.MultiPage(
-                pageFormat: PdfPageFormat.a4,
-                build: (pw.Context context) {
-                  return [
-                    pw.Container(
-                      color: primaryColor,
-                      padding: const pw.EdgeInsets.all(10),
-                      child: pw.Row(
-                        crossAxisAlignment: pw.CrossAxisAlignment.center,
-                        children: [
-                          pw.Container(
-                            height: 60,
-                            width: 60,
-                            child: pw.Image(companyLogo),
-                          ),
-                          pw.SizedBox(width: 15),
-                          pw.Text(
-                            "Virtual Gardens",
-                            style: pw.TextStyle(
-                              fontSize: 24,
-                              fontWeight: pw.FontWeight.bold,
-                              color: PdfColors.white,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    pw.SizedBox(height: 20),
-                    pw.Text("Kupci",
-                        style: pw.TextStyle(
-                            fontSize: 18,
-                            fontWeight: pw.FontWeight.bold,
-                            color: secondaryColor)),
-                    pw.SizedBox(height: 5),
-                    pw.TableHelper.fromTextArray(
-                      headers: ["Ime i prezime", "Email", "Broj narudzbi"],
-                      data: monthlyStatistic!.kupci.map((customer) {
-                        final korisnik = customer.korisnik;
-                        return [
-                          "${korisnik.ime} ${korisnik.prezime}",
-                          korisnik.email,
-                          customer.brojNarudzbi.toString()
-                        ];
-                      }).toList(),
-                      border: pw.TableBorder.all(width: 1, color: primaryColor),
-                      headerStyle: pw.TextStyle(
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.white),
-                      headerDecoration:
-                          const pw.BoxDecoration(color: secondaryColor),
-                      cellAlignment: pw.Alignment.centerLeft,
-                    ),
-                    pw.SizedBox(height: 20),
-                    pw.Text("Zaposlenici",
-                        style: pw.TextStyle(
-                            fontSize: 18,
-                            fontWeight: pw.FontWeight.bold,
-                            color: secondaryColor)),
-                    pw.SizedBox(height: 5),
-                    pw.TableHelper.fromTextArray(
-                      headers: ["Ime i prezime", "Email", "Broj narudzbi"],
-                      data: monthlyStatistic!.workers.map((worker) {
-                        final zaposlenik = worker.zaposlenik;
-                        return [
-                          "${zaposlenik.ime} ${zaposlenik.prezime}",
-                          zaposlenik.email,
-                          worker.brojNarudzbi.toString()
-                        ];
-                      }).toList(),
-                      border: pw.TableBorder.all(width: 1, color: primaryColor),
-                      headerStyle: pw.TextStyle(
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.white),
-                      headerDecoration:
-                          const pw.BoxDecoration(color: secondaryColor),
-                      cellAlignment: pw.Alignment.centerLeft,
-                    ),
-                    pw.SizedBox(height: 20),
-                    pw.Text("Broj narudzbi po mjesecima",
-                        style: pw.TextStyle(
-                            fontSize: 18,
-                            fontWeight: pw.FontWeight.bold,
-                            color: secondaryColor)),
-                    pw.SizedBox(height: 5),
-                    pw.TableHelper.fromTextArray(
-                      headers: ["Mjesec", "Broj"],
-                      data: List.generate(
-                          12,
-                          (index) => [
-                                "${index + 1}",
-                                monthlyStatistic!.narudzbe[index].toString()
-                              ]),
-                      border: pw.TableBorder.all(width: 1, color: primaryColor),
-                      headerStyle: pw.TextStyle(
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.white),
-                      headerDecoration:
-                          const pw.BoxDecoration(color: secondaryColor),
-                      cellAlignment: pw.Alignment.centerLeft,
-                    ),
-                    pw.SizedBox(height: 20),
-                    pw.Text("Prihodi po mjesecu",
-                        style: pw.TextStyle(
-                            fontSize: 18,
-                            fontWeight: pw.FontWeight.bold,
-                            color: secondaryColor)),
-                    pw.SizedBox(height: 5),
-                    pw.TableHelper.fromTextArray(
-                      headers: ["Mjesec", "Prihod"],
-                      data: List.generate(
-                          12,
-                          (index) => [
-                                "${index + 1}",
-                                "${monthlyStatistic!.prihodi[index].toString()} KM"
-                              ]),
-                      border: pw.TableBorder.all(width: 1, color: primaryColor),
-                      headerStyle: pw.TextStyle(
-                          fontWeight: pw.FontWeight.bold,
-                          color: PdfColors.white),
-                      headerDecoration:
-                          const pw.BoxDecoration(color: secondaryColor),
-                      cellAlignment: pw.Alignment.centerLeft,
-                    ),
-                  ];
-                },
-              ),
-            );
+            pdf.addPage(await _buildContent());
 
             String? outputFilePath = await FilePicker.platform.saveFile(
               dialogTitle: "Spremite Vaš PDF izvještaj",
@@ -1065,6 +1063,47 @@ class _StatisticsScreenState extends State<StatisticsScreen> {
             "Izvještaj",
             style: TextStyle(color: Color.fromRGBO(3, 43, 43, 1)),
           )),
+    );
+  }
+
+  Widget _buildPrintPdfButton() {
+    return Container(
+      margin: const EdgeInsets.only(right: 10),
+      child: ElevatedButton(
+        onPressed: () async {
+          final pdf = pw.Document();
+
+          pdf.addPage(await _buildContent());
+          try {
+            var response = await Printing.layoutPdf(
+              onLayout: (PdfPageFormat format) async => await pdf.save(),
+            );
+
+            if (mounted && response) {
+              await buildSuccessAlert(
+                  context, "Uspješan ispis", "PDF je uspješno ispisan",
+                  isDoublePop: false);
+            } else if (mounted && !response) {
+              await buildErrorAlert(
+                  context,
+                  "Odustali ste od ispisa",
+                  "Odustali ste od ispisa",
+                  Exception("Odustali ste od ispisa"));
+            }
+          } on Exception catch (e) {
+            if (mounted) {
+              await buildErrorAlert(context, "Greška", e.toString(), e);
+            }
+          }
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.white,
+        ),
+        child: const Text(
+          "Print PDF",
+          style: TextStyle(color: Color.fromRGBO(3, 43, 43, 1)),
+        ),
+      ),
     );
   }
 }

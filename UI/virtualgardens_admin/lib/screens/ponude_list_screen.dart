@@ -284,7 +284,7 @@ class _PonudeListScreenState extends State<PonudeListScreen> {
             ),
             ElevatedButton(
                 onPressed: () async {
-                  var response = await Navigator.of(context).push(
+                  bool? response = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (context) => const PonudeDetailsScreen()));
 
@@ -370,7 +370,7 @@ class PonudeDataSource extends AdvancedDataTableSource<Ponuda> {
     return DataRow(
         onSelectChanged: (selected) async {
           if (selected == true) {
-            var response = await Navigator.of(context).push(MaterialPageRoute(
+            bool? response = await Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => PonudeDetailsScreen(
                       ponuda: item,
                     )));

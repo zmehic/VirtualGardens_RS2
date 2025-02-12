@@ -163,14 +163,14 @@ class _PitanjaOdgovoriListScreenState extends State<PitanjaOdgovoriListScreen> {
               child: Row(
                 children: [
                   Expanded(
-                    child: Container(
-                      color: Colors.white,
-                      child: TextField(
-                        controller: _porukaEditingController,
-                        decoration: const InputDecoration(
-                          hintText: 'Upišite poruku...',
-                          border: OutlineInputBorder(),
-                        ),
+                    child: TextField(
+                      maxLength: 255,
+                      controller: _porukaEditingController,
+                      decoration: const InputDecoration(
+                        fillColor: Colors.white,
+                        filled: true,
+                        hintText: 'Upišite poruku...',
+                        border: OutlineInputBorder(),
                       ),
                     ),
                   ),

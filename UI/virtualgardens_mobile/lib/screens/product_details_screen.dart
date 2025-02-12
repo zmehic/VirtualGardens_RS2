@@ -193,7 +193,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             DrawerHeader(
-              decoration: BoxDecoration(color: Colors.green.shade700),
+              decoration:
+                  const BoxDecoration(color: Color.fromRGBO(32, 76, 56, 1)),
               child: Center(
                 child: Text(
                   title,
@@ -248,7 +249,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                       const SizedBox(height: 8),
                       FormBuilderTextField(
                         name: "komentar",
-                        maxLines: 3,
+                        maxLines: 5,
+                        maxLength: 255,
                         decoration: InputDecoration(
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(12),
@@ -265,6 +267,12 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  const Color.fromRGBO(32, 76, 56, 1),
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 25),
+                            ),
                             onPressed: () async {
                               if (_productRatingFormKey.currentState
                                       ?.saveAndValidate() ==
@@ -322,7 +330,8 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                                 });
                               }
                             },
-                            child: const Text("Pošalji recenziju"),
+                            child: const Text("Pošalji recenziju",
+                                style: TextStyle(color: Colors.white)),
                           ),
                           ElevatedButton(
                             onPressed: () {
@@ -333,8 +342,13 @@ class _ProductDetailsScreenState extends State<ProductDetailsScreen> {
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.grey,
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 25),
                             ),
-                            child: const Text("Otkaži"),
+                            child: const Text(
+                              "Otkaži",
+                              style: TextStyle(color: Colors.white),
+                            ),
                           ),
                         ],
                       ),

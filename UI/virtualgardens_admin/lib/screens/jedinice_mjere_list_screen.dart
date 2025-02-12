@@ -121,7 +121,7 @@ class _JediniceMjereListScreenState extends State<JediniceMjereListScreen> {
                     minimumSize:
                         MaterialStateProperty.all(const Size(150, 50))),
                 onPressed: () async {
-                  var response = await Navigator.push(
+                  bool? response = await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: ((context) =>
@@ -192,7 +192,7 @@ class JediniceMjereDataSource extends AdvancedDataTableSource<JediniceMjere> {
     return DataRow(
         onSelectChanged: (selected) async {
           if (selected == true) {
-            var response = await Navigator.push(
+            bool? response = await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: ((context) => JedinicaMjereDetailsScreen(

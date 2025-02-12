@@ -143,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   name: "korisnickoIme",
                   isRequired: true,
                   minLength: 3,
-                  maxLength: 32,
+                  maxLength: 50,
                   match: r'^\S+$',
                   matchErrorText:
                       "Korisničko ime ne smije sadržavati razmake."),
@@ -151,6 +151,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               buildFormBuilderTextField(
                 label: "Email",
                 name: "email",
+                maxLength: 100,
                 isEmail: true,
                 isRequired: true,
               ),
@@ -159,7 +160,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label: "Ime",
                   name: "ime",
                   minLength: 3,
-                  maxLength: 32,
+                  maxLength: 50,
                   isRequired: true,
                   match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                   matchErrorText: "Ime može sadržavati samo slova."),
@@ -170,7 +171,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   label: "Prezime",
                   name: "prezime",
                   minLength: 3,
-                  maxLength: 32,
+                  maxLength: 50,
                   isRequired: true,
                   match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                   matchErrorText: "Prezime može sadržavati samo slova."),
@@ -216,7 +217,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
               ),
               const SizedBox(height: 15),
               buildFormBuilderTextField(
-                maxLength: 32,
+                maxLength: 255,
                 label: "Adresa",
                 name: "adresa",
                 isValidated: false,
@@ -225,7 +226,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 height: 15,
               ),
               buildFormBuilderTextField(
-                  maxLength: 32,
+                  maxLength: 100,
                   label: "Grad",
                   name: "grad",
                   match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
@@ -234,7 +235,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 height: 15,
               ),
               buildFormBuilderTextField(
-                  maxLength: 32,
+                  maxLength: 100,
                   label: "Država",
                   name: "drzava",
                   match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
@@ -247,7 +248,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   name: "lozinka",
                   isRequired: true,
                   minLength: 8,
-                  maxLength: 32,
+                  maxLength: 50,
                   match: r"",
                   matchErrorText:
                       "Lozinka mora sadržavati \nvelika slova, mala slova, brojeve \n i specijalne znakove.",
@@ -263,7 +264,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       decoration:
                           const InputDecoration(labelText: "Potvrdite lozinku"),
                       obscureText: true,
-                      maxLength: 32,
+                      maxLength: 50,
                       name: "lozinkaPotvrda",
                       validator: FormBuilderValidators.compose([
                         FormBuilderValidators.required(

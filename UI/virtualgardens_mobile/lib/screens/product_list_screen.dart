@@ -189,6 +189,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
               child: FormBuilderTextField(
                 controller: _searchController,
                 name: 'naziv',
+                maxLength: 100,
                 decoration: const InputDecoration(
                   labelText: "Pretraži proizvode",
                   prefixIcon: Icon(Icons.search),
@@ -219,7 +220,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.green.shade700),
+            decoration:
+                const BoxDecoration(color: Color.fromRGBO(32, 76, 56, 1)),
             child: Center(
               child: Text(
                 title,
@@ -238,11 +240,19 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 _buildSearch(),
                 const SizedBox(height: 16),
                 ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 15, horizontal: 25),
+                  ),
                   onPressed: () async {
                     _fetchProducts(reset: true);
                     _scaffoldKey.currentState?.closeDrawer();
                   },
-                  child: const Text("Apply Filters"),
+                  child: const Text(
+                    "Filtriraj",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ],
             ),
@@ -337,7 +347,8 @@ class _ProductListScreenState extends State<ProductListScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           DrawerHeader(
-            decoration: BoxDecoration(color: Colors.green.shade700),
+            decoration:
+                const BoxDecoration(color: Color.fromRGBO(32, 76, 56, 1)),
             child: Center(
               child: Text(
                 title,
@@ -368,25 +379,41 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    ElevatedButton(
-                      onPressed: () async {
-                        _fetchProducts(reset: true);
-                        _scaffoldKey.currentState?.closeEndDrawer();
-                      },
-                      child: const Text("Sortiraj"),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 25),
+                        ),
+                        onPressed: () async {
+                          _fetchProducts(reset: true);
+                          _scaffoldKey.currentState?.closeEndDrawer();
+                        },
+                        child: const Text("Sortiraj",
+                            style: TextStyle(color: Colors.white)),
+                      ),
                     ),
                     const SizedBox(
                       width: 8,
                     ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        sortBy = null;
-                        isAscending = true;
-                        _fetchProducts(reset: true);
-                        _scaffoldKey.currentState?.closeEndDrawer();
-                        setState(() {});
-                      },
-                      child: const Text("Ukloni sortiranje"),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 15, horizontal: 25),
+                        ),
+                        onPressed: () async {
+                          sortBy = null;
+                          isAscending = true;
+                          _fetchProducts(reset: true);
+                          _scaffoldKey.currentState?.closeEndDrawer();
+                          setState(() {});
+                        },
+                        child: const Text("Ukloni",
+                            style: TextStyle(color: Colors.white)),
+                      ),
                     ),
                   ],
                 ),
@@ -464,7 +491,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
               Icons.filter_list,
               color: Colors.white,
             ),
-            backgroundColor: Colors.green.shade700,
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
           ),
           const SizedBox(
             width: 5,
@@ -482,7 +509,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
               Icons.sort,
               color: Colors.white,
             ),
-            backgroundColor: Colors.green.shade700,
+            backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
           ),
         ],
       ),

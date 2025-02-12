@@ -169,7 +169,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                     minimumSize:
                         MaterialStateProperty.all(const Size(150, 50))),
                 onPressed: () async {
-                  var response = await Navigator.push(
+                  bool? response = await Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: ((context) =>
@@ -311,7 +311,7 @@ class ProductDataSource extends AdvancedDataTableSource<Proizvod> {
     return DataRow(
         onSelectChanged: (selected) async {
           if (selected == true) {
-            var response = await Navigator.push(
+            bool? response = await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: ((context) =>

@@ -60,7 +60,6 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
               icon: const Icon(Icons.arrow_back, color: Colors.white),
               onPressed: () {
                 Navigator.of(context).pop();
-                Navigator.of(context).pop();
               },
             ),
             actions: <Widget>[Container()],
@@ -152,14 +151,18 @@ class _UserOrdersScreenState extends State<UserOrdersScreen>
                     IconButton(
                       icon:
                           const Icon(Icons.arrow_forward, color: Colors.green),
-                      onPressed: () {
-                        Navigator.of(context).push(
+                      onPressed: () async {
+                        bool? response = await Navigator.of(context).push(
                           MaterialPageRoute(
                             builder: (context) => NarudzbaUserDetailsScreen(
                               narudzba: order,
                             ),
                           ),
                         );
+
+                        if (response == true) {
+                          fetchUserOrders();
+                        }
                       },
                     ),
                   ],

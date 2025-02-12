@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_form_builder/flutter_form_builder.dart';
 import 'package:form_builder_validators/form_builder_validators.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
@@ -34,6 +36,7 @@ void main() {
   HttpOverrides.global = MyHttpOverrides();
   runZonedGuarded(() async {
     WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
     FlutterError.onError = (FlutterErrorDetails errorDetails) {
       //print("ON error error: ${errorDetails.exception.toString()}");
     };
@@ -104,12 +107,14 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SingleChildScrollView(
         child: Column(
           children: [
             Container(
               height: 500,
               decoration: const BoxDecoration(
+                  color: Colors.white,
                   image: DecorationImage(
                       image: AssetImage("assets/images/background.png"),
                       fit: BoxFit.fill)),
@@ -128,8 +133,9 @@ class LoginPage extends StatelessWidget {
                 ],
               ),
             ),
-            Padding(
+            Container(
               padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(color: Colors.white),
               child: FormBuilder(
                 key: _formKey,
                 child: Column(
@@ -196,6 +202,9 @@ class LoginPage extends StatelessWidget {
                                 await provider.login(
                                     username: AuthProvider.username,
                                     password: AuthProvider.password);
+
+                                _usernameController.text = "";
+                                _passwordController.text = "";
                                 navigator.push(MaterialPageRoute(
                                     builder: (context) => const HomeScreen()));
                               } on Exception catch (e) {

@@ -109,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       Container(
                         margin: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
+                            horizontal: 5, vertical: 10),
                         color: const Color.fromRGBO(235, 241, 224, 1),
                         child: body(),
                       ),
@@ -167,24 +167,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         label: "Korisničko ime",
                         isRequired: true,
                         minLength: 3,
-                        maxLength: 32,
+                        maxLength: 50,
                         match: r'^\S+$',
                         matchErrorText:
                             "Korisničko ime ne smije sadržavati razmake."),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
-                      name: "email",
-                      label: "Email",
-                      isEmail: true,
-                      isRequired: true,
-                    ),
+                        name: "email",
+                        label: "Email",
+                        isEmail: true,
+                        isRequired: true,
+                        maxLength: 100),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
                         name: "ime",
                         label: "Ime",
                         isRequired: true,
                         minLength: 3,
-                        maxLength: 32,
+                        maxLength: 50,
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                         matchErrorText: "Ime može sadržavati samo slova."),
                     const SizedBox(height: 10),
@@ -192,7 +192,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         name: "prezime",
                         label: "Prezime",
                         minLength: 3,
-                        maxLength: 32,
+                        maxLength: 50,
                         isRequired: true,
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ]+$',
                         matchErrorText: "Prezime može sadržavati samo slova."),
@@ -205,25 +205,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       label: "Broj telefona",
                       match: r'^(?:\+387[0-9]{2}[0-9]{6}|06[0-9]{7})$',
                       matchErrorText:
-                          "Unesite ispravan broj mobitela (npr. +38761234567).",
+                          "Unesite ispravan broj mobitela \n(npr. +38761234567 ili 061234567).",
                     ),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
-                      maxLength: 32,
+                      maxLength: 255,
                       name: "adresa",
                       label: "Adresa",
                       isValidated: false,
                     ),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
-                        maxLength: 32,
+                        maxLength: 100,
                         name: "grad",
                         label: "Grad",
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
                         matchErrorText: "Grad može sadržavati samo slova."),
                     const SizedBox(height: 10),
                     buildFormBuilderTextField(
-                        maxLength: 32,
+                        maxLength: 100,
                         name: "drzava",
                         label: "Država",
                         match: r'^[a-zA-ZčćžšđČĆŽŠĐ ]+$',
@@ -264,15 +264,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           setState(() {});
 
                           try {
-                            if (request.containsKey('lozinka') == false ||
-                                (request.containsKey('lozinka') == true &&
+                            if (changePassword == false ||
+                                (changePassword == true &&
+                                    request.containsKey('lozinka') == true &&
                                     request.containsKey('staraLozinka') ==
                                         true &&
                                     request.containsKey('lozinkaPotvrda') ==
-                                        true &&
-                                    request.containsKey('lozinka') ==
-                                        request
-                                            .containsKey('lozinkaPotvrda'))) {
+                                        true)) {
                               var response = await _korisnikProvider.update(
                                   AuthProvider.korisnikId!, request);
 
@@ -289,8 +287,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   text:
                                       "Ukoliko ste mijenjali lozinku, potrebno je da se ponovo prijavite na sistem!",
                                   onConfirmBtnTap: () {
-                                    if (request.containsKey('lozinka') ==
-                                        false) {
+                                    if (changePassword == false) {
                                       Navigator.of(context).pushReplacement(
                                           MaterialPageRoute(
                                               builder: (context) =>
@@ -319,12 +316,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromRGBO(32, 76, 56, 1),
-                        padding: const EdgeInsets.symmetric(vertical: 15),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 15, horizontal: 10),
                       ),
-                      child: const Text(
-                        "Spasi promjene",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      child: const Icon(Icons.save, color: Colors.white),
                     ),
                   ],
                 ),
@@ -371,12 +366,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             name: "lozinka",
             label: "Nova lozinka",
             isRequired: true,
-            maxLength: 32,
+            maxLength: 50,
             minLength: 8,
             match:
                 r'^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$',
             matchErrorText:
-                "Lozinka mora sadržavati velika slova, mala slova, brojeve \n i specijalne znakove.",
+                "Lozinka mora sadržavati velika slova,\nmala slova, brojeve \ni specijalne znakove.",
             obscureText: true,
           ),
           const SizedBox(height: 10),
@@ -389,14 +384,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       const InputDecoration(labelText: "Potvrdite lozinku"),
                   obscureText: true,
                   name: "lozinkaPotvrda",
-                  maxLength: 32,
+                  maxLength: 50,
                   validator: FormBuilderValidators.compose([
                     FormBuilderValidators.required(
                         errorText: "Potvrda lozinke je obavezno."),
                     (value) {
                       if (value !=
                           _formKey.currentState?.fields['lozinka']?.value) {
-                        return "Potvrda lozinke se ne poklapa s novom lozinkom.";
+                        return "Potvrda lozinke se ne poklapa s \nnovom lozinkom.";
                       }
                       return null;
                     }
@@ -407,7 +402,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 10),
           buildFormBuilderTextField(
-            maxLength: 32,
+            maxLength: 50,
             name: "staraLozinka",
             label: "Stara lozinka",
             isRequired: true,

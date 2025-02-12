@@ -141,11 +141,11 @@ class _NaloziListScreenState extends State<NaloziListScreen> {
             ),
             ElevatedButton(
                 onPressed: () async {
-                  var response = await Navigator.of(context).push(
+                  bool? response = await Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (context) => const NaloziDetailsScreen()));
 
-                  if (response) {
+                  if (response == true) {
                     dataSource.filterServerSide(_ftsEditingController.text,
                         datumOdString, datumDoString, selectedStanje);
                     setState(() {});
@@ -271,7 +271,7 @@ class NaloziDataSource extends AdvancedDataTableSource<Nalog> {
     return DataRow(
         onSelectChanged: (selected) async {
           if (selected == true) {
-            var response = await Navigator.of(context).push(MaterialPageRoute(
+            bool? response = await Navigator.of(context).push(MaterialPageRoute(
                 builder: (context) => NaloziDetailsScreen(
                       nalog: item,
                     )));

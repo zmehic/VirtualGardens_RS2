@@ -13,7 +13,6 @@ import 'package:virtualgardens_mobile/providers/ponude_provider.dart';
 import 'package:virtualgardens_mobile/providers/setovi_provider.dart';
 import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
 import 'package:virtualgardens_mobile/screens/add_product_set_screen.dart';
-import 'package:virtualgardens_mobile/screens/narudzbe_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/pitanja_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/ponude_details_screen.dart';
 
@@ -102,10 +101,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back, color: Colors.white),
                 onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                        builder: (context) => const UserOrdersScreen()),
-                  );
+                  Navigator.of(context).pop(true);
                 },
               ),
               actions: <Widget>[
@@ -240,11 +236,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                     onPressed: () async {
                       await buildDeleteAlert(context, "Set", "Set",
                           _setoviProvider, setoviResult!.result[index].setId);
-                      widget.narudzba!.ukupnaCijena =
-                          (widget.narudzba!.ukupnaCijena -
-                              setoviResult!.result[index].cijenaSaPopustom!);
-                      setoviResult!.result.removeAt(index);
-                      setState(() {});
+                      initForm();
                     },
                     icon: const Icon(
                       Icons.delete,
@@ -366,6 +358,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                               ],
                               note: "Hvala Vam na plaćanju",
                               onSuccess: (Map params) async {
+                                print(params);
                                 var request = {
                                   "brojNarudzbe": widget.narudzba!.brojNarudzbe,
                                   "ukupnaCijena": widget.narudzba!.ukupnaCijena,
@@ -386,6 +379,7 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                                 }
                               },
                               onError: (error) {
+                                print(error);
                                 Navigator.pop(context);
                               },
                               onCancel: () {},
@@ -420,14 +414,22 @@ class _NarudzbaUserDetailsScreenState extends State<NarudzbaUserDetailsScreen> {
                 : Container(),
             const SizedBox(width: 20),
             ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(context).push(
+              onPressed: () async {
+                bool? response = await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => AddProductSetScreen(
                       narudzba: widget.narudzba,
                     ),
                   ),
                 );
+                if (response == true) {
+                  if (mounted) {
+                    buildSuccessAlert(context, "Set uspješno dodan!",
+                        "Uspješno ste dodali set u narudžbu.",
+                        isDoublePop: false);
+                  }
+                  await initForm();
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
