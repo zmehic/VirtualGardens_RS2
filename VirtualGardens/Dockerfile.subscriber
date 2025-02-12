@@ -1,0 +1,19 @@
+# Dockerfile.subscriber
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+WORKDIR /app
+
+
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+ARG BUILD_CONFIGURATION=Release
+WORKDIR /src
+COPY . .
+RUN dotnet restore "VirtualGardens.Subscriber/VirtualGardens.Subscriber.csproj"
+RUN dotnet build "VirtualGardens.Subscriber/VirtualGardens.Subscriber.csproj" -c $BUILD_CONFIGURATION -o /app
+
+FROM build AS publish
+RUN dotnet publish "VirtualGardens.Subscriber/VirtualGardens.Subscriber.csproj" -c $BUILD_CONFIGURATION -o /app
+
+FROM base AS final
+WORKDIR /app
+COPY --from=publish /app .
+ENTRYPOINT ["dotnet", "VirtualGardens.Subscriber.dll"]

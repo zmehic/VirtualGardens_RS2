@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using VirtualGardens.Services.BaseInterfaces;
 
 namespace VirtualGardens.Services.Database;
 
-public partial class SetoviPonude
+public partial class SetoviPonude : ISoftDeletable
 {
     public int SetoviPonudeId { get; set; }
 
@@ -14,4 +15,6 @@ public partial class SetoviPonude
     public virtual Ponude Ponuda { get; set; } = null!;
 
     public virtual Setovi Set { get; set; } = null!;
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? VrijemeBrisanja { get; set; }
 }

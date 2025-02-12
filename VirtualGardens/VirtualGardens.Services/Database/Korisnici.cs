@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using VirtualGardens.Services.BaseInterfaces;
 
 namespace VirtualGardens.Services.Database;
 
-public partial class Korisnici
+public partial class Korisnici : ISoftDeletable
 {
     public int KorisnikId { get; set; }
 
     public string KorisnickoIme { get; set; } = null!;
-
-    public string Lozinka { get; set; } = null!;
 
     public string Email { get; set; } = null!;
 
@@ -25,13 +24,18 @@ public partial class Korisnici
 
     public string? Drzava { get; set; }
 
+    public string LozinkaHash { get; set; } = null!;
+
+    public string LozinkaSalt { get; set; } = null!;
+
     public DateTime DatumRegistracije { get; set; }
 
     public DateTime? ZadnjiLogin { get; set; }
 
-    public bool JeAktivan { get; set; }
+    public bool JeAktivan { get; set; } = true;
 
     public DateTime? DatumRodjenja { get; set; }
+    public byte[]? Slika { get; set; }
 
     public virtual ICollection<KorisniciUloge> KorisniciUloges { get; set; } = new List<KorisniciUloge>();
 
@@ -42,4 +46,7 @@ public partial class Korisnici
     public virtual ICollection<Recenzije> Recenzijes { get; set; } = new List<Recenzije>();
 
     public virtual ICollection<Ulazi> Ulazis { get; set; } = new List<Ulazi>();
+
+    public bool IsDeleted { get; set; } = false;
+    public DateTime? VrijemeBrisanja { get; set; }
 }
