@@ -82,35 +82,35 @@ namespace VirtualGardens.Services.Migrations
             values: new object[,]
             {
 
-                { 1, "Kvalitetna Zemlja", "Svježa kvalitetna zemlja za biljke", 2.50f, 1000, 1, 1 },
-                { 2, "Tlo za Cvijeće", "Idealno tlo za cvjetne biljke", 3.00f, 750, 1, 1 },
-                { 3, "Zemlja za Raste", "Posebno mješavina tla za rastuće biljke", 2.75f, 500, 1, 1 }, 
-                { 4, "Zemlja za cvijeće 2", "Svježa kvalitetna zemlja za cvijeće", 2.50f, 1000, 1, 1 },
-                { 5, "Tlo za Paradajz", "Idealno tlo za paradajz", 3.00f, 750, 1, 1 }, 
-                { 6, "Zemlja za Kukuruz", "Posebno mješavina tla za kukuruz", 2.75f, 500, 1, 1 },
-                { 7, "Kvalitetna Zemlja za Paprike", "Svježa kvalitetna zemlja za paprike", 2.50f, 1000, 1, 1 },
-                { 8, "Tlo za Cvijeće 2", "Idealno tlo za cvjetne biljke", 3.00f, 750, 1, 1 }, 
-                { 9, "Zemlja za Raste 2", "Posebno mješavina tla za rastuće biljke", 2.75f, 500, 1, 1 }, 
+                { 1, "Kvalitetna Zemlja", "Svježa kvalitetna zemlja za biljke", 2.50f, 2001, 1, 1 },
+                { 2, "Tlo za Cvijeće", "Idealno tlo za cvjetne biljke", 3.00f, 1501, 1, 1 },
+                { 3, "Zemlja za Raste", "Posebno mješavina tla za rastuće biljke", 2.75f, 1001, 1, 1 }, 
+                { 4, "Zemlja za cvijeće 2", "Svježa kvalitetna zemlja za cvijeće", 2.50f, 2001, 1, 1 },
+                { 5, "Tlo za Paradajz", "Idealno tlo za paradajz", 3.00f, 1501, 1, 1 }, 
+                { 6, "Zemlja za Kukuruz", "Posebno mješavina tla za kukuruz", 2.75f, 1001, 1, 1 },
+                { 7, "Kvalitetna Zemlja za Paprike", "Svježa kvalitetna zemlja za paprike", 2.50f, 2001, 1, 1 },
+                { 8, "Tlo za Cvijeće 2", "Idealno tlo za cvjetne biljke", 3.00f, 1501, 1, 1 }, 
+                { 9, "Zemlja za Raste 2", "Posebno mješavina tla za rastuće biljke", 2.75f, 1001, 1, 1 }, 
                 
-                { 10, "Organski Đubrivo", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 600, 2, 2 },  
-                { 11, "Mineralno Đubrivo", "Đubrivo bogato mineralima", 6.00f, 400, 2, 2 }, 
-                { 12, "NPK Đubrivo", "NPK đubrivo za optimalan rast biljaka", 4.50f, 800, 2, 2 },
-                { 13, "Organski Đubrivo 2", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 600, 2, 2 }, 
-                { 14, "Mineralno Đubrivo 2", "Đubrivo bogato mineralima", 6.00f, 400, 2, 2 }, 
-                { 15, "NPK Đubrivo 2", "NPK đubrivo za optimalan rast biljaka", 4.50f, 800, 2, 2 }, 
-                { 16, "Organski Đubrivo 3", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 600, 2, 2 }, 
-                { 17, "Mineralno Đubrivo 3", "Đubrivo bogato mineralima", 6.00f, 400, 2, 2 }, 
-                { 18, "NPK Đubrivo 3", "NPK đubrivo za optimalan rast biljaka", 4.50f, 800, 2, 2 }, 
+                { 10, "Organski Đubrivo", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 1201, 2, 2 },  
+                { 11, "Mineralno Đubrivo", "Đubrivo bogato mineralima", 6.00f, 801, 2, 2 }, 
+                { 12, "NPK Đubrivo", "NPK đubrivo za optimalan rast biljaka", 4.50f, 1601, 2, 2 },
+                { 13, "Organski Đubrivo 2", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 1201, 2, 2 }, 
+                { 14, "Mineralno Đubrivo 2", "Đubrivo bogato mineralima", 6.00f, 801, 2, 2 }, 
+                { 15, "NPK Đubrivo 2", "NPK đubrivo za optimalan rast biljaka", 4.50f, 1601, 2, 2 }, 
+                { 16, "Organski Đubrivo 3", "Prirodno đubrivo za poboljšanje rasta", 5.00f, 1201, 2, 2 }, 
+                { 17, "Mineralno Đubrivo 3", "Đubrivo bogato mineralima", 6.00f, 801, 2, 2 }, 
+                { 18, "NPK Đubrivo 3", "NPK đubrivo za optimalan rast biljaka", 4.50f, 1601, 2, 2 }, 
 
-                { 19, "Sjemenke Rajčice", "Sjemenke za uzgoj rajčice", 1.50f, 2000, 1, 3 }, 
-                { 20, "Sjemenke Paprike", "Sjemenke za uzgoj paprike", 1.80f, 1800, 1, 3 }, 
-                { 21, "Sjemenke Krastavca", "Sjemenke za uzgoj krastavca", 1.60f, 1500, 1, 3 } , 
-                { 22, "Sjemenke Kukuruza", "Sjemenke za uzgoj rajčice", 1.50f, 2000, 1, 3 }, 
-                { 23, "Sjemenke Mahune", "Sjemenke za uzgoj paprike", 1.80f, 1800, 1, 3 }, 
-                { 24, "Sjemenke Graška", "Sjemenke za uzgoj krastavca", 1.60f, 1500, 1, 3 } ,
-                { 25, "Sjemenke Mrkve", "Sjemenke za uzgoj rajčice", 1.50f, 2000, 1, 3 },
-                { 26, "Sjemenke Špinata", "Sjemenke za uzgoj paprike", 1.80f, 1800, 1, 3 },
-                { 27, "Sjemenke Blitve", "Sjemenke za uzgoj krastavca", 1.60f, 1500, 1, 3 }  
+                { 19, "Sjemenke Rajčice", "Sjemenke za uzgoj rajčice", 1.50f, 4001, 1, 3 }, 
+                { 20, "Sjemenke Paprike", "Sjemenke za uzgoj paprike", 1.80f, 3601, 1, 3 }, 
+                { 21, "Sjemenke Krastavca", "Sjemenke za uzgoj krastavca", 1.60f, 3001, 1, 3 } , 
+                { 22, "Sjemenke Kukuruza", "Sjemenke za uzgoj rajčice", 1.50f, 4001, 1, 3 }, 
+                { 23, "Sjemenke Mahune", "Sjemenke za uzgoj paprike", 1.80f, 3601, 1, 3 }, 
+                { 24, "Sjemenke Graška", "Sjemenke za uzgoj krastavca", 1.60f, 3001, 1, 3 } ,
+                { 25, "Sjemenke Mrkve", "Sjemenke za uzgoj rajčice", 1.50f, 4001, 1, 3 },
+                { 26, "Sjemenke Špinata", "Sjemenke za uzgoj paprike", 1.80f, 3601, 1, 3 },
+                { 27, "Sjemenke Blitve", "Sjemenke za uzgoj krastavca", 1.60f, 3001, 1, 3 }  
             });
 
             migrationBuilder.InsertData(
@@ -130,7 +130,10 @@ namespace VirtualGardens.Services.Migrations
                 {
                     { 1, "Batch-1", DateTime.Now, 1 }, 
                     { 2, "Batch-2", DateTime.Now.AddDays(-1), 1 }, 
-                    { 3, "Batch-3", DateTime.Now.AddDays(-2), 1 }  
+                    { 3, "Batch-3", DateTime.Now.AddDays(-2), 1 },
+                    { 4, "Batch-4", DateTime.Now, 1 },
+                    { 5, "Batch-5", DateTime.Now.AddDays(-1), 1 },
+                    { 6, "Batch-6", DateTime.Now.AddDays(-2), 1 }
                 });
 
             migrationBuilder.InsertData(
@@ -165,6 +168,33 @@ namespace VirtualGardens.Services.Migrations
                     { 25, 3, 25, 2000 },
                     { 26, 3, 26, 1800 },
                     { 27, 3, 27, 1500 },
+                    { 28, 4, 1, 1000 },
+                    { 29, 4, 2, 750 },
+                    { 30, 4, 3, 500 },
+                    { 31, 4, 4, 1000 },
+                    { 32, 4, 5, 750 },
+                    { 33, 4, 6, 500 },
+                    { 34, 4, 7, 1000 },
+                    { 35, 4, 8, 750 },
+                    { 36, 4, 9, 500 },
+                    { 37, 5, 10, 600 },
+                    { 38, 5, 11, 400 },
+                    { 39, 5, 12, 800 },
+                    { 40, 5, 13, 600 },
+                    { 41, 5, 14, 400 },
+                    { 42, 5, 15, 800 },
+                    { 43, 5, 16, 600},
+                    { 44, 5, 17, 400 },
+                    { 45, 5, 18, 800 },
+                    { 46, 6, 19, 2000 },
+                    { 47, 6, 20, 1800 },
+                    { 48, 6, 21, 1500 },
+                    { 49, 6, 22, 2000 },
+                    { 50, 6, 23, 1800 },
+                    { 51, 6, 24, 1500 },
+                    { 52, 6, 25, 2000 },
+                    { 53, 6, 26, 1800 },
+                    { 54, 6, 27, 1500 },
                });
 
             migrationBuilder.InsertData(
@@ -599,6 +629,21 @@ namespace VirtualGardens.Services.Migrations
                 keyValue: 3);
 
             migrationBuilder.DeleteData(
+            table: "Ulazi",
+            keyColumn: "UlazID",
+            keyValue: 4);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi",
+                keyColumn: "UlazID",
+                keyValue:5);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi",
+                keyColumn: "UlazID",
+                keyValue: 6);
+
+            migrationBuilder.DeleteData(
             table: "Ulazi_Proizvodi",
             keyColumn: "UlaziProizvodiID",
             keyValue: 1);
@@ -732,6 +777,141 @@ namespace VirtualGardens.Services.Migrations
                 table: "Ulazi_Proizvodi",
                 keyColumn: "UlaziProizvodiID",
                 keyValue: 27);
+
+            migrationBuilder.DeleteData(
+            table: "Ulazi_Proizvodi",
+            keyColumn: "UlaziProizvodiID",
+            keyValue: 28);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 29);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 30);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 31);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 32);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 33);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 34);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 35);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 36);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 37);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 38);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 39);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 40);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 41);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 42);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 43);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 44);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 45);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 46);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 47);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 48);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 49);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 50);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 51);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 52);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 53);
+
+            migrationBuilder.DeleteData(
+                table: "Ulazi_Proizvodi",
+                keyColumn: "UlaziProizvodiID",
+                keyValue: 54);
 
             migrationBuilder.DeleteData(
             table: "Nalozi",
