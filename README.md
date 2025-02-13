@@ -8,7 +8,7 @@ Seminarski rad iz predmeta Razvoj softvera 2 na Fakultetu informacijskih tehnolo
 - **Iz te arhive uraditi extract .env file-a u istom folderu (VirtualGardens_RS2/VirtualGardens)**
 - **.env file treba biti u VirtualGardens_RS2\VirtualGardens folderu**
 - **Unutar VirtualGardens_RS2\VirtualGardens, otvoriti terminal i pokrenuti komandu docker compose up --build, te sačekati da se sve uspješno build-a.**
-- **Vratiti se u VirtualGardens_RS2 folder i locirati fit-build-2025-02-12.part1.rar arhivu**
+- **Vratiti se u VirtualGardens_RS2 folder i locirati fit-build-2025-02-13.part1.rar arhivu**
 - **Iz te arhive uraditi extract, gdje biste trebali dobiti dva foldera: Debug i flutter-apk.**
 - **Otvoriti Debug folder i iz njega otvoriti virtualgardens_admin.exe**
 - **Otvoriti flutter-apk folder**
