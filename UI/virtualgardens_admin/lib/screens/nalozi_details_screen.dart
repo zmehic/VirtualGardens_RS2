@@ -58,14 +58,23 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
   void initState() {
     _naloziProvider = context.read<NaloziProvider>();
     _narudzbaProvider = context.read<NarudzbaProvider>();
-    _zaposlenikProvider = context.read<ZaposlenikProvider>();
-    selectedStanje = widget.nalog?.zavrsen ?? false;
-    zaposlenikId = widget.nalog?.zaposlenikId;
     dataSource =
         NarudzbeNalogDataSource(provider: _narudzbaProvider, context: context);
-
+    _zaposlenikProvider = context.read<ZaposlenikProvider>();
     initForm();
+    selectedStanje = widget.nalog?.zavrsen ?? false;
+    zaposlenikId = widget.nalog?.zaposlenikId;
+
     super.initState();
+  }
+
+  bool checkIfZaposlenikExists(int zaposlenikId) {
+    for (var i = 0; i < zaposleniciResult!.result.length; i++) {
+      if (zaposleniciResult!.result[i].zaposlenikId == zaposlenikId) {
+        return true;
+      }
+    }
+    return false;
   }
 
   Future initForm() async {
@@ -86,6 +95,12 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
     };
 
     zaposleniciResult = await _zaposlenikProvider.get(filter: filter);
+    if (widget.nalog != null) {
+      _initialValue['zaposlenikId'] =
+          checkIfZaposlenikExists(widget.nalog!.zaposlenikId)
+              ? widget.nalog!.zaposlenikId
+              : null;
+    }
 
     if (widget.nalog != null) {
       var filter2 = {
@@ -309,12 +324,11 @@ class _NaloziDetailsScreenState extends State<NaloziDetailsScreen> {
                         child: FormBuilderDropdown(
                       enabled: true,
                       name: "zaposlenikId",
-                      initialValue: widget.nalog?.zaposlenikId.toString(),
                       decoration:
                           const InputDecoration(labelText: "Zaposlenik"),
                       items: zaposleniciResult?.result
                               .map((item) => DropdownMenuItem(
-                                    value: item.zaposlenikId.toString(),
+                                    value: item.zaposlenikId,
                                     child: Text("${item.ime} ${item.prezime}"),
                                   ))
                               .toList() ??
