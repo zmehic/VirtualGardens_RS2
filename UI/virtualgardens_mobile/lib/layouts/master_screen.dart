@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
+import 'package:virtualgardens_mobile/screens/frmChallenges14072025.dart';
 import 'package:virtualgardens_mobile/screens/home_screen.dart';
 import 'package:virtualgardens_mobile/screens/product_list_screen.dart';
 import 'package:virtualgardens_mobile/screens/profile_screen.dart';
@@ -83,6 +84,16 @@ class _MasterScreenState extends State<MasterScreen> {
                     Navigator.of(context).push(
                       MaterialPageRoute(
                           builder: (context) => const ProductListScreen()),
+                    );
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.golf_course,
+                  label: "Izazovi",
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                          builder: (context) => const ChallengesListScreen()),
                     );
                   },
                 )

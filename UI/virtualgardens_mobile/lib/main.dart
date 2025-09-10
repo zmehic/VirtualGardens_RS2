@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:virtualgardens_mobile/providers/helper_providers/auth_provider.dart';
 import 'package:virtualgardens_mobile/providers/helper_providers/utils.dart';
+import 'package:virtualgardens_mobile/providers/izazov_provider.dart';
 import 'package:virtualgardens_mobile/providers/jedinice_mjere_provider.dart';
 import 'package:virtualgardens_mobile/providers/korisnik_provider.dart';
 import 'package:virtualgardens_mobile/providers/narudzbe_provider.dart';
@@ -52,7 +53,8 @@ void main() {
         ChangeNotifierProvider(create: (_) => PonudeProvider()),
         ChangeNotifierProvider(create: (_) => SetProizvodProvider()),
         ChangeNotifierProvider(create: (_) => PitanjaOdgovoriProvider()),
-        ChangeNotifierProvider(create: (_) => RecenzijeProvider())
+        ChangeNotifierProvider(create: (_) => RecenzijeProvider()),
+        ChangeNotifierProvider(create: (_) => IzazovProvider())
       ],
       child: const MyApp(),
     ));

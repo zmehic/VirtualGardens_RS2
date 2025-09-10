@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using VirtualGardens.API;
 using VirtualGardens.API.Filters;
+using VirtualGardens.Services.AllServices;
 using VirtualGardens.Services.AllServices.JediniceMjere;
 using VirtualGardens.Services.AllServices.Korisnici;
 using VirtualGardens.Services.AllServices.KorisniciUloge;
@@ -50,6 +51,7 @@ builder.Services.AddTransient<IProizvodiSetoviService, ProizvodiSetoviService>()
 builder.Services.AddTransient<IRecenzijeService, RecenzijeService>();
 builder.Services.AddTransient<ISetoviPonudeService,SetoviPonudeService>();
 builder.Services.AddTransient<IProizvodiNoImageService, ProizvodiNoImageService>();
+builder.Services.AddTransient<IUserIzazovService, UserIzazovService>();
 
 builder.Services.AddTransient<BaseNarudzbaState>();
 builder.Services.AddTransient<InitialNarudzbaState>();
@@ -93,7 +95,7 @@ builder.Services.AddSwaggerGen(c =>
 
 });
 
-var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING");
+var connectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING") ?? "Data Source=localhost, 1433; Initial Catalog=210011Ispit;Trusted_Connection=True;TrustServerCertificate=True";
 builder.Services.AddDbContext<_210011Context>(options => options.UseSqlServer(connectionString));
 builder.Services.AddMapster();
 builder.Services.AddAuthentication("BasicAuthentication").AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication",null);

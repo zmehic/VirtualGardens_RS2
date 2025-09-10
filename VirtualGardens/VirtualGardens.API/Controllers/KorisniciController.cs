@@ -43,7 +43,7 @@ namespace VirtualGardens.API.Controllers
             return base.Update(id, request);
         }
 
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Kupac")]
         public override PagedResult<KorisniciDTO> GetList([FromQuery] KorisniciSearchObject searchObject)
         {
             return base.GetList(searchObject);

@@ -22,6 +22,58 @@ namespace VirtualGardens.Services.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("VirtualGardens.Services.Database.Challenge14072025", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Naziv")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PraviloUspjeha")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Tip")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Challenges");
+                });
+
+            modelBuilder.Entity("VirtualGardens.Services.Database.ChallengeReward14072025", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BrojPonavljanja")
+                        .HasColumnType("int");
+
+                    b.Property<int>("IzazovId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Naziv")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Tip")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IzazovId");
+
+                    b.ToTable("ChallengeRewards");
+                });
+
             modelBuilder.Entity("VirtualGardens.Services.Database.JediniceMjere", b =>
                 {
                     b.Property<int>("JedinicaMjereId")
@@ -274,6 +326,43 @@ namespace VirtualGardens.Services.Migrations
                     b.HasIndex("NalogId");
 
                     b.ToTable("Narudzbe", (string)null);
+                });
+
+            modelBuilder.Entity("VirtualGardens.Services.Database.PeerChallenge14072025", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DatumKreiranja")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IzazovId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KorisnikIzazivacId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KorisnikIzazvaniId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Poruka")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IzazovId");
+
+                    b.HasIndex("KorisnikIzazivacId");
+
+                    b.HasIndex("KorisnikIzazvaniId");
+
+                    b.ToTable("PeerChallenges");
                 });
 
             modelBuilder.Entity("VirtualGardens.Services.Database.PitanjaOdgovori", b =>
@@ -663,6 +752,41 @@ namespace VirtualGardens.Services.Migrations
                     b.ToTable("Uloge", (string)null);
                 });
 
+            modelBuilder.Entity("VirtualGardens.Services.Database.UserChallenge14072024", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BrojPonavljanja")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("DatumPrihvatanja")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("IzazovId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("KorisnikId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("VrijemeZavrsetka")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IzazovId");
+
+                    b.HasIndex("KorisnikId");
+
+                    b.ToTable("UserChallenges");
+                });
+
             modelBuilder.Entity("VirtualGardens.Services.Database.VrsteProizvodum", b =>
                 {
                     b.Property<int>("VrstaProizvodaId")
@@ -755,6 +879,17 @@ namespace VirtualGardens.Services.Migrations
                     b.ToTable("Zaposlenici", (string)null);
                 });
 
+            modelBuilder.Entity("VirtualGardens.Services.Database.ChallengeReward14072025", b =>
+                {
+                    b.HasOne("VirtualGardens.Services.Database.Challenge14072025", "Izazov")
+                        .WithMany()
+                        .HasForeignKey("IzazovId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Izazov");
+                });
+
             modelBuilder.Entity("VirtualGardens.Services.Database.KorisniciUloge", b =>
                 {
                     b.HasOne("VirtualGardens.Services.Database.Korisnici", "Korisnik")
@@ -801,6 +936,33 @@ namespace VirtualGardens.Services.Migrations
                     b.Navigation("Korisnik");
 
                     b.Navigation("Nalog");
+                });
+
+            modelBuilder.Entity("VirtualGardens.Services.Database.PeerChallenge14072025", b =>
+                {
+                    b.HasOne("VirtualGardens.Services.Database.Challenge14072025", "Izazov")
+                        .WithMany()
+                        .HasForeignKey("IzazovId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VirtualGardens.Services.Database.Korisnici", "KorisnikIzazivac")
+                        .WithMany()
+                        .HasForeignKey("KorisnikIzazivacId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VirtualGardens.Services.Database.Korisnici", "KorisnikIzazvani")
+                        .WithMany()
+                        .HasForeignKey("KorisnikIzazvaniId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Izazov");
+
+                    b.Navigation("KorisnikIzazivac");
+
+                    b.Navigation("KorisnikIzazvani");
                 });
 
             modelBuilder.Entity("VirtualGardens.Services.Database.PitanjaOdgovori", b =>
@@ -936,6 +1098,25 @@ namespace VirtualGardens.Services.Migrations
                     b.Navigation("Proizvod");
 
                     b.Navigation("Ulaz");
+                });
+
+            modelBuilder.Entity("VirtualGardens.Services.Database.UserChallenge14072024", b =>
+                {
+                    b.HasOne("VirtualGardens.Services.Database.Challenge14072025", "Izazov")
+                        .WithMany()
+                        .HasForeignKey("IzazovId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("VirtualGardens.Services.Database.Korisnici", "Korisnik")
+                        .WithMany()
+                        .HasForeignKey("KorisnikId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Izazov");
+
+                    b.Navigation("Korisnik");
                 });
 
             modelBuilder.Entity("VirtualGardens.Services.Database.JediniceMjere", b =>
